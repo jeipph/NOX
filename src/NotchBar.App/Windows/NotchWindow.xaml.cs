@@ -10,6 +10,7 @@ using Microsoft.Win32;
 using NotchBar.App.ViewModels;
 using NotchBar.Core.Models;
 using NotchBar.Core.Shell;
+using NotchBar.Windows.Clipboard;
 using NotchBar.Windows.Shell;
 
 namespace NotchBar.App.Windows;
@@ -18,6 +19,7 @@ public partial class NotchWindow : Window, IDisposable
 {
     private readonly NotchViewModel _viewModel;
     private readonly NotchContentViewModel _content;
+    private readonly ClipboardMonitor _clipboard;
 
     // Solo corre mientras espera para contraer; en reposo no hay temporizadores activos.
     private readonly DispatcherTimer _collapseTimer;
@@ -26,13 +28,14 @@ public partial class NotchWindow : Window, IDisposable
     private nint _hwnd;
     private bool _isExpanded;
 
-    public NotchWindow(NotchViewModel viewModel, NotchContentViewModel content)
+    public NotchWindow(NotchViewModel viewModel, NotchContentViewModel content, ClipboardMonitor clipboard)
     {
         InitializeComponent();
 
         _viewModel = viewModel;
         _viewModel.PropertyChanged += OnViewModelChanged;
         _content = content;
+        _clipboard = clipboard;
         Pill.DataContext = content;
 
         _collapseTimer = new DispatcherTimer { Interval = (TimeSpan)FindResource("Hover.CollapseDelay") };
@@ -59,6 +62,7 @@ public partial class NotchWindow : Window, IDisposable
         _appBar = new AppBar(_hwnd);
         _appBar.FullscreenChanged += OnFullscreenChanged;
         _appBar.PositionChanged += PlaceWindow;
+        _clipboard.Attach(_hwnd);
         SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
 
         PlaceWindow();
@@ -72,6 +76,10 @@ public partial class NotchWindow : Window, IDisposable
             handled = true;
             return WindowHelper.MaNoActivate;
         }
+
+        // Avisos de "se copió algo" para la pestaña Portapapeles.
+        if (_clipboard.HandleMessage(msg))
+            handled = true;
 
         if (_appBar?.HandleMessage(msg, wParam, lParam) == true)
             handled = true;

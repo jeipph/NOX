@@ -13,4 +13,8 @@ public static class TextShortener
 
         return text[..(maxLength - 1)].TrimEnd() + "…";
     }
+
+    /// <summary>Vista previa en una sola línea: saltos de línea y espacios repetidos se convierten en un espacio.</summary>
+    public static string OneLine(string text, int maxLength) =>
+        Shorten(string.Join(' ', text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries)), maxLength);
 }

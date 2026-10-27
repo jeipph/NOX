@@ -6,10 +6,12 @@ using NotchBar.App.Services;
 using NotchBar.App.ViewModels;
 using NotchBar.App.Windows;
 using NotchBar.Core.Abstractions;
+using NotchBar.Core.Clipboard;
 using NotchBar.Core.Lyrics;
 using NotchBar.Core.Media;
 using NotchBar.Core.Settings;
 using NotchBar.Windows.Audio;
+using NotchBar.Windows.Clipboard;
 using NotchBar.Windows.Lyrics;
 using NotchBar.Windows.Media;
 using NotchBar.Windows.Shell;
@@ -78,6 +80,9 @@ public partial class App : Application
         services.AddSingleton<ILyricsService, LyricsService>();
         services.AddSingleton<IAutoStart, AutoStart>();
         services.AddSingleton<IVolumeService, NAudioVolumeService>();
+        services.AddSingleton<ClipboardMonitor>();
+        services.AddSingleton<IClipboardService>(s => s.GetRequiredService<ClipboardMonitor>());
+        services.AddSingleton(_ => new PinnedClipsStore());
         services.AddSingleton<ThemeService>();
         services.AddSingleton<SettingsCoordinator>();
 
@@ -85,6 +90,7 @@ public partial class App : Application
         services.AddSingleton<NowPlayingViewModel>();
         services.AddSingleton<LyricsViewModel>();
         services.AddSingleton<VolumeViewModel>();
+        services.AddSingleton<ClipboardViewModel>();
         services.AddSingleton<NotchContentViewModel>();
         services.AddSingleton<NotchWindow>();
         return services.BuildServiceProvider();

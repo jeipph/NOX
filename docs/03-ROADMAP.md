@@ -96,9 +96,9 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [ ] Volumen por aplicación con `AudioSessionManager` de NAudio.
 
 ## M7 — Portapapeles (≈2.5 h)
-- [ ] Tests de `ClipboardHistory` (límite 50, sin duplicados consecutivos, fijar).
-- [ ] `ClipboardMonitor` con `WM_CLIPBOARDUPDATE`, reintentos y exclusión de gestores de contraseñas.
-- [ ] `ClipboardView`: lista, clic para copiar, botón fijar, botón borrar todo.
+- [x] Tests de `ClipboardHistory` (límite 50, sin duplicados: una copia repetida sube arriba, fijar, borrar sin tocar fijados).
+- [x] `ClipboardMonitor` con `WM_CLIPBOARDUPDATE` y API Win32 del portapapeles, reintentos y exclusión de gestores de contraseñas (probado: una copia con `ExcludeClipboardContentFromMonitorProcessing` no aparece).
+- [x] `ClipboardView`: lista, clic para copiar, botón fijar (se guarda en `pinned-clips.json`), "Borrar historial" (los fijados se quedan).
 
 ## M8 — Notas rápidas (≈1.5 h)
 - [ ] `NotesView`: cuadro de texto, Ctrl+Enter guarda `.md` de forma atómica.

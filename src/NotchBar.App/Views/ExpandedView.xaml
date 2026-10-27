@@ -23,6 +23,8 @@
         <!-- El vinilo solo gira mientras se ve: lo decide VinylView con IsVisible. -->
         <views:VinylView DataContext="{Binding NowPlaying}"
                          Visibility="{Binding DataContext.IsVinylActive, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibleIfTrue}}" />
+        <views:ClipboardView DataContext="{Binding Clipboard}"
+                             Visibility="{Binding DataContext.IsClipboardActive, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibleIfTrue}}" />
 
         <!-- Pestañas -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="{DynamicResource Space.TabBar}">
@@ -64,6 +66,21 @@
                     <Style TargetType="Button" BasedOn="{StaticResource TabButton}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsVinylActive}" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource Brush.Text}" />
+                                <Setter Property="Background" Value="{DynamicResource Brush.Surface}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Content="Portapapeles"
+                    Command="{Binding ShowPanelCommand}"
+                    CommandParameter="{x:Static vm:NotchPanel.Clipboard}"
+                    AutomationProperties.Name="Pestaña Portapapeles">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource TabButton}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsClipboardActive}" Value="True">
                                 <Setter Property="Foreground" Value="{DynamicResource Brush.Text}" />
                                 <Setter Property="Background" Value="{DynamicResource Brush.Surface}" />
                             </DataTrigger>
