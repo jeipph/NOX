@@ -144,3 +144,4 @@ Posición (interpolada) ──────────────────�
 - Liberar suscripciones al cerrar (`IDisposable`).
 - Manejar excepciones en cada llamada a Windows (`try/catch` con registro), porque las APIs pueden fallar según el reproductor.
 - Pruebas manuales por hito en `docs/03-ROADMAP.md`.
+- **Errores no previstos:** `App` los muestra en un aviso y los apunta en `%LOCALAPPDATA%\NotchBar\logs\error.log` (solo el error técnico, nada personal). Antes se perdían en silencio y la app quedaba abierta sin ventana (pasó en M8).
