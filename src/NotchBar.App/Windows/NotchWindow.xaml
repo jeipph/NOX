@@ -1,0 +1,19 @@
+<Window x:Class="NotchBar.App.Windows.NotchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="NotchBar"
+        Width="{DynamicResource Size.Collapsed.Width}"
+        Height="{DynamicResource Size.Collapsed.Height}"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        Topmost="True"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        WindowStartupLocation="Manual">
+
+    <!-- La pastilla: pegada al borde superior, esquinas redondeadas solo abajo. -->
+    <Border Background="{DynamicResource Brush.Background}"
+            CornerRadius="{DynamicResource Radius.Notch.Collapsed}" />
+</Window>

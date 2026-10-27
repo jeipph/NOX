@@ -1,0 +1,25 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <!-- Colores (ver docs/04-UI-THEME.md). Mismos nombres en Tokens.Light.xaml. -->
+    <SolidColorBrush x:Key="Brush.Background" Color="#000000" />
+    <SolidColorBrush x:Key="Brush.Surface" Color="#141414" />
+    <SolidColorBrush x:Key="Brush.SurfaceHover" Color="#1F1F1F" />
+    <SolidColorBrush x:Key="Brush.Border" Color="#2A2A2A" />
+    <SolidColorBrush x:Key="Brush.Text" Color="#F5F5F5" />
+    <SolidColorBrush x:Key="Brush.TextMuted" Color="#8A8A8A" />
+    <SolidColorBrush x:Key="Brush.Accent" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="Brush.Danger" Color="#FF5A5A" />
+
+    <!-- Medidas -->
+    <sys:Double x:Key="Size.Collapsed.Width">220</sys:Double>
+    <sys:Double x:Key="Size.Collapsed.Height">34</sys:Double>
+    <sys:Double x:Key="Size.Expanded.Width">560</sys:Double>
+    <sys:Double x:Key="Size.Expanded.Height">200</sys:Double>
+    <CornerRadius x:Key="Radius.Notch.Collapsed">0,0,18,18</CornerRadius>
+    <CornerRadius x:Key="Radius.Notch.Expanded">0,0,26,26</CornerRadius>
+    <CornerRadius x:Key="Radius.Control">10</CornerRadius>
+
+    <FontFamily x:Key="Font.Main">Segoe UI Variable, Segoe UI</FontFamily>
+</ResourceDictionary>
