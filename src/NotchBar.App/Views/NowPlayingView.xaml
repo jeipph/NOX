@@ -104,5 +104,22 @@
                 <ProgressBar Grid.Row="3" Style="{DynamicResource ThinProgressBar}" Value="{Binding Progress, Mode=OneWay}" />
             </Grid>
         </Grid>
+
+        <!-- Reproductor: cada clic pasa al siguiente (Auto → Chrome → MusicBee → Auto). -->
+        <Button Style="{DynamicResource ChipButton}"
+                Content="{Binding SourceLabel}"
+                Command="{Binding NextSourceCommand}"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                ToolTip="Cambiar de reproductor"
+                AutomationProperties.Name="Cambiar de reproductor">
+            <Button.Visibility>
+                <Binding Path="ShowSourceLabel">
+                    <Binding.Converter>
+                        <BooleanToVisibilityConverter />
+                    </Binding.Converter>
+                </Binding>
+            </Button.Visibility>
+        </Button>
     </Grid>
 </UserControl>

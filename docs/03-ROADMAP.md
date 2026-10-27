@@ -52,8 +52,8 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [x] **`FakeMediaService`** (canción y letra de mentira) para probar la interfaz sin abrir un reproductor; activable con el argumento `--fake` (idea del modo `--selftest` de Oyenza).
 
 ## M3b — Varios reproductores (≈1 h) *(añadido tras la investigación)*
-- [ ] Listar todas las sesiones SMTC activas (`GetSessions()`), no solo la actual.
-- [ ] Ajuste "Reproductor preferido" y cambio rápido desde el notch.
+- [x] Listar todas las sesiones SMTC activas (`GetSessions()`), no solo la actual.
+- [x] Ajuste "Reproductor preferido" y cambio rápido desde el notch (etiqueta "Auto · Chrome" que rota Auto → reproductores → Auto; en memoria hasta M9). Automático = el que suena, aunque Windows marque otro como actual (`SourcePicker`).
 
 **Terminado cuando:** la información cambia sola al cambiar de canción y los 3 botones funcionan en YouTube Music.
 
@@ -146,3 +146,4 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - **2026-10-27 — M0 terminado.** .NET SDK 10.0.403 instalado, VS Code + C# Dev Kit, telemetría de la CLI desactivada (`DOTNET_CLI_TELEMETRY_OPTOUT=1`). Los proyectos se movieron de OneDrive a `C:\Dev\NotchBar` y `C:\Dev\Marginalia` (OneDrive bloquea `bin/obj`). Repositorio git creado. Siguiente paso: M1.
 - **2026-10-27 — M1 y decisión de música.** Esqueleto creado (4 proyectos, notch 220×34, bandeja, instancia única); compila sin avisos, 54 MB RAM. Falta la verificación visual de la persona usuaria para marcar M1. Música: opción A (YouTube Music + reproductor externo para carpetas locales, todo vía SMTC con `Windows.Media.Control`).
 - **2026-10-27 — M2b y M3.** Estilos, modo invisible, Esc y franja reservada probados con UI Automation y capturas. M3 funciona con YouTube Music en Chrome (datos, carátula, botones). Errores encontrados en las pruebas y corregidos: carátula con el logo de Chrome, parpadeo de "Nada en reproducción" al cambiar de canción (Chrome cierra y reabre su sesión; ahora se esperan 1,5 s) y notch desplazado tras quitar la franja reservada (ahora se recoloca con `WM_SETTINGCHANGE`). Pendiente: probar música local con MusicBee. Siguiente: M3b.
+- **2026-10-27 — M3b.** Varios reproductores: se vigila play/pausa de todos y se muestra el que suena; etiqueta para fijar uno. Hallazgo en pruebas: al abrir un reproductor nuevo Windows no siempre manda `SessionsChanged`, así que la lista también se rehace con `CurrentSessionChanged`. 45 pruebas. Siguiente: M4 (letras).

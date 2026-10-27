@@ -21,11 +21,25 @@ public sealed class FakeMediaService : IMediaService
 
     public event Action<MediaInfo?>? MediaChanged;
 
+    public event Action? SourcesChanged;
+
     public MediaInfo? Current => _info;
+
+    public IReadOnlyList<MediaSource> Sources { get; } = [new MediaSource("fake", "Prueba")];
+
+    public string? PreferredSourceId { get; private set; }
 
     public Task StartAsync()
     {
+        SourcesChanged?.Invoke();
         Publish(_info);
+        return Task.CompletedTask;
+    }
+
+    public Task SetPreferredSourceAsync(string? sourceId)
+    {
+        PreferredSourceId = sourceId;
+        SourcesChanged?.Invoke();
         return Task.CompletedTask;
     }
 

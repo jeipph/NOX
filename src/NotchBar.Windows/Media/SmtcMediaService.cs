@@ -1,7 +1,9 @@
 using NotchBar.Core.Abstractions;
+using NotchBar.Core.Media;
 using NotchBar.Core.Models;
 using Windows.Media.Control;
 using Windows.Storage.Streams;
+using PlaybackStatus = Windows.Media.Control.GlobalSystemMediaTransportControlsSessionPlaybackStatus;
 using Session = Windows.Media.Control.GlobalSystemMediaTransportControlsSession;
 using SessionManager = Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager;
 
@@ -10,25 +12,45 @@ namespace NotchBar.Windows.Media;
 /// <summary>
 /// Lee la música desde los controles multimedia de Windows (SMTC): navegador con YouTube Music,
 /// MusicBee, Spotify... Todo por eventos; no hay temporizadores.
+/// De todos los reproductores abiertos solo se escucha play/pausa (para saber cuál suena);
+/// los avisos completos (canción, carátula, posición) solo los del reproductor elegido.
 /// </summary>
 public sealed class SmtcMediaService : IMediaService, IDisposable
 {
-    // Los eventos de Windows llegan en hilos distintos; esto evita leer dos veces a la vez.
-    private readonly SemaphoreSlim _gate = new(1, 1);
     private static readonly TimeSpan EmptyGracePeriod = TimeSpan.FromSeconds(1.5);
+
+    // Los eventos de Windows llegan en hilos distintos: _sync protege la lista de reproductores
+    // y la elección; _gate evita leer la canción dos veces a la vez.
+    private readonly object _sync = new();
+    private readonly SemaphoreSlim _gate = new(1, 1);
+    private readonly List<Session> _watched = [];
     private CancellationTokenSource? _pendingEmpty;
     private SessionManager? _manager;
     private Session? _session;
 
     public event Action<MediaInfo?>? MediaChanged;
 
+    public event Action? SourcesChanged;
+
     public MediaInfo? Current { get; private set; }
+
+    public IReadOnlyList<MediaSource> Sources { get; private set; } = [];
+
+    public string? PreferredSourceId { get; private set; }
 
     public async Task StartAsync()
     {
         _manager = await SessionManager.RequestAsync();
+        _manager.SessionsChanged += OnSessionsChanged;
         _manager.CurrentSessionChanged += OnCurrentSessionChanged;
-        await SwitchSessionAsync();
+        await UpdateSessionsAsync();
+    }
+
+    public Task SetPreferredSourceAsync(string? sourceId)
+    {
+        PreferredSourceId = sourceId;
+        SourcesChanged?.Invoke();
+        return SelectAsync();
     }
 
     public Task TogglePlayPauseAsync() => ControlAsync(s => s.TryTogglePlayPauseAsync().AsTask());
@@ -52,32 +74,126 @@ public sealed class SmtcMediaService : IMediaService, IDisposable
         }
     }
 
-    private void OnCurrentSessionChanged(SessionManager sender, CurrentSessionChangedEventArgs args) =>
-        _ = SwitchSessionAsync();
+    // --- Reproductores abiertos y elección ---
 
-    private async Task SwitchSessionAsync()
+    private void OnSessionsChanged(SessionManager sender, SessionsChangedEventArgs args) => _ = UpdateSessionsAsync();
+
+    // Probado el 2026-10-27: al abrir un reproductor nuevo, Windows no siempre manda SessionsChanged,
+    // pero sí CurrentSessionChanged; por eso aquí también se rehace la lista.
+    private void OnCurrentSessionChanged(SessionManager sender, CurrentSessionChangedEventArgs args) => _ = UpdateSessionsAsync();
+
+    private void OnAnyPlaybackInfoChanged(Session sender, PlaybackInfoChangedEventArgs args) => _ = SelectAsync();
+
+    private async Task UpdateSessionsAsync()
     {
-        Session? session = _manager?.GetCurrentSession();
-        DetachSession();
-
-        _session = session;
-        if (session is not null)
+        IReadOnlyList<Session> sessions;
+        try
         {
-            session.MediaPropertiesChanged += OnMediaPropertiesChanged;
-            session.PlaybackInfoChanged += OnPlaybackInfoChanged;
-            session.TimelinePropertiesChanged += OnTimelinePropertiesChanged;
+            sessions = _manager?.GetSessions() ?? [];
+        }
+        catch (Exception)
+        {
+            return;
         }
 
-        await RefreshAsync(readThumbnail: true);
+        lock (_sync)
+        {
+            foreach (Session old in _watched)
+                Unwatch(old);
+            _watched.Clear();
+
+            foreach (Session session in sessions)
+            {
+                session.PlaybackInfoChanged += OnAnyPlaybackInfoChanged;
+                _watched.Add(session);
+            }
+
+            Sources = sessions
+                .Select(s => s.SourceAppUserModelId)
+                .Distinct()
+                .Select(id => new MediaSource(id, SourceNames.Friendly(id)))
+                .ToList();
+        }
+
+        SourcesChanged?.Invoke();
+        await SelectAsync();
     }
 
-    private void DetachSession()
+    private async Task SelectAsync()
+    {
+        bool switched;
+        lock (_sync)
+        {
+            var states = _watched.Select(s => new SourceState(s.SourceAppUserModelId, IsPlaying(s))).ToList();
+            string? currentId = TryGetCurrentId();
+            int current = currentId is null ? -1 : _watched.FindIndex(s => s.SourceAppUserModelId == currentId);
+
+            int picked = SourcePicker.Pick(states, PreferredSourceId, current);
+            Session? target = picked >= 0 ? _watched[picked] : null;
+
+            switched = !ReferenceEquals(target, _session);
+            if (switched)
+            {
+                DetachSelected();
+                _session = target;
+                AttachSelected();
+            }
+        }
+
+        await RefreshAsync(readThumbnail: switched);
+    }
+
+    private string? TryGetCurrentId()
+    {
+        try
+        {
+            return _manager?.GetCurrentSession()?.SourceAppUserModelId;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    // Un reproductor recién cerrado puede dar error al quitarle el aviso; no importa.
+    private void Unwatch(Session session)
+    {
+        try
+        {
+            session.PlaybackInfoChanged -= OnAnyPlaybackInfoChanged;
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    private static bool IsPlaying(Session session)
+    {
+        try
+        {
+            return session.GetPlaybackInfo().PlaybackStatus == PlaybackStatus.Playing;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    private void AttachSelected()
+    {
+        if (_session is null)
+            return;
+
+        _session.MediaPropertiesChanged += OnMediaPropertiesChanged;
+        _session.TimelinePropertiesChanged += OnTimelinePropertiesChanged;
+    }
+
+    private void DetachSelected()
     {
         if (_session is null)
             return;
 
         _session.MediaPropertiesChanged -= OnMediaPropertiesChanged;
-        _session.PlaybackInfoChanged -= OnPlaybackInfoChanged;
         _session.TimelinePropertiesChanged -= OnTimelinePropertiesChanged;
         _session = null;
     }
@@ -86,9 +202,9 @@ public sealed class SmtcMediaService : IMediaService, IDisposable
     private void OnMediaPropertiesChanged(Session sender, MediaPropertiesChangedEventArgs args) =>
         _ = RefreshAsync(readThumbnail: true);
 
-    private void OnPlaybackInfoChanged(Session sender, PlaybackInfoChangedEventArgs args) => _ = RefreshAsync();
-
     private void OnTimelinePropertiesChanged(Session sender, TimelinePropertiesChangedEventArgs args) => _ = RefreshAsync();
+
+    // --- Lectura de la canción ---
 
     private async Task RefreshAsync(bool readThumbnail = false)
     {
@@ -141,7 +257,7 @@ public sealed class SmtcMediaService : IMediaService, IDisposable
             Duration: timeline.EndTime - timeline.StartTime,
             Position: timeline.Position,
             PositionUpdatedAt: timeline.LastUpdatedTime,
-            IsPlaying: playback.PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing,
+            IsPlaying: playback.PlaybackStatus == PlaybackStatus.Playing,
             SourceApp: session.SourceAppUserModelId,
             Thumbnail: thumbnail);
     }
@@ -157,6 +273,8 @@ public sealed class SmtcMediaService : IMediaService, IDisposable
         await input.CopyToAsync(memory);
         return memory.ToArray();
     }
+
+    // --- Publicar ---
 
     // Al cambiar de canción, Chrome cierra su sesión y abre otra casi enseguida. Para no mostrar
     // "Nada en reproducción" durante ese instante, el vacío solo se publica si dura un rato.
@@ -212,9 +330,20 @@ public sealed class SmtcMediaService : IMediaService, IDisposable
     public void Dispose()
     {
         if (_manager is not null)
+        {
+            _manager.SessionsChanged -= OnSessionsChanged;
             _manager.CurrentSessionChanged -= OnCurrentSessionChanged;
+        }
         _manager = null;
-        DetachSession();
+
+        lock (_sync)
+        {
+            DetachSelected();
+            foreach (Session session in _watched)
+                Unwatch(session);
+            _watched.Clear();
+        }
+
         CancelPendingEmpty();
         _gate.Dispose();
     }

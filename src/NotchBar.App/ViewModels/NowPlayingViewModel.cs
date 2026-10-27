@@ -45,11 +45,20 @@ public partial class NowPlayingViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private double _progress;
 
+    /// <summary>Texto de la etiqueta del reproductor: "Auto · Chrome" o "MusicBee" (fijado).</summary>
+    [ObservableProperty]
+    private string _sourceLabel = "";
+
+    /// <summary>La etiqueta solo aparece si hay más de un reproductor o si se fijó uno.</summary>
+    [ObservableProperty]
+    private bool _showSourceLabel;
+
     public NowPlayingViewModel(IMediaService media)
     {
         _media = media;
         _dispatcher = Dispatcher.CurrentDispatcher;
         _media.MediaChanged += OnMediaChanged;
+        _media.SourcesChanged += OnSourcesChanged;
 
         _progressTimer = new DispatcherTimer
         {
@@ -87,7 +96,36 @@ public partial class NowPlayingViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private Task Previous() => _media.PreviousAsync();
 
+    /// <summary>Cada clic pasa al siguiente: Automático → reproductor 1 → reproductor 2 → Automático.</summary>
+    [RelayCommand]
+    private Task NextSource()
+    {
+        IReadOnlyList<MediaSource> sources = _media.Sources;
+        int index = -1;
+        for (int i = 0; i < sources.Count; i++)
+        {
+            if (sources[i].Id == _media.PreferredSourceId)
+                index = i;
+        }
+
+        string? next = index + 1 < sources.Count ? sources[index + 1].Id : null;
+        return _media.SetPreferredSourceAsync(next);
+    }
+
     private void OnMediaChanged(MediaInfo? info) => _dispatcher.BeginInvoke(() => Apply(info));
+
+    private void OnSourcesChanged() => _dispatcher.BeginInvoke(UpdateSourceLabel);
+
+    private void UpdateSourceLabel()
+    {
+        string? preferred = _media.PreferredSourceId;
+        string showing = _info is null ? "" : SourceNames.Friendly(_info.SourceApp);
+
+        SourceLabel = preferred is not null
+            ? SourceNames.Friendly(preferred)
+            : showing.Length > 0 ? $"Auto · {showing}" : "Auto";
+        ShowSourceLabel = _media.Sources.Count > 1 || preferred is not null;
+    }
 
     private void Apply(MediaInfo? info)
     {
@@ -102,6 +140,7 @@ public partial class NowPlayingViewModel : ObservableObject, IDisposable
         if (coverChanged)
             Cover = ToImage(info?.Thumbnail);
 
+        UpdateSourceLabel();
         UpdateProgress();
         UpdateTimer();
     }
@@ -144,5 +183,6 @@ public partial class NowPlayingViewModel : ObservableObject, IDisposable
     {
         _progressTimer.Stop();
         _media.MediaChanged -= OnMediaChanged;
+        _media.SourcesChanged -= OnSourcesChanged;
     }
 }
