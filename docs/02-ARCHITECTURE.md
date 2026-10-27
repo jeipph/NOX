@@ -15,7 +15,7 @@
 | Pruebas | xUnit | Estándar |
 | Instalador (más adelante) | Inno Setup | Lo usan Nock y OrbitDrop |
 
-**NuGet permitidos:** `CommunityToolkit.Mvvm`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.Hosting` (opcional), `NAudio`, `H.NotifyIcon.Wpf`, `xunit`, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk`, `FluentAssertions` (opcional, ojo: v8+ cambió licencia; usar 6.x o no usarla).
+**NuGet permitidos:** `CommunityToolkit.Mvvm`, `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.Hosting` (opcional), `NAudio` (se usa `NAudio.Wasapi`), `H.NotifyIcon.Wpf`, `xunit`, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk`, `FluentAssertions` (opcional, ojo: v8+ cambió licencia; usar 6.x o no usarla).
 
 ## Estructura de carpetas
 
@@ -101,7 +101,7 @@ Vista con la carátula recortada en círculo y un `RotateTransform` animado (`Do
 Implementado en `VinylView`: la animación se quita (y el disco queda en su ángulo) cuando la vista deja de verse (`IsVisible`) o la música se pausa; se vuelve a crear desde ese ángulo al reanudar. `DesiredFrameRate` = 30.
 
 ### 5. Volumen y reloj (hito M6)
-- **Volumen:** `NAudio` → `MMDeviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia).AudioEndpointVolume`. Evento `OnVolumeNotification` para reflejar cambios externos.
+- **Volumen (hecho):** paquete `NAudio.Wasapi` 2.2.1 (parte de NAudio, MIT; la 3.x era demasiado nueva). Además se escucha `IMMNotificationClient` para seguir al cambiar de dispositivo de salida. `NAudio` → `MMDeviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia).AudioEndpointVolume`. Evento `OnVolumeNotification` para reflejar cambios externos.
 - **Batería:** descartada (la app es para un PC de escritorio).
 - **Reloj:** `DispatcherTimer` de 1 s **solo si el reloj es visible**; al contraer, actualizar cada minuto.
 - **Brillo:** fuera de la v1 (depende del driver; Nock usa driver directo con WMI como respaldo).

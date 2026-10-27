@@ -1,3 +1,5 @@
+using System.ComponentModel;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -11,24 +13,38 @@ public enum NotchPanel
     Vinyl,
 }
 
-/// <summary>Contenido de la pastilla: qué panel se ve y avisos de visibilidad a cada panel.</summary>
-public partial class NotchContentViewModel : ObservableObject
+/// <summary>Contenido de la pastilla: qué panel se ve, el texto del notch cerrado y avisos de visibilidad.</summary>
+public partial class NotchContentViewModel : ObservableObject, IDisposable
 {
+    // Reloj del notch cerrado: despierta una vez por minuto, justo al cambiar el minuto,
+    // y solo mientras no suena nada (si suena, se muestra el título).
+    private readonly DispatcherTimer _clockTimer = new();
     private bool _isExpanded;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNowPlayingActive), nameof(IsLyricsActive), nameof(IsVinylActive))]
     private NotchPanel _activePanel = NotchPanel.NowPlaying;
 
-    public NotchContentViewModel(NowPlayingViewModel nowPlaying, LyricsViewModel lyrics)
+    /// <summary>Texto del notch cerrado: el título de la canción o, si no suena nada, la hora.</summary>
+    [ObservableProperty]
+    private string _collapsedText = "";
+
+    public NotchContentViewModel(NowPlayingViewModel nowPlaying, LyricsViewModel lyrics, VolumeViewModel volume)
     {
         NowPlaying = nowPlaying;
         Lyrics = lyrics;
+        Volume = volume;
+
+        _clockTimer.Tick += (_, _) => UpdateCollapsedText();
+        NowPlaying.PropertyChanged += OnNowPlayingChanged;
+        UpdateCollapsedText();
     }
 
     public NowPlayingViewModel NowPlaying { get; }
 
     public LyricsViewModel Lyrics { get; }
+
+    public VolumeViewModel Volume { get; }
 
     public bool IsNowPlayingActive => ActivePanel == NotchPanel.NowPlaying;
 
@@ -55,5 +71,32 @@ public partial class NotchContentViewModel : ObservableObject
     {
         NowPlaying.SetVisible(_isExpanded && IsNowPlayingActive);
         Lyrics.SetVisible(_isExpanded && IsLyricsActive);
+    }
+
+    private void OnNowPlayingChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(NowPlayingViewModel.ShortTitle) or nameof(NowPlayingViewModel.HasMedia))
+            UpdateCollapsedText();
+    }
+
+    private void UpdateCollapsedText()
+    {
+        _clockTimer.Stop();
+        if (NowPlaying.HasMedia)
+        {
+            CollapsedText = NowPlaying.ShortTitle;
+            return;
+        }
+
+        DateTime now = DateTime.Now;
+        CollapsedText = now.ToString("t"); // hora corta, en el formato de Windows
+        _clockTimer.Interval = TimeSpan.FromSeconds(60 - now.Second) - TimeSpan.FromMilliseconds(now.Millisecond);
+        _clockTimer.Start();
+    }
+
+    public void Dispose()
+    {
+        _clockTimer.Stop();
+        NowPlaying.PropertyChanged -= OnNowPlayingChanged;
     }
 }

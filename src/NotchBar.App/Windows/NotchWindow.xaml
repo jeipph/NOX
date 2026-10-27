@@ -25,9 +25,9 @@
 
         <!-- DataContext de la pastilla: NotchContentViewModel (se asigna en el código). -->
         <Grid>
-            <!-- Contraído: título corto de la canción. -->
+            <!-- Contraído: título corto de la canción, o la hora si no suena nada. -->
             <TextBlock x:Name="CollapsedContent"
-                       Text="{Binding NowPlaying.ShortTitle}"
+                       Text="{Binding CollapsedText}"
                        Margin="{DynamicResource Padding.Collapsed}"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"

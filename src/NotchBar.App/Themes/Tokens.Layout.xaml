@@ -33,6 +33,11 @@
     <sys:Double x:Key="Size.IconButton">36</sys:Double>
     <sys:Double x:Key="Size.IconButtonSmall">28</sys:Double>
     <sys:Double x:Key="Size.Progress">3</sys:Double>
+    <sys:Double x:Key="Size.SliderThumb">10</sys:Double>
+    <!-- Alto de la zona que se puede pulsar del deslizador (más que la línea, para acertar fácil) -->
+    <sys:Double x:Key="Size.SliderHitHeight">20</sys:Double>
+    <sys:Double x:Key="Size.VolumeSlider">140</sys:Double>
+    <Thickness x:Key="Space.Above">0,6,0,0</Thickness>
     <Thickness x:Key="Space.Gap">16,0,0,0</Thickness>
     <Thickness x:Key="Space.Below">0,0,0,8</Thickness>
     <Thickness x:Key="Padding.Collapsed">16,0,16,0</Thickness>

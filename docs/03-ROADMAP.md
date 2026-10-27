@@ -77,8 +77,8 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [x] Pestañas abajo: Ahora suena / Letras / Vinilo.
 
 ## M6 — Volumen y reloj (≈1.5 h)
-- [ ] `IVolumeService` con NAudio, control deslizante y botón de silencio.
-- [ ] Reloj en la pastilla contraída (opcional).
+- [x] `IVolumeService` con NAudio (`NAudio.Wasapi` 2.2.1, MIT), deslizador y botón de silencio dentro de "Ahora suena". Probado en los dos sentidos (notch → Windows y teclas de volumen → notch).
+- [x] Reloj en la pastilla contraída cuando no suena nada (formato de hora de Windows; despierta una vez por minuto). *(Sin probar: necesitaba parar la música.)*
 - (Batería descartada: la app es para un PC de escritorio.)
 
 ## M6b — Enfoque (≈1.5 h) *(añadido tras la investigación)*

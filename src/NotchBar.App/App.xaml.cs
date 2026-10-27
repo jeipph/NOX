@@ -9,6 +9,7 @@ using NotchBar.Core.Abstractions;
 using NotchBar.Core.Lyrics;
 using NotchBar.Core.Media;
 using NotchBar.Core.Settings;
+using NotchBar.Windows.Audio;
 using NotchBar.Windows.Lyrics;
 using NotchBar.Windows.Media;
 using NotchBar.Windows.Shell;
@@ -76,12 +77,14 @@ public partial class App : Application
         }
         services.AddSingleton<ILyricsService, LyricsService>();
         services.AddSingleton<IAutoStart, AutoStart>();
+        services.AddSingleton<IVolumeService, NAudioVolumeService>();
         services.AddSingleton<ThemeService>();
         services.AddSingleton<SettingsCoordinator>();
 
         services.AddSingleton<NotchViewModel>();
         services.AddSingleton<NowPlayingViewModel>();
         services.AddSingleton<LyricsViewModel>();
+        services.AddSingleton<VolumeViewModel>();
         services.AddSingleton<NotchContentViewModel>();
         services.AddSingleton<NotchWindow>();
         return services.BuildServiceProvider();

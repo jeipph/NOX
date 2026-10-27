@@ -87,6 +87,62 @@
         <Setter Property="Foreground" Value="{DynamicResource Brush.TextMuted}" />
     </Style>
 
+    <!-- Deslizador fino (volumen): pista gris, parte llena con el acento y un punto para arrastrar. -->
+    <Style x:Key="ThinSlider" TargetType="Slider">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Minimum" Value="0" />
+        <Setter Property="Maximum" Value="100" />
+        <Setter Property="SmallChange" Value="1" />
+        <Setter Property="LargeChange" Value="10" />
+        <Setter Property="TickFrequency" Value="1" />
+        <Setter Property="IsSnapToTickEnabled" Value="True" />
+        <Setter Property="IsMoveToPointEnabled" Value="True" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Grid Height="{DynamicResource Size.SliderHitHeight}" Background="Transparent">
+                        <Border Height="{DynamicResource Size.Progress}" VerticalAlignment="Center"
+                                Background="{DynamicResource Brush.Border}" />
+                        <Track x:Name="PART_Track">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="Slider.DecreaseLarge" Focusable="False">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Grid Background="Transparent">
+                                                <Border Height="{DynamicResource Size.Progress}" VerticalAlignment="Center"
+                                                        Background="{DynamicResource Brush.Accent}" />
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="Slider.IncreaseLarge" Focusable="False">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Grid Background="Transparent" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Focusable="False">
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Ellipse Width="{DynamicResource Size.SliderThumb}" Height="{DynamicResource Size.SliderThumb}"
+                                                     Fill="{DynamicResource Brush.Accent}" />
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Barra de progreso fina. WPF ajusta el ancho de PART_Indicator según Value. -->
     <Style x:Key="ThinProgressBar" TargetType="ProgressBar">
         <Setter Property="Height" Value="{DynamicResource Size.Progress}" />
