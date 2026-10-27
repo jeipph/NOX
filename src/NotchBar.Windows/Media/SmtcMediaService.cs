@@ -15,6 +15,8 @@ public sealed class SmtcMediaService : IMediaService, IDisposable
 {
     // Los eventos de Windows llegan en hilos distintos; esto evita leer dos veces a la vez.
     private readonly SemaphoreSlim _gate = new(1, 1);
+    private static readonly TimeSpan EmptyGracePeriod = TimeSpan.FromSeconds(1.5);
+    private CancellationTokenSource? _pendingEmpty;
     private SessionManager? _manager;
     private Session? _session;
 
@@ -66,7 +68,7 @@ public sealed class SmtcMediaService : IMediaService, IDisposable
             session.TimelinePropertiesChanged += OnTimelinePropertiesChanged;
         }
 
-        await RefreshAsync();
+        await RefreshAsync(readThumbnail: true);
     }
 
     private void DetachSession()
@@ -80,23 +82,29 @@ public sealed class SmtcMediaService : IMediaService, IDisposable
         _session = null;
     }
 
-    private void OnMediaPropertiesChanged(Session sender, MediaPropertiesChangedEventArgs args) => _ = RefreshAsync();
+    // Solo el aviso de "propiedades" trae carátula nueva; pausa y posición no la cambian.
+    private void OnMediaPropertiesChanged(Session sender, MediaPropertiesChangedEventArgs args) =>
+        _ = RefreshAsync(readThumbnail: true);
 
     private void OnPlaybackInfoChanged(Session sender, PlaybackInfoChangedEventArgs args) => _ = RefreshAsync();
 
     private void OnTimelinePropertiesChanged(Session sender, TimelinePropertiesChangedEventArgs args) => _ = RefreshAsync();
 
-    private async Task RefreshAsync()
+    private async Task RefreshAsync(bool readThumbnail = false)
     {
         await _gate.WaitAsync();
         try
         {
-            Publish(_session is { } session ? await ReadAsync(session) : null);
+            MediaInfo? info = _session is { } session ? await ReadAsync(session, readThumbnail) : null;
+            if (info is not null)
+                Publish(info);
+            else
+                PublishEmptyAfterGrace();
         }
         catch (Exception)
         {
             // La sesión desapareció mientras la leíamos (se cerró la pestaña o el reproductor).
-            Publish(null);
+            PublishEmptyAfterGrace();
         }
         finally
         {
@@ -104,7 +112,7 @@ public sealed class SmtcMediaService : IMediaService, IDisposable
         }
     }
 
-    private async Task<MediaInfo?> ReadAsync(Session session)
+    private async Task<MediaInfo?> ReadAsync(Session session, bool readThumbnail)
     {
         var properties = await session.TryGetMediaPropertiesAsync();
         if (properties is null || string.IsNullOrWhiteSpace(properties.Title))
@@ -113,12 +121,18 @@ public sealed class SmtcMediaService : IMediaService, IDisposable
         var playback = session.GetPlaybackInfo();
         var timeline = session.GetTimelineProperties();
 
-        // La carátula solo se vuelve a leer si cambia la canción (o si aún no había llegado).
+        // Chrome manda primero su logo como carátula y después la portada real (en otro aviso
+        // de propiedades), así que la carátula se relee en cada aviso de propiedades o al cambiar de canción.
         MediaInfo? previous = Current;
         bool sameSong = previous is not null && previous.Title == properties.Title && previous.Artist == properties.Artist;
-        byte[]? thumbnail = sameSong && previous!.Thumbnail is not null
-            ? previous.Thumbnail
-            : await ReadThumbnailAsync(properties.Thumbnail);
+        byte[]? thumbnail = previous?.Thumbnail;
+        if (readThumbnail || !sameSong || thumbnail is null)
+        {
+            byte[]? fresh = await ReadThumbnailAsync(properties.Thumbnail);
+            // Si son los mismos bytes se conserva el arreglo anterior y la interfaz no redibuja la imagen.
+            if (fresh is null || thumbnail is null || !fresh.AsSpan().SequenceEqual(thumbnail))
+                thumbnail = fresh;
+        }
 
         return new MediaInfo(
             Title: properties.Title,
@@ -144,8 +158,50 @@ public sealed class SmtcMediaService : IMediaService, IDisposable
         return memory.ToArray();
     }
 
+    // Al cambiar de canción, Chrome cierra su sesión y abre otra casi enseguida. Para no mostrar
+    // "Nada en reproducción" durante ese instante, el vacío solo se publica si dura un rato.
+    private void PublishEmptyAfterGrace()
+    {
+        if (Current is null || _pendingEmpty is not null)
+            return;
+
+        _pendingEmpty = new CancellationTokenSource();
+        _ = PublishEmptyLaterAsync(_pendingEmpty.Token);
+    }
+
+    private async Task PublishEmptyLaterAsync(CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(EmptyGracePeriod, token);
+            await _gate.WaitAsync(token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        try
+        {
+            if (!token.IsCancellationRequested)
+                Publish(null);
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
+    private void CancelPendingEmpty()
+    {
+        _pendingEmpty?.Cancel();
+        _pendingEmpty?.Dispose();
+        _pendingEmpty = null;
+    }
+
     private void Publish(MediaInfo? info)
     {
+        CancelPendingEmpty();
         if (info == Current)
             return;
 
@@ -159,6 +215,7 @@ public sealed class SmtcMediaService : IMediaService, IDisposable
             _manager.CurrentSessionChanged -= OnCurrentSessionChanged;
         _manager = null;
         DetachSession();
+        CancelPendingEmpty();
         _gate.Dispose();
     }
 }
