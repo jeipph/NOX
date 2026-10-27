@@ -36,14 +36,14 @@ NotchBar/
 │  │  ├─ Lyrics/        LrclibClient.cs
 │  │  ├─ Audio/         NAudioVolumeService.cs
 │  │  ├─ Clipboard/     ClipboardMonitor.cs
-│  │  ├─ Shell/         NativeMethods.cs (P/Invoke), FullscreenDetector.cs, AutoStart.cs
+│  │  ├─ Shell/         NativeMethods.cs (P/Invoke), WindowHelper.cs, AppBar.cs (pantalla completa y franja reservada), EscapeKeyHook.cs, AutoStart.cs
 │  │  └─ Storage/       JsonSettingsStore.cs
 │  └─ NotchBar.App/                   (WPF, net10.0-windows10.0.19041.0, WinExe)
 │     ├─ App.xaml / App.xaml.cs       (arranque, DI, bandeja)
 │     ├─ Windows/       NotchWindow.xaml(.cs), SettingsWindow.xaml(.cs)
 │     ├─ Views/         CollapsedView, NowPlayingView, LyricsView, VinylView, ClipboardView, NotesView
 │     ├─ ViewModels/    NotchViewModel, NowPlayingViewModel, LyricsViewModel, ...
-│     ├─ Themes/        Tokens.Dark.xaml, Tokens.Light.xaml, Controls.xaml
+│     ├─ Themes/        Tokens.Layout.xaml (medidas y tiempos), Tokens.Dark.xaml, Tokens.Light.xaml (colores), Controls.xaml
 │     └─ Assets/        icono.ico, fuentes (si se incluyen)
 └─ tests/
    └─ NotchBar.Core.Tests/            (xUnit: LrcParser, LyricsSyncEngine, ClipboardHistory)

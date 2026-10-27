@@ -16,7 +16,15 @@ internal static partial class NativeMethods
 
     public const uint ABM_NEW = 0x0;
     public const uint ABM_REMOVE = 0x1;
+    public const uint ABM_QUERYPOS = 0x2;
+    public const uint ABM_SETPOS = 0x3;
+    public const uint ABE_TOP = 1;
+    public const int ABN_POSCHANGED = 0x1;
     public const int ABN_FULLSCREENAPP = 0x2;
+
+    public const int WH_KEYBOARD_LL = 13;
+    public const int WM_KEYDOWN = 0x0100;
+    public const int VK_ESCAPE = 0x1B;
 
     public const uint MONITOR_DEFAULTTOPRIMARY = 1;
     public const uint MONITOR_DEFAULTTONEAREST = 2;
@@ -89,6 +97,19 @@ internal static partial class NativeMethods
 
     [LibraryImport("user32.dll", EntryPoint = "RegisterWindowMessageW", StringMarshalling = StringMarshalling.Utf16)]
     public static partial uint RegisterWindowMessage(string lpString);
+
+    [LibraryImport("user32.dll", EntryPoint = "SetWindowsHookExW")]
+    public static partial nint SetWindowsHookEx(int idHook, nint lpfn, nint hMod, uint dwThreadId);
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool UnhookWindowsHookEx(nint hhk);
+
+    [LibraryImport("user32.dll")]
+    public static partial nint CallNextHookEx(nint hhk, int nCode, nint wParam, nint lParam);
+
+    [LibraryImport("kernel32.dll", EntryPoint = "GetModuleHandleW", StringMarshalling = StringMarshalling.Utf16)]
+    public static partial nint GetModuleHandle(string? lpModuleName);
 
     [LibraryImport("shell32.dll")]
     public static partial nuint SHAppBarMessage(uint dwMessage, ref APPBARDATA pData);

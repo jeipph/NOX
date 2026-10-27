@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using NotchBar.Core.Shell;
 using static NotchBar.Windows.Shell.NativeMethods;
 
@@ -17,13 +18,16 @@ public static class WindowHelper
         SetWindowLongPtr(hwnd, GWL_EXSTYLE, (nint)style);
     }
 
-    /// <summary>Área de trabajo (sin la barra de tareas) del monitor principal, en píxeles físicos.</summary>
-    public static PixelRect GetPrimaryWorkArea()
+    /// <summary>
+    /// Monitor principal en píxeles físicos: <c>Bounds</c> es la pantalla entera y
+    /// <c>WorkArea</c> lo que queda sin la barra de tareas (y sin franjas reservadas).
+    /// </summary>
+    public static (PixelRect Bounds, PixelRect WorkArea) GetPrimaryMonitor()
     {
         nint monitor = MonitorFromPoint(new POINT(), MONITOR_DEFAULTTOPRIMARY);
-        var info = new MONITORINFO { cbSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf<MONITORINFO>() };
+        var info = new MONITORINFO { cbSize = (uint)Marshal.SizeOf<MONITORINFO>() };
         GetMonitorInfo(monitor, ref info);
-        return ToPixelRect(info.rcWork);
+        return (ToPixelRect(info.rcMonitor), ToPixelRect(info.rcWork));
     }
 
     /// <summary>Coloca la ventana arriba al centro de <paramref name="area"/> y la mantiene encima de todo.</summary>

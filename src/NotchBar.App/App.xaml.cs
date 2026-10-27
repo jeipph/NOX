@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using H.NotifyIcon;
 using Microsoft.Extensions.DependencyInjection;
+using NotchBar.App.ViewModels;
 using NotchBar.App.Windows;
 
 namespace NotchBar.App;
@@ -26,6 +27,7 @@ public partial class App : Application
         _services = ConfigureServices();
 
         _trayIcon = (TaskbarIcon)FindResource("TrayIcon");
+        _trayIcon.DataContext = _services.GetRequiredService<NotchViewModel>();
         _trayIcon.ForceCreate();
 
         _services.GetRequiredService<NotchWindow>().Show();
@@ -34,6 +36,7 @@ public partial class App : Application
     private static ServiceProvider ConfigureServices()
     {
         var services = new ServiceCollection();
+        services.AddSingleton<NotchViewModel>();
         services.AddSingleton<NotchWindow>();
         return services.BuildServiceProvider();
     }

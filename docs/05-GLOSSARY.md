@@ -45,6 +45,7 @@ Añade aquí cada término nuevo que aparezca. Explicaciones cortas y sin jerga.
 - **Estilo extendido (`WS_EX_...`):** opciones de una ventana. `WS_EX_TOOLWINDOW` la quita de Alt+Tab; `WS_EX_NOACTIVATE` hace que no robe el foco al hacer clic.
 - **AppBar:** ventana que Windows trata como "barra de escritorio" (como la barra de tareas). Las AppBar reciben el aviso `ABN_FULLSCREENAPP` cuando algo entra o sale de pantalla completa.
 - **Píxeles físicos:** píxeles reales del monitor, sin aplicar el escalado.
+- **Gancho de teclado (`WH_KEYBOARD_LL`):** pedirle a Windows ver las teclas que se pulsan en todo el sistema. Lo usamos **solo mientras el notch está abierto** y **solo para Esc**, porque el notch nunca tiene el foco del teclado. No bloquea la tecla ni guarda nada.
 
 ## Música y letras
 - **LRC:** formato de texto de letras con tiempo: `[01:23.45] texto de la línea`.
