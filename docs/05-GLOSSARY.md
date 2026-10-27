@@ -31,7 +31,7 @@ Añade aquí cada término nuevo que aparezca. Explicaciones cortas y sin jerga.
 ## Windows por dentro
 - **API:** conjunto de funciones que ofrece un sistema o servicio para usarlas desde tu código.
 - **Win32:** la API clásica de Windows (funciones en DLL como `user32`, `kernel32`).
-- **P/Invoke:** manera de llamar desde C# a funciones Win32 (se declaran con `[DllImport]`).
+- **P/Invoke:** manera de llamar desde C# a funciones Win32 (se declaran con `[DllImport]` o, en .NET moderno, `[LibraryImport]`, que es lo que usamos).
 - **HWND:** "identificador de ventana" que usa Windows para cada ventana.
 - **COM:** tecnología antigua de Windows para componentes; el audio de Windows la usa. NAudio nos la esconde.
 - **WinRT:** API moderna de Windows (como la de música). Con el TFM correcto se usa directo desde C#.
