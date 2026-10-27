@@ -21,6 +21,14 @@
     <AssemblyName>NOX</AssemblyName>
     <ApplicationIcon>Assets\nox.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <!-- Datos que muestra Windows en Propiedades → Detalles -->
+    <Version>0.1.0</Version>
+    <!-- Que la versión se vea "0.1.0" y no "0.1.0+<código de commit>" -->
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <Product>NOX</Product>
+    <Description>NOX: notch minimalista para Windows</Description>
+    <Copyright>© 2026 JeiPo</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

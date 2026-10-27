@@ -64,7 +64,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [x] Validación de duración (±3 s) y caché en disco.
 - [x] `LyricsView`: línea actual resaltada y la anterior/siguiente atenuadas; desplazamiento suave.
 - [x] Ajuste de desfase −5…+5 s con botones.
-- [ ] Opción para desactivar letras (privacidad). *(Hecha en el menú de la bandeja: "Buscar letras en internet"; falta probarla.)*
+- [x] Opción para desactivar letras (privacidad): casilla "Buscar letras en internet" en la bandeja. Probado: desactivada muestra "Letras desactivadas" y no consulta lrclib.net.
 - [x] ~~Importar un archivo `.lrc` manualmente~~ — **descartado** por la persona usuaria el 2026-10-27 (sobraba).
 - [x] Estado discreto "Sin letra sincronizada" (no es un error).
 
@@ -117,11 +117,11 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [ ] Detectar conflictos con atajos ya registrados y avisar.
 
 ## M10 — Empaquetado (≈2 h)
-- [ ] `dotnet publish -c Release -r win-x64 --self-contained false` (requiere .NET Desktop Runtime) o `--self-contained true` (más pesado, sin requisitos).
-- [ ] Probar el `.exe` en una carpeta limpia.
-- [ ] Instalador con **Inno Setup** (script `installer/notchbar.iss`).
-- [ ] Icono, nombre final, versión 0.1.0.
-- [ ] Nota: el instalador sin firma digital hará que SmartScreen avise; es normal en proyectos personales.
+- [x] `dotnet publish` **con .NET incluido** (`--self-contained true`), para poder enviarlo a PCs sin .NET. Comandos en `installer/README.md`.
+- [x] Probado aquí: instalación silenciosa en una carpeta de prueba, NOX arranca sin errores, desinstalación limpia (conserva notas y ajustes).
+- [x] Instalador con **Inno Setup 6** (`installer/nox.iss`): para el usuario (sin administrador), español, acceso en el menú Inicio, casilla "Iniciar con Windows", cierra NOX antes de instalar o desinstalar. Resultado: `dist/NOX-0.1.0-instalador.exe` (47,5 MB).
+- [x] Icono (N en círculo negro), nombre final NOX, versión 0.1.0.
+- [x] Nota: el instalador sin firma digital hará que SmartScreen avise; es normal en proyectos personales.
 - [ ] Investigar firma gratuita para código abierto (SignPath, usada por un proyecto similar). No confirmado que aplique.
 
 ## M11 — Pulido y calidad
@@ -129,16 +129,16 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [ ] Probar con un juego o video en pantalla completa: el notch se oculta y no baja los FPS.
 - [ ] Probar con 1 y 2 monitores, y con escalados distintos.
 - [ ] Revisar excepciones y mensajes de log.
-- [ ] README de usuario con capturas.
-- [ ] Revisar `THIRD-PARTY-NOTICES.md`.
+- [x] README de usuario (sin capturas por ahora).
+- [x] Revisar `THIRD-PARTY-NOTICES.md` (creado: todas MIT, copyright leído de cada repositorio oficial).
 
 ---
 
 ## Decisiones pendientes (la persona usuaria debe elegir)
-- [ ] Nombre definitivo de la app (provisional: NOX).
+- [x] Nombre definitivo: **NOX** (2026-10-27).
 - [x] Editor: VS Code + C# Dev Kit.
 - [ ] ¿Notas compartidas con Morrow (misma carpeta)?
-- [ ] ¿Repositorio privado en GitHub? (opcional)
+- [ ] ¿Repositorio privado en GitHub? **Sí** (2026-10-27); falta instalar `gh` y `gh auth login` (pasos de la persona usuaria).
 
 ## Registro de sesiones
 - **2026-10-26 — Planificación.** Se analizaron Kissa, Nock, Morrow y OrbitDrop. Se decidió: Programa 1 en C#/.NET 8/WPF, estilo minimalista blanco/negro con tema cambiable. Documentos creados. No hay código ni .NET instalado todavía. Siguiente paso: M0.
@@ -156,3 +156,4 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - **2026-10-27 — M6, M7 y M8.** Volumen (dentro de Ahora suena) y reloj en el notch cerrado; Portapapeles (historial de 50, fijados en disco, ignora gestores de contraseñas); Notas (.md con Ctrl+Enter y "modo escritura"). Errores encontrados probando: (1) un token de ancho con el tipo equivocado hacía que la ventana no se creara y el error se perdía → ahora los errores se muestran y se registran; (2) al salir de una nota con Esc el teclado no volvía a tu ventana → se recuerda al abrir el notch. Un script de prueba hizo clic a ciegas cuando falló la app; ahora los scripts se detienen si no encuentran un botón. 128 pruebas.
 - **2026-10-27 — M6b (parcial): Enfoque.** Temporizador de concentración con duraciones de un clic (15, 25, 30, 45 min, 1 h, 1 h 30); pausar/continuar/cancelar; cuenta atrás en el notch cerrado; al terminar, sonido y el notch se abre 6 s. Probado de punta a punta en `--fake` (tiene una duración extra de 10 s solo para pruebas). Sin cronómetro ni "mantener despierto" (no se pidieron). Añadido `.gitattributes`. 143 pruebas.
 - **2026-10-27 — Renombrado a NOX (antes NotchBar).** Decisión de la persona usuaria antes de empaquetar. Cambió todo: carpeta `C:\Dev\NOX`, `Nox.sln`, proyectos `Nox.*`, ejecutable `NOX.exe`, datos en `%APPDATA%\NOX`, `%LOCALAPPDATA%\NOX` y `Documentos\NOX`. `LegacyData` traslada solas las carpetas viejas al arrancar (probado: ajustes, fijados y caché de letras trasladados). Icono nuevo: N blanca en círculo negro (`Assets/nox.ico`). Pendiente: copia privada en GitHub (falta instalar `gh` e iniciar sesión) y M10.
+- **2026-10-27 — M10: instalador 0.1.0.** `dist\NOX-0.1.0-instalador.exe` (47,5 MB, .NET incluido, sin administrador). Probado instalar → abrir → desinstalar. Añadidos `THIRD-PARTY-NOTICES.md`, README de usuario y versión 0.1.0. La persona usuaria no quiere más funciones por ahora. Pendiente: probarlo en otro PC (lo hará la persona usuaria), escalado 125/150 % y dos monitores, juego a pantalla completa, MusicBee, GitHub.
