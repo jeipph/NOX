@@ -1,4 +1,4 @@
-# Programa 1 — NotchBar (nombre provisional)
+# Programa 1 — NOX (nombre provisional)
 
 Utilidad de escritorio para **Windows 10/11**: una pastilla ("notch") minimalista en el borde superior de la pantalla que se expande al pasar el ratón. Hecha en **C# / .NET 10 / WPF**.
 

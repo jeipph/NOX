@@ -9,7 +9,7 @@
 | Interfaz | **WPF** | Ventanas transparentes y animaciones sencillas, XAML |
 | Patrón | MVVM + `CommunityToolkit.Mvvm` | Menos código repetido, estándar |
 | Inyección de dependencias | `Microsoft.Extensions.DependencyInjection` | Desacopla Core de Windows |
-| Música (Windows) | `Windows.Media.Control` (WinRT / SMTC), sin paquetes extra | La misma API que usan Kissa y Nock. **Decisión 2026-10-27:** dos fuentes, YouTube Music (navegador o app) y música local en carpetas reproducida con un reproductor externo que publique en SMTC (MusicBee, foobar2000, Reproductor multimedia). NotchBar **no** reproduce archivos (reproductor propio = idea v2). |
+| Música (Windows) | `Windows.Media.Control` (WinRT / SMTC), sin paquetes extra | La misma API que usan Kissa y Nock. **Decisión 2026-10-27:** dos fuentes, YouTube Music (navegador o app) y música local en carpetas reproducida con un reproductor externo que publique en SMTC (MusicBee, foobar2000, Reproductor multimedia). NOX **no** reproduce archivos (reproductor propio = idea v2). |
 | Audio (volumen) | `NAudio` (MIT) — `MMDeviceEnumerator` | Evita escribir COM a mano |
 | Bandeja | `H.NotifyIcon.Wpf` (MIT) | Icono de bandeja para WPF |
 | Pruebas | xUnit | Estándar |
@@ -20,25 +20,25 @@
 ## Estructura de carpetas
 
 ```
-NotchBar/
+NOX/
 ├─ AGENTS.md  README.md  THIRD-PARTY-NOTICES.md
 ├─ docs/
-├─ NotchBar.sln
+├─ NOX.sln
 ├─ src/
-│  ├─ NotchBar.Core/                  (net10.0, SIN WPF, SIN APIs de Windows)
+│  ├─ Nox.Core/                  (net10.0, SIN WPF, SIN APIs de Windows)
 │  │  ├─ Models/        MediaInfo.cs, LyricLine.cs, ClipboardEntry.cs, AppSettings.cs
 │  │  ├─ Abstractions/  IMediaService.cs, ILyricsService.cs, IVolumeService.cs,
 │  │  │                 IClipboardService.cs, ISettingsStore.cs, IAutoStart.cs
 │  │  ├─ Lyrics/        LrcParser.cs, LyricsSyncEngine.cs
 │  │  └─ Clipboard/     ClipboardHistory.cs
-│  ├─ NotchBar.Windows/               (net10.0-windows10.0.19041.0)
+│  ├─ Nox.Windows/               (net10.0-windows10.0.19041.0)
 │  │  ├─ Media/         SmtcMediaService.cs
 │  │  ├─ Lyrics/        LrclibClient.cs
 │  │  ├─ Audio/         NAudioVolumeService.cs
 │  │  ├─ Clipboard/     ClipboardMonitor.cs
 │  │  ├─ Shell/         NativeMethods.cs (P/Invoke), WindowHelper.cs, AppBar.cs (pantalla completa y franja reservada), EscapeKeyHook.cs, AutoStart.cs
 │  │  └─ Shell/         SystemTheme.cs, AutoStart.cs (registro de Windows)
-│  └─ NotchBar.App/                   (WPF, net10.0-windows10.0.19041.0, WinExe)
+│  └─ Nox.App/                   (WPF, net10.0-windows10.0.19041.0, WinExe)
 │     ├─ App.xaml / App.xaml.cs       (arranque, DI, bandeja)
 │     ├─ Windows/       NotchWindow.xaml(.cs), SettingsWindow.xaml(.cs)
 │     ├─ Views/         CollapsedView, NowPlayingView, LyricsView, VinylView, ClipboardView, NotesView
@@ -46,7 +46,7 @@ NotchBar/
 │     ├─ Themes/        Tokens.Layout.xaml (medidas y tiempos), Tokens.Dark.xaml, Tokens.Light.xaml (colores), Controls.xaml
 │     └─ Assets/        icono.ico, fuentes (si se incluyen)
 └─ tests/
-   └─ NotchBar.Core.Tests/            (xUnit: LrcParser, LyricsSyncEngine, ClipboardHistory)
+   └─ Nox.Core.Tests/            (xUnit: LrcParser, LyricsSyncEngine, ClipboardHistory)
 ```
 
 Regla de dependencias: `App → Windows → Core` y `App → Core`. **Core nunca referencia a los otros.**
@@ -55,11 +55,11 @@ Regla de dependencias: `App → Windows → Core` y `App → Core`. **Core nunca
 
 | Qué | Dónde |
 |---|---|
-| Ajustes | `%APPDATA%\NotchBar\settings.json` |
-| Letras en caché | `%LOCALAPPDATA%\NotchBar\lyrics\<hash>.json` |
-| Portapapeles fijado | `%APPDATA%\NotchBar\pinned-clips.json` |
-| Notas rápidas | `%USERPROFILE%\Documents\NotchBar\notes\*.md` |
-| Registros (logs) | `%LOCALAPPDATA%\NotchBar\logs\` (sin contenido personal) |
+| Ajustes | `%APPDATA%\NOX\settings.json` |
+| Letras en caché | `%LOCALAPPDATA%\NOX\lyrics\<hash>.json` |
+| Portapapeles fijado | `%APPDATA%\NOX\pinned-clips.json` |
+| Notas rápidas | `%USERPROFILE%\Documents\NOX\notes\*.md` |
+| Registros (logs) | `%LOCALAPPDATA%\NOX\logs\` (sin contenido personal) |
 
 ## Cómo funciona cada pieza
 
@@ -74,7 +74,7 @@ Se construye como una ventana WPF "flotante":
 - **Riesgo conocido:** `AllowsTransparency` en WPF usa una ventana en capas (renderizado por software). Con una ventana pequeña es aceptable. Si diera problemas de rendimiento, plan B: dejar la ventana opaca con esquinas redondeadas mediante `Window.Clip`/`SetWindowRgn`.
 
 ### 2. Ahora suena (hito M3)
-- Clase `SmtcMediaService : IMediaService` en `NotchBar.Windows`.
+- Clase `SmtcMediaService : IMediaService` en `Nox.Windows`.
 - Usa `GlobalSystemMediaTransportControlsSessionManager.RequestAsync()` para obtener el administrador, y `GetCurrentSession()` para la sesión activa.
 - Eventos (no sondeo): `CurrentSessionChanged`, `MediaPropertiesChanged`, `PlaybackInfoChanged`, `TimelinePropertiesChanged`.
 - Datos: `TryGetMediaPropertiesAsync()` → título, artista, álbum, miniatura (`Thumbnail` → `IRandomAccessStreamReference` → `BitmapImage`).
@@ -86,7 +86,7 @@ Se construye como una ventana WPF "flotante":
 
 ### 3. Letras sincronizadas (hito M4)
 - **Servicio:** LRCLIB, gratuito y sin clave. `GET https://lrclib.net/api/get?artist_name=...&track_name=...&album_name=...&duration=<segundos>` devuelve JSON con `syncedLyrics` (formato LRC) y `plainLyrics`.
-- **Cortesía:** enviar un `User-Agent` descriptivo (`NotchBar/0.1 (contacto)`). Verificar la documentación vigente en <https://lrclib.net/docs> antes de implementar.
+- **Cortesía:** enviar un `User-Agent` descriptivo (`NOX/0.1 (contacto)`). Verificar la documentación vigente en <https://lrclib.net/docs> antes de implementar.
 - **Parser (`LrcParser`, en Core):** convierte líneas `[mm:ss.xx] texto` en `LyricLine(TimeSpan Start, string Text)`. Manejar varias marcas por línea, líneas vacías y metadatos `[ar:]`, `[ti:]`.
 - **Sincronía (`LyricsSyncEngine`, en Core):** dada la posición actual + desfase del usuario (−5.0 s a +5.0 s), devuelve el índice de la línea activa con búsqueda binaria. Es lo más fácil de probar con xUnit.
 - **Validación:** descartar resultados cuya duración difiera más de ~3 s de la pista (suele ser otra versión).
@@ -121,7 +121,7 @@ Implementado en `VinylView`: la animación se quita (y el disco queda en su áng
 - **Modo escritura (hecho):** el notch tiene `WS_EX_NOACTIVATE` para no robar el foco. Al hacer clic en el cuadro de nota se quita ese estilo y se activa la ventana (`WindowHelper.SetActivatable`); mientras tanto el temporizador de cierre no actúa. Al salir (Esc, cerrar el notch o clic en otra ventana) se vuelve a poner y, con Esc, se devuelve el teclado a la ventana que se recordó al abrir el notch.
 
 ### 8. Ajustes, tema, arranque (hito M9)
-- `AppSettings` y `JsonSettingsStore` (los dos en Core, con pruebas: solo usan archivos y JSON) en `%APPDATA%NotchBarsettings.json`, enums como texto. Archivo dañado → se aparta como `.bad` y se usan los valores por defecto.
+- `AppSettings` y `JsonSettingsStore` (los dos en Core, con pruebas: solo usan archivos y JSON) en `%APPDATA%NOXsettings.json`, enums como texto. Archivo dañado → se aparta como `.bad` y se usan los valores por defecto.
 - `SettingsCoordinator` (App) carga al arrancar y guarda en cada cambio; `ThemeService` (App) reemplaza el diccionario de colores. Sin ventana de ajustes: todo está en el menú de la bandeja.
 - Tema: `Dark | Light | System`. Cambiar reemplazando el `ResourceDictionary` de tokens en `Application.Resources.MergedDictionaries`. Detectar el tema de Windows leyendo `HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize\AppsUseLightTheme` y suscribirse a `SystemEvents.UserPreferenceChanged`.
 - Arranque con Windows: valor en `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` (sin permisos de administrador).
@@ -144,4 +144,4 @@ Posición (interpolada) ──────────────────�
 - Liberar suscripciones al cerrar (`IDisposable`).
 - Manejar excepciones en cada llamada a Windows (`try/catch` con registro), porque las APIs pueden fallar según el reproductor.
 - Pruebas manuales por hito en `docs/03-ROADMAP.md`.
-- **Errores no previstos:** `App` los muestra en un aviso y los apunta en `%LOCALAPPDATA%\NotchBar\logs\error.log` (solo el error técnico, nada personal). Antes se perdían en silencio y la app quedaba abierta sin ventana (pasó en M8).
+- **Errores no previstos:** `App` los muestra en un aviso y los apunta en `%LOCALAPPDATA%\NOX\logs\error.log` (solo el error técnico, nada personal). Antes se perdían en silencio y la app quedaba abierta sin ventana (pasó en M8).

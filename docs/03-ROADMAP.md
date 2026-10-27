@@ -11,14 +11,14 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [x] Instalar el SDK de .NET 10 (10.0.403): `winget install Microsoft.DotNet.SDK.10` (cerrar y volver a abrir la terminal).
 - [x] Verificar: `dotnet --version` muestra `10.x`.
 - [x] Editor: **VS Code + extensión "C# Dev Kit"** (elegido 2026-10-27).
-- [x] `git init` en `NotchBar/` y primer commit con estos documentos.
+- [x] `git init` en `NOX/` y primer commit con estos documentos.
 - [x] Crear `.gitignore` de .NET: `dotnet new gitignore`.
 
 **Terminado cuando:** `dotnet --version` funciona y existe un repositorio git con los documentos.
 
 ## M1 — Esqueleto de la solución (≈1 h)
-- [x] `dotnet new sln -n NotchBar`
-- [x] Crear proyectos: `NotchBar.Core` (classlib net10.0), `NotchBar.Windows` (classlib `net10.0-windows10.0.19041.0`), `NotchBar.App` (WPF `net10.0-windows10.0.19041.0`), `NotchBar.Core.Tests` (xUnit).
+- [x] `dotnet new sln -n NOX`
+- [x] Crear proyectos: `Nox.Core` (classlib net10.0), `Nox.Windows` (classlib `net10.0-windows10.0.19041.0`), `Nox.App` (WPF `net10.0-windows10.0.19041.0`), `Nox.Core.Tests` (xUnit).
 - [x] Añadir referencias: App→Windows, App→Core, Windows→Core, Tests→Core.
 - [x] Añadir paquetes NuGet de `02-ARCHITECTURE.md` (solo CommunityToolkit.Mvvm y DI por ahora).
 - [x] `NotchWindow`: ventana sin borde, transparente, siempre encima, sin barra de tareas, pastilla negra redondeada de 220×34 arriba al centro.
@@ -135,7 +135,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 ---
 
 ## Decisiones pendientes (la persona usuaria debe elegir)
-- [ ] Nombre definitivo de la app (provisional: NotchBar).
+- [ ] Nombre definitivo de la app (provisional: NOX).
 - [x] Editor: VS Code + C# Dev Kit.
 - [ ] ¿Notas compartidas con Morrow (misma carpeta)?
 - [ ] ¿Repositorio privado en GitHub? (opcional)
@@ -144,7 +144,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - **2026-10-26 — Planificación.** Se analizaron Kissa, Nock, Morrow y OrbitDrop. Se decidió: Programa 1 en C#/.NET 8/WPF, estilo minimalista blanco/negro con tema cambiable. Documentos creados. No hay código ni .NET instalado todavía. Siguiente paso: M0.
 - **2026-10-26 — Investigación.** Se buscaron proyectos similares (ver `07-RESEARCH-SIMILAR-PROJECTS.md`). Cambios: se quitó la batería; se pasó a **.NET 10** (.NET 8 termina soporte en nov. 2026); se añadieron M2b, M3b, M6b, M6c, M6d, M9b; objetivo de RAM ≤150 MB. Instalar con `winget install Microsoft.DotNet.SDK.10`.
 - **2026-10-27 — Clones y reparto.** Se estudiaron boring.notch, BetterLyrics, WindowsMediaController (MIT), Poricom y Clone-Wars (ver `07-RESEARCH…` §6). Se creó `../REPARTO-MODELOS.md` (qué modelo hace cada tarea). Pendiente: decidir si usar `Dubya.WindowsMediaController` o `Windows.Media.Control` directo. Siguiente paso: M0.
-- **2026-10-27 — M0 terminado.** .NET SDK 10.0.403 instalado, VS Code + C# Dev Kit, telemetría de la CLI desactivada (`DOTNET_CLI_TELEMETRY_OPTOUT=1`). Los proyectos se movieron de OneDrive a `C:\Dev\NotchBar` y `C:\Dev\Marginalia` (OneDrive bloquea `bin/obj`). Repositorio git creado. Siguiente paso: M1.
+- **2026-10-27 — M0 terminado.** .NET SDK 10.0.403 instalado, VS Code + C# Dev Kit, telemetría de la CLI desactivada (`DOTNET_CLI_TELEMETRY_OPTOUT=1`). Los proyectos se movieron de OneDrive a `C:\Dev\NOX` y `C:\Dev\Marginalia` (OneDrive bloquea `bin/obj`). Repositorio git creado. Siguiente paso: M1.
 - **2026-10-27 — M1 y decisión de música.** Esqueleto creado (4 proyectos, notch 220×34, bandeja, instancia única); compila sin avisos, 54 MB RAM. Falta la verificación visual de la persona usuaria para marcar M1. Música: opción A (YouTube Music + reproductor externo para carpetas locales, todo vía SMTC con `Windows.Media.Control`).
 - **2026-10-27 — M2b y M3.** Estilos, modo invisible, Esc y franja reservada probados con UI Automation y capturas. M3 funciona con YouTube Music en Chrome (datos, carátula, botones). Errores encontrados en las pruebas y corregidos: carátula con el logo de Chrome, parpadeo de "Nada en reproducción" al cambiar de canción (Chrome cierra y reabre su sesión; ahora se esperan 1,5 s) y notch desplazado tras quitar la franja reservada (ahora se recoloca con `WM_SETTINGCHANGE`). Pendiente: probar música local con MusicBee. Siguiente: M3b.
 - **2026-10-27 — M3b.** Varios reproductores: se vigila play/pausa de todos y se muestra el que suena; etiqueta para fijar uno. Hallazgo en pruebas: al abrir un reproductor nuevo Windows no siempre manda `SessionsChanged`, así que la lista también se rehace con `CurrentSessionChanged`. 45 pruebas. Siguiente: M4 (letras).

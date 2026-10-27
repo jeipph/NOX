@@ -3,7 +3,7 @@
 Lee este archivo completo antes de tocar nada.
 
 ## Proyecto
-App de escritorio Windows 10/11 llamada provisionalmente **NotchBar**: pastilla minimalista arriba al centro de la pantalla, se expande al pasar el ratón y muestra widgets (música, letras, volumen, portapapeles, notas rápidas, reloj). Tema claro/oscuro/sistema. Documentación en `docs/`.
+App de escritorio Windows 10/11 llamada provisionalmente **NOX**: pastilla minimalista arriba al centro de la pantalla, se expande al pasar el ratón y muestra widgets (música, letras, volumen, portapapeles, notas rápidas, reloj). Tema claro/oscuro/sistema. Documentación en `docs/`.
 
 ## Persona usuaria
 - Nivel de programación **medio**, con dudas en pasos y términos. Idioma: **español**.
@@ -15,9 +15,9 @@ App de escritorio Windows 10/11 llamada provisionalmente **NotchBar**: pastilla 
 1. **Lenguaje y plataforma:** C# 14, **.NET 10 (LTS)**, WPF. TFM de los proyectos con Windows: `net10.0-windows10.0.19041.0`. (Se descartó .NET 8 porque su soporte termina en nov. 2026.)
 2. **Patrón:** MVVM con `CommunityToolkit.Mvvm` e inyección de dependencias (`Microsoft.Extensions.DependencyInjection`).
 3. **Separación de proyectos:**
-   - `NotchBar.Core`: lógica pura y interfaces. **Sin referencias a WPF ni a APIs de Windows.** Debe poder probarse con xUnit.
-   - `NotchBar.Windows`: implementaciones que usan APIs de Windows (SMTC, audio, portapapeles, P/Invoke).
-   - `NotchBar.App`: WPF (ventanas, vistas, ViewModels, temas).
+   - `Nox.Core`: lógica pura y interfaces. **Sin referencias a WPF ni a APIs de Windows.** Debe poder probarse con xUnit.
+   - `Nox.Windows`: implementaciones que usan APIs de Windows (SMTC, audio, portapapeles, P/Invoke).
+   - `Nox.App`: WPF (ventanas, vistas, ViewModels, temas).
 4. **Nada de código ajeno copiado.** Kissa tiene licencia que lo prohíbe. Nock y OrbitDrop son MIT: se pueden consultar como referencia, pero escribe código propio; si copias algo, conserva el aviso de copyright y anótalo en `THIRD-PARTY-NOTICES.md`.
 5. **Privacidad:** sin telemetría, sin cuentas. La única red permitida es LRCLIB para letras (ver arquitectura). Todo lo demás es local.
 6. **Rendimiento:** la app corre siempre; en reposo no debe usar CPU apreciable. Sin bucles de sondeo: usa eventos. Temporizadores solo mientras hay animación.

@@ -1,0 +1,71 @@
+﻿<Application x:Class="Nox.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:tb="clr-namespace:H.NotifyIcon;assembly=H.NotifyIcon.Wpf"
+             xmlns:models="clr-namespace:Nox.Core.Models;assembly=Nox.Core"
+             ShutdownMode="OnExplicitShutdown">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Tokens.Layout.xaml" />
+                <!-- Colores del tema activo. ThemeService lo cambiará en M9. -->
+                <ResourceDictionary Source="Themes/Tokens.Dark.xaml" />
+                <ResourceDictionary Source="Themes/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- DataContext = NotchViewModel (se asigna en App.xaml.cs). -->
+            <tb:TaskbarIcon x:Key="TrayIcon" ToolTipText="NOX" IconSource="/Assets/nox.ico">
+                <tb:TaskbarIcon.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Estilo">
+                            <MenuItem Header="Notch"
+                                      IsChecked="{Binding IsNotchStyle, Mode=OneWay}"
+                                      Command="{Binding SetStyleCommand}"
+                                      CommandParameter="{x:Static models:NotchStyle.Notch}" />
+                            <MenuItem Header="Cápsula"
+                                      IsChecked="{Binding IsCapsuleStyle, Mode=OneWay}"
+                                      Command="{Binding SetStyleCommand}"
+                                      CommandParameter="{x:Static models:NotchStyle.Capsule}" />
+                            <MenuItem Header="Indicador"
+                                      IsChecked="{Binding IsIndicatorStyle, Mode=OneWay}"
+                                      Command="{Binding SetStyleCommand}"
+                                      CommandParameter="{x:Static models:NotchStyle.Indicator}" />
+                        </MenuItem>
+                        <MenuItem Header="Visible solo al pasar el ratón"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding OnlyOnHover}" />
+                        <MenuItem Header="Reservar la franja superior"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding ReserveTopStrip}" />
+                        <MenuItem Header="Buscar letras en internet (lrclib.net)"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding LyricsEnabled}"
+                                  ToolTip="Envía título, artista y duración de la canción a lrclib.net" />
+                        <Separator />
+                        <MenuItem Header="Tema">
+                            <MenuItem Header="Sistema (como Windows)"
+                                      IsChecked="{Binding IsSystemTheme, Mode=OneWay}"
+                                      Command="{Binding SetThemeCommand}"
+                                      CommandParameter="{x:Static models:AppTheme.System}" />
+                            <MenuItem Header="Oscuro"
+                                      IsChecked="{Binding IsDarkTheme, Mode=OneWay}"
+                                      Command="{Binding SetThemeCommand}"
+                                      CommandParameter="{x:Static models:AppTheme.Dark}" />
+                            <MenuItem Header="Claro"
+                                      IsChecked="{Binding IsLightTheme, Mode=OneWay}"
+                                      Command="{Binding SetThemeCommand}"
+                                      CommandParameter="{x:Static models:AppTheme.Light}" />
+                        </MenuItem>
+                        <MenuItem Header="Carpeta de notas…"
+                                  Command="{Binding ChooseNotesFolderCommand}" />
+                        <MenuItem Header="Iniciar con Windows"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding StartWithWindows}" />
+                        <Separator />
+                        <MenuItem Header="Salir" Click="OnExitClick" />
+                    </ContextMenu>
+                </tb:TaskbarIcon.ContextMenu>
+            </tb:TaskbarIcon>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
