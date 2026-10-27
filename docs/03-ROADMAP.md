@@ -17,13 +17,13 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 **Terminado cuando:** `dotnet --version` funciona y existe un repositorio git con los documentos.
 
 ## M1 — Esqueleto de la solución (≈1 h)
-- [ ] `dotnet new sln -n NotchBar`
-- [ ] Crear proyectos: `NotchBar.Core` (classlib net10.0), `NotchBar.Windows` (classlib `net10.0-windows10.0.19041.0`), `NotchBar.App` (WPF `net10.0-windows10.0.19041.0`), `NotchBar.Core.Tests` (xUnit).
-- [ ] Añadir referencias: App→Windows, App→Core, Windows→Core, Tests→Core.
-- [ ] Añadir paquetes NuGet de `02-ARCHITECTURE.md` (solo CommunityToolkit.Mvvm y DI por ahora).
-- [ ] `NotchWindow`: ventana sin borde, transparente, siempre encima, sin barra de tareas, pastilla negra redondeada de 220×34 arriba al centro.
-- [ ] Icono en la bandeja con menú: "Ajustes (pendiente)" y "Salir".
-- [ ] `Mutex` de instancia única.
+- [x] `dotnet new sln -n NotchBar`
+- [x] Crear proyectos: `NotchBar.Core` (classlib net10.0), `NotchBar.Windows` (classlib `net10.0-windows10.0.19041.0`), `NotchBar.App` (WPF `net10.0-windows10.0.19041.0`), `NotchBar.Core.Tests` (xUnit).
+- [x] Añadir referencias: App→Windows, App→Core, Windows→Core, Tests→Core.
+- [x] Añadir paquetes NuGet de `02-ARCHITECTURE.md` (solo CommunityToolkit.Mvvm y DI por ahora).
+- [x] `NotchWindow`: ventana sin borde, transparente, siempre encima, sin barra de tareas, pastilla negra redondeada de 220×34 arriba al centro.
+- [x] Icono en la bandeja con menú: "Ajustes (pendiente)" y "Salir".
+- [x] `Mutex` de instancia única.
 
 **Terminado cuando:** al ejecutar, aparece la pastilla arriba al centro, no sale en la barra de tareas, y "Salir" cierra la app. `dotnet build` y `dotnet test` pasan.
 
