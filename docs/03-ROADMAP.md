@@ -122,7 +122,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [x] Instalador con **Inno Setup 6** (`installer/nox.iss`): para el usuario (sin administrador), español, acceso en el menú Inicio, casilla "Iniciar con Windows", cierra NOX antes de instalar o desinstalar. Resultado: `dist/NOX-0.1.0-instalador.exe` (47,5 MB).
 - [x] Icono (N en círculo negro), nombre final NOX, versión 0.1.0.
 - [x] Nota: el instalador sin firma digital hará que SmartScreen avise; es normal en proyectos personales.
-- [ ] Investigar firma gratuita para código abierto (SignPath, usada por un proyecto similar). No confirmado que aplique.
+- [x] ~~Firma gratuita (SignPath)~~: no aplica, exige que el código sea público y el repositorio será privado. Se acepta el aviso de SmartScreen.
 
 ## M11 — Pulido y calidad
 - [x] Revisar consumo (Administrador de tareas): objetivo **≤150 MB de RAM y ~0 % de CPU en reposo** con 1 monitor. *(2026-10-27, Release con todas las pestañas abiertas: 90 MB de memoria privada —lo que muestra el Administrador de tareas—, 0 ms de CPU en 10 s de reposo.)*
