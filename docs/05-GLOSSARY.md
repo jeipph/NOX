@@ -42,6 +42,9 @@ Añade aquí cada término nuevo que aparezca. Explicaciones cortas y sin jerga.
 - **Evento:** aviso que llega solo cuando algo pasa.
 - **Registro de Windows (`HKCU`):** base de datos de configuración. `HKCU` es la parte del usuario actual (no requiere administrador).
 - **Mutex:** candado con nombre para saber si la app ya está abierta y no abrir dos copias.
+- **Estilo extendido (`WS_EX_...`):** opciones de una ventana. `WS_EX_TOOLWINDOW` la quita de Alt+Tab; `WS_EX_NOACTIVATE` hace que no robe el foco al hacer clic.
+- **AppBar:** ventana que Windows trata como "barra de escritorio" (como la barra de tareas). Las AppBar reciben el aviso `ABN_FULLSCREENAPP` cuando algo entra o sale de pantalla completa.
+- **Píxeles físicos:** píxeles reales del monitor, sin aplicar el escalado.
 
 ## Música y letras
 - **LRC:** formato de texto de letras con tiempo: `[01:23.45] texto de la línea`.

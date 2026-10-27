@@ -70,7 +70,7 @@ Se construye como una ventana WPF "flotante":
 - **Posición:** centrada horizontalmente en el monitor principal, `Top = 0`. Usar `SystemParameters.PrimaryScreenWidth` (ya en unidades independientes de DPI).
 - **Expandir/contraer:** `MouseEnter` → anima `Width` y `Height` con `DoubleAnimation` (~220 ms, `CubicEase EaseOut`). `MouseLeave` → espera ~400 ms (para no parpadear) y contrae. Estado en `NotchViewModel.IsExpanded`.
 - **Tamaños:** contraído ~ 220×34 px; expandido ~ 560×200 px (valores en `Tokens.*.xaml`).
-- **Pantalla completa:** `SHQueryUserNotificationState` (shell32) indica si hay una app en pantalla completa o presentación; si sí, ocultar la ventana. Se consulta al cambiar la ventana activa con `SetWinEventHook(EVENT_SYSTEM_FOREGROUND)`, **no** con un temporizador.
+- **Pantalla completa:** la ventana se registra como *AppBar* (`SHAppBarMessage(ABM_NEW)`) **sin reservar espacio**; Windows envía entonces el aviso `ABN_FULLSCREENAPP` al entrar y salir de pantalla completa. Al recibirlo se comprueba que la ventana activa tape nuestro monitor y no sea el escritorio (`FullscreenRules` en Core, con pruebas). Sin temporizadores. (Cambio 2026-10-27: sustituye a `SHQueryUserNotificationState` + `SetWinEventHook`, que obligaba a consultar en cada cambio de ventana.)
 - **Riesgo conocido:** `AllowsTransparency` en WPF usa una ventana en capas (renderizado por software). Con una ventana pequeña es aceptable. Si diera problemas de rendimiento, plan B: dejar la ventana opaca con esquinas redondeadas mediante `Window.Clip`/`SetWindowRgn`.
 
 ### 2. Ahora suena (hito M3)

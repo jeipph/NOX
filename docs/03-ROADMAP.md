@@ -31,7 +31,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [ ] Estilos extendidos por P/Invoke (`WS_EX_TOOLWINDOW`, `WS_EX_NOACTIVATE`).
 - [ ] Expandir al entrar el ratón y contraer al salir (con retraso de ~400 ms), con animación de 220 ms.
 - [ ] Ajuste correcto con escalado de pantalla (DPI 100 %, 125 %, 150 %). Probar cambiando el escalado en Windows.
-- [ ] Ocultar cuando una app está en pantalla completa (`SHQueryUserNotificationState` + `SetWinEventHook`).
+- [ ] Ocultar cuando una app está en pantalla completa (aviso `ABN_FULLSCREENAPP` de una AppBar sin espacio reservado + `FullscreenRules`).
 - [ ] Prueba: contenido de relleno ("Hola") dentro del panel expandido.
 
 **Terminado cuando:** pasa el ratón → se despliega suave; sale → se pliega; abrir un video en pantalla completa lo oculta; al salir de pantalla completa vuelve.
