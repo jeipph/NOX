@@ -17,7 +17,7 @@ namespace NotchBar.App.Windows;
 public partial class NotchWindow : Window, IDisposable
 {
     private readonly NotchViewModel _viewModel;
-    private readonly NowPlayingViewModel _nowPlaying;
+    private readonly NotchContentViewModel _content;
 
     // Solo corre mientras espera para contraer; en reposo no hay temporizadores activos.
     private readonly DispatcherTimer _collapseTimer;
@@ -26,14 +26,14 @@ public partial class NotchWindow : Window, IDisposable
     private nint _hwnd;
     private bool _isExpanded;
 
-    public NotchWindow(NotchViewModel viewModel, NowPlayingViewModel nowPlaying)
+    public NotchWindow(NotchViewModel viewModel, NotchContentViewModel content)
     {
         InitializeComponent();
 
         _viewModel = viewModel;
         _viewModel.PropertyChanged += OnViewModelChanged;
-        _nowPlaying = nowPlaying;
-        Pill.DataContext = nowPlaying;
+        _content = content;
+        Pill.DataContext = content;
 
         _collapseTimer = new DispatcherTimer { Interval = (TimeSpan)FindResource("Hover.CollapseDelay") };
         _collapseTimer.Tick += (_, _) =>
@@ -225,7 +225,7 @@ public partial class NotchWindow : Window, IDisposable
         Pill.SetResourceReference(Border.CornerRadiusProperty, expanded ? ExpandedRadiusKey : CollapsedRadiusKey);
         ExpandedContent.Visibility = expanded ? Visibility.Visible : Visibility.Collapsed;
         CollapsedContent.Visibility = !expanded && ShowsCollapsedText ? Visibility.Visible : Visibility.Collapsed;
-        _nowPlaying.SetVisible(expanded);
+        _content.SetExpanded(expanded);
     }
 
     // Aspecto contraído del estilo actual, sin animación.
@@ -243,7 +243,7 @@ public partial class NotchWindow : Window, IDisposable
         Pill.SetResourceReference(Border.BackgroundProperty, CollapsedBackgroundKey);
         ExpandedContent.Visibility = Visibility.Collapsed;
         CollapsedContent.Visibility = ShowsCollapsedText ? Visibility.Visible : Visibility.Collapsed;
-        _nowPlaying.SetVisible(false);
+        _content.SetExpanded(false);
     }
 
     public void Dispose()

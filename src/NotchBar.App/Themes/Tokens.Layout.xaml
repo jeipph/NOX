@@ -7,12 +7,12 @@
 
     <!-- La ventana es transparente y siempre mide esto; dentro crece y encoge la pastilla. -->
     <sys:Double x:Key="Size.Window.Width">560</sys:Double>
-    <sys:Double x:Key="Size.Window.Height">212</sys:Double>
+    <sys:Double x:Key="Size.Window.Height">248</sys:Double>
 
     <sys:Double x:Key="Size.Collapsed.Width">220</sys:Double>
     <sys:Double x:Key="Size.Collapsed.Height">34</sys:Double>
     <sys:Double x:Key="Size.Expanded.Width">560</sys:Double>
-    <sys:Double x:Key="Size.Expanded.Height">200</sys:Double>
+    <sys:Double x:Key="Size.Expanded.Height">236</sys:Double>
     <sys:Double x:Key="Size.Indicator.Width">60</sys:Double>
     <sys:Double x:Key="Size.Indicator.Height">6</sys:Double>
 
@@ -28,7 +28,7 @@
     <Thickness x:Key="Margin.Capsule">0,8,0,0</Thickness>
 
     <!-- Panel "Ahora suena" -->
-    <Thickness x:Key="Padding.Expanded">20,16,20,16</Thickness>
+    <Thickness x:Key="Padding.Expanded">20,16,20,8</Thickness>
     <sys:Double x:Key="Size.Cover">128</sys:Double>
     <sys:Double x:Key="Size.IconButton">36</sys:Double>
     <sys:Double x:Key="Size.Progress">3</sys:Double>
@@ -36,6 +36,15 @@
     <Thickness x:Key="Space.Below">0,0,0,8</Thickness>
     <Thickness x:Key="Padding.Collapsed">16,0,16,0</Thickness>
     <Thickness x:Key="Padding.Chip">8,2,8,2</Thickness>
+    <Thickness x:Key="Space.TabBar">0,0,0,10</Thickness>
+    <Thickness x:Key="Space.Inline">8,0,8,0</Thickness>
+
+    <!-- Panel "Letras" -->
+    <Thickness x:Key="Space.LyricCurrent">0,6,0,6</Thickness>
+    <sys:Double x:Key="FontSize.Lyric">18</sys:Double>
+    <sys:Double x:Key="FontSize.LyricDim">14</sys:Double>
+    <!-- Cuánto sube la línea nueva al aparecer -->
+    <sys:Double x:Key="Lyric.SlideDistance">10</sys:Double>
 
     <!-- Tiempos -->
     <sys:TimeSpan x:Key="Duration.Expand">00:00:00.22</sys:TimeSpan>

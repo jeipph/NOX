@@ -58,15 +58,15 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 **Terminado cuando:** la información cambia sola al cambiar de canción y los 3 botones funcionan en YouTube Music.
 
 ## M4 — Letras sincronizadas (≈3 h)
-- [ ] Tests primero: `LrcParserTests` (varias marcas, líneas vacías, metadatos) y `LyricsSyncEngineTests` (índice según posición y desfase).
-- [ ] `LrcParser` y `LyricsSyncEngine` en Core.
-- [ ] `LrclibClient` en Windows (HttpClient, User-Agent, tiempo de espera 5 s, manejo de 404).
-- [ ] Validación de duración (±3 s) y caché en disco.
-- [ ] `LyricsView`: línea actual resaltada y la anterior/siguiente atenuadas; desplazamiento suave.
-- [ ] Ajuste de desfase −5…+5 s con botones.
-- [ ] Opción para desactivar letras (privacidad).
-- [ ] Importar un archivo `.lrc` manualmente para una canción sin letra. Opcional: carpeta de letras locales buscando `Artista - Título.lrc` (SMTC no da la ruta del archivo que suena, así que no se puede leer el `.lrc` "de al lado" automáticamente).
-- [ ] Estado discreto "Sin letra sincronizada" (no es un error).
+- [x] Tests primero: `LrcParserTests` (varias marcas, líneas vacías, metadatos) y `LyricsSyncEngineTests` (índice según posición y desfase).
+- [x] `LrcParser` y `LyricsSyncEngine` en Core.
+- [x] `LrclibClient` en Windows (HttpClient, User-Agent, tiempo de espera 5 s, manejo de 404).
+- [x] Validación de duración (±3 s) y caché en disco.
+- [x] `LyricsView`: línea actual resaltada y la anterior/siguiente atenuadas; desplazamiento suave.
+- [x] Ajuste de desfase −5…+5 s con botones.
+- [ ] Opción para desactivar letras (privacidad). *(Hecha en el menú de la bandeja: "Buscar letras en internet"; falta probarla.)*
+- [ ] *(Botón "Importar .lrc" hecho; falta probarlo con un archivo real.)* Importar un archivo `.lrc` manualmente para una canción sin letra. Opcional: carpeta de letras locales buscando `Artista - Título.lrc` (SMTC no da la ruta del archivo que suena, así que no se puede leer el `.lrc` "de al lado" automáticamente).
+- [x] Estado discreto "Sin letra sincronizada" (no es un error).
 
 **Terminado cuando:** una canción con letra sincronizada la muestra en tiempo con el audio y los tests pasan.
 
@@ -147,3 +147,4 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - **2026-10-27 — M1 y decisión de música.** Esqueleto creado (4 proyectos, notch 220×34, bandeja, instancia única); compila sin avisos, 54 MB RAM. Falta la verificación visual de la persona usuaria para marcar M1. Música: opción A (YouTube Music + reproductor externo para carpetas locales, todo vía SMTC con `Windows.Media.Control`).
 - **2026-10-27 — M2b y M3.** Estilos, modo invisible, Esc y franja reservada probados con UI Automation y capturas. M3 funciona con YouTube Music en Chrome (datos, carátula, botones). Errores encontrados en las pruebas y corregidos: carátula con el logo de Chrome, parpadeo de "Nada en reproducción" al cambiar de canción (Chrome cierra y reabre su sesión; ahora se esperan 1,5 s) y notch desplazado tras quitar la franja reservada (ahora se recoloca con `WM_SETTINGCHANGE`). Pendiente: probar música local con MusicBee. Siguiente: M3b.
 - **2026-10-27 — M3b.** Varios reproductores: se vigila play/pausa de todos y se muestra el que suena; etiqueta para fijar uno. Hallazgo en pruebas: al abrir un reproductor nuevo Windows no siempre manda `SessionsChanged`, así que la lista también se rehace con `CurrentSessionChanged`. 45 pruebas. Siguiente: M4 (letras).
+- **2026-10-27 — M4.** Letras de LRCLIB con caché en disco, pestañas Ahora suena / Letras, desfase ±5 s, importar .lrc, opción de privacidad en la bandeja. 99 pruebas. Verificado: búsqueda real (una canción solo tenía letra sin tiempos en LRCLIB, comprobado con su API) y letra sincronizada con `--fake` (avance y desfase). Pendiente de probar: letra no avanza en pausa, importar .lrc, desactivar letras.

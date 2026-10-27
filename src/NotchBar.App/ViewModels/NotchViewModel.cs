@@ -20,6 +20,10 @@ public partial class NotchViewModel : ObservableObject
     [ObservableProperty]
     private bool _reserveTopStrip;
 
+    /// <summary>Permite buscar letras en lrclib.net (envía título, artista y duración).</summary>
+    [ObservableProperty]
+    private bool _lyricsEnabled = true;
+
     public bool IsNotchStyle => Style == NotchStyle.Notch;
     public bool IsCapsuleStyle => Style == NotchStyle.Capsule;
     public bool IsIndicatorStyle => Style == NotchStyle.Indicator;

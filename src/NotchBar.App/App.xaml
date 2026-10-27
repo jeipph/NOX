@@ -42,6 +42,10 @@
                         <MenuItem Header="Reservar la franja superior"
                                   IsCheckable="True"
                                   IsChecked="{Binding ReserveTopStrip}" />
+                        <MenuItem Header="Buscar letras en internet (lrclib.net)"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding LyricsEnabled}"
+                                  ToolTip="Envía título, artista y duración de la canción a lrclib.net" />
                         <Separator />
                         <MenuItem Header="Ajustes (pendiente)" IsEnabled="False" />
                         <Separator />

@@ -1,9 +1,7 @@
 <UserControl x:Class="NotchBar.App.Views.NowPlayingView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Width="{DynamicResource Size.Expanded.Width}"
-             Height="{DynamicResource Size.Expanded.Height}">
-    <!-- DataContext: NowPlayingViewModel. Tamaño fijo para que no se recoloque durante la animación. -->
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- DataContext: NowPlayingViewModel. Ocupa el espacio que le da ExpandedView. -->
 
     <Grid Margin="{DynamicResource Padding.Expanded}">
         <!-- Nada sonando -->

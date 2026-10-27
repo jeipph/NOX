@@ -43,12 +43,13 @@
         <Setter Property="Foreground" Value="{DynamicResource Brush.TextMuted}" />
         <Setter Property="FontFamily" Value="{DynamicResource Font.Main}" />
         <Setter Property="FontSize" Value="{DynamicResource FontSize.Micro}" />
+        <Setter Property="Background" Value="{DynamicResource Brush.Surface}" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Background"
-                            Background="{DynamicResource Brush.Surface}"
+                            Background="{TemplateBinding Background}"
                             CornerRadius="{DynamicResource Radius.Control}"
                             Padding="{DynamicResource Padding.Chip}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -62,6 +63,21 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!-- Pestaña del notch abierto: como la etiqueta, pero sin fondo si no está activa. -->
+    <Style x:Key="TabButton" TargetType="Button" BasedOn="{StaticResource ChipButton}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Margin" Value="{DynamicResource Space.Inline}" />
+    </Style>
+
+    <!-- Líneas de letra apagadas (la anterior y la siguiente). -->
+    <Style x:Key="LyricDimLine" TargetType="TextBlock">
+        <Setter Property="TextAlignment" Value="Center" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        <Setter Property="FontFamily" Value="{DynamicResource Font.Main}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.LyricDim}" />
+        <Setter Property="Foreground" Value="{DynamicResource Brush.TextMuted}" />
     </Style>
 
     <!-- Barra de progreso fina. WPF ajusta el ancho de PART_Indicator según Value. -->

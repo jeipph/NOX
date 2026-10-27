@@ -23,11 +23,11 @@
             MouseEnter="OnPillMouseEnter"
             MouseLeave="OnPillMouseLeave">
 
-        <!-- DataContext de la pastilla: NowPlayingViewModel (se asigna en el código). -->
+        <!-- DataContext de la pastilla: NotchContentViewModel (se asigna en el código). -->
         <Grid>
             <!-- Contraído: título corto de la canción. -->
             <TextBlock x:Name="CollapsedContent"
-                       Text="{Binding ShortTitle}"
+                       Text="{Binding NowPlaying.ShortTitle}"
                        Margin="{DynamicResource Padding.Collapsed}"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
@@ -36,11 +36,11 @@
                        FontSize="{DynamicResource FontSize.Micro}"
                        Foreground="{DynamicResource Brush.Text}" />
 
-            <!-- Expandido: ahora suena. -->
-            <views:NowPlayingView x:Name="ExpandedContent"
-                                  Visibility="Collapsed"
-                                  HorizontalAlignment="Center"
-                                  VerticalAlignment="Top" />
+            <!-- Expandido: pestañas "Ahora suena" y "Letras". -->
+            <views:ExpandedView x:Name="ExpandedContent"
+                                Visibility="Collapsed"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Top" />
         </Grid>
     </Border>
 </Window>
