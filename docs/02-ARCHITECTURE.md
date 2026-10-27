@@ -9,7 +9,7 @@
 | Interfaz | **WPF** | Ventanas transparentes y animaciones sencillas, XAML |
 | Patrón | MVVM + `CommunityToolkit.Mvvm` | Menos código repetido, estándar |
 | Inyección de dependencias | `Microsoft.Extensions.DependencyInjection` | Desacopla Core de Windows |
-| Música (Windows) | `Windows.Media.Control` (WinRT / SMTC) | La misma API que usan Kissa y Nock |
+| Música (Windows) | `Windows.Media.Control` (WinRT / SMTC), sin paquetes extra | La misma API que usan Kissa y Nock. **Decisión 2026-10-27:** dos fuentes, YouTube Music (navegador o app) y música local en carpetas reproducida con un reproductor externo que publique en SMTC (MusicBee, foobar2000, Reproductor multimedia). NotchBar **no** reproduce archivos (reproductor propio = idea v2). |
 | Audio (volumen) | `NAudio` (MIT) — `MMDeviceEnumerator` | Evita escribir COM a mano |
 | Bandeja | `H.NotifyIcon.Wpf` (MIT) | Icono de bandeja para WPF |
 | Pruebas | xUnit | Estándar |

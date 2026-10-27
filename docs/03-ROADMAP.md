@@ -47,7 +47,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [ ] `SmtcMediaService` con los eventos descritos en la arquitectura.
 - [ ] Vista `NowPlayingView`: carátula, título, artista, botones ⏮ ⏯ ⏭, barra de progreso.
 - [ ] En el estado contraído mostrar título corto (máx. ~24 caracteres con "…").
-- [ ] Probar con: YouTube Music en Chrome/Edge, Spotify (si está instalado), reproductor local.
+- [ ] Probar con: YouTube Music en Chrome/Edge (y su app de escritorio si se usa) y música local con MusicBee / foobar2000 / Reproductor multimedia. Comprobar cuál publica bien en SMTC (MusicBee puede necesitar activar su integración con los controles de Windows; no confirmado).
 - [ ] Manejo de "no suena nada": mostrar texto discreto "Nada en reproducción".
 - [ ] **`FakeMediaService`** (canción y letra de mentira) para probar la interfaz sin abrir un reproductor; activable con el argumento `--fake` (idea del modo `--selftest` de Oyenza).
 
@@ -65,7 +65,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [ ] `LyricsView`: línea actual resaltada y la anterior/siguiente atenuadas; desplazamiento suave.
 - [ ] Ajuste de desfase −5…+5 s con botones.
 - [ ] Opción para desactivar letras (privacidad).
-- [ ] Importar un archivo `.lrc` manualmente para una canción sin letra.
+- [ ] Importar un archivo `.lrc` manualmente para una canción sin letra. Opcional: carpeta de letras locales buscando `Artista - Título.lrc` (SMTC no da la ruta del archivo que suena, así que no se puede leer el `.lrc` "de al lado" automáticamente).
 - [ ] Estado discreto "Sin letra sincronizada" (no es un error).
 
 **Terminado cuando:** una canción con letra sincronizada la muestra en tiempo con el audio y los tests pasan.
@@ -144,3 +144,4 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - **2026-10-26 — Investigación.** Se buscaron proyectos similares (ver `07-RESEARCH-SIMILAR-PROJECTS.md`). Cambios: se quitó la batería; se pasó a **.NET 10** (.NET 8 termina soporte en nov. 2026); se añadieron M2b, M3b, M6b, M6c, M6d, M9b; objetivo de RAM ≤150 MB. Instalar con `winget install Microsoft.DotNet.SDK.10`.
 - **2026-10-27 — Clones y reparto.** Se estudiaron boring.notch, BetterLyrics, WindowsMediaController (MIT), Poricom y Clone-Wars (ver `07-RESEARCH…` §6). Se creó `../REPARTO-MODELOS.md` (qué modelo hace cada tarea). Pendiente: decidir si usar `Dubya.WindowsMediaController` o `Windows.Media.Control` directo. Siguiente paso: M0.
 - **2026-10-27 — M0 terminado.** .NET SDK 10.0.403 instalado, VS Code + C# Dev Kit, telemetría de la CLI desactivada (`DOTNET_CLI_TELEMETRY_OPTOUT=1`). Los proyectos se movieron de OneDrive a `C:\Dev\NotchBar` y `C:\Dev\Marginalia` (OneDrive bloquea `bin/obj`). Repositorio git creado. Siguiente paso: M1.
+- **2026-10-27 — M1 y decisión de música.** Esqueleto creado (4 proyectos, notch 220×34, bandeja, instancia única); compila sin avisos, 54 MB RAM. Falta la verificación visual de la persona usuaria para marcar M1. Música: opción A (YouTube Music + reproductor externo para carpetas locales, todo vía SMTC con `Windows.Media.Control`).
