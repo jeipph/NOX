@@ -10,6 +10,7 @@
                 <ResourceDictionary Source="Themes/Tokens.Layout.xaml" />
                 <!-- Colores del tema activo. ThemeService lo cambiará en M9. -->
                 <ResourceDictionary Source="Themes/Tokens.Dark.xaml" />
+                <ResourceDictionary Source="Themes/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <!-- DataContext = NotchViewModel (se asigna en App.xaml.cs). -->

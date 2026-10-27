@@ -3,6 +3,9 @@ using H.NotifyIcon;
 using Microsoft.Extensions.DependencyInjection;
 using NotchBar.App.ViewModels;
 using NotchBar.App.Windows;
+using NotchBar.Core.Abstractions;
+using NotchBar.Core.Media;
+using NotchBar.Windows.Media;
 
 namespace NotchBar.App;
 
@@ -24,19 +27,29 @@ public partial class App : Application
 
         base.OnStartup(e);
 
-        _services = ConfigureServices();
+        // --fake: canción de mentira para probar la interfaz sin reproductor.
+        bool useFakeMedia = e.Args.Contains("--fake", StringComparer.OrdinalIgnoreCase);
+        _services = ConfigureServices(useFakeMedia);
 
         _trayIcon = (TaskbarIcon)FindResource("TrayIcon");
         _trayIcon.DataContext = _services.GetRequiredService<NotchViewModel>();
         _trayIcon.ForceCreate();
 
         _services.GetRequiredService<NotchWindow>().Show();
+        _ = _services.GetRequiredService<NowPlayingViewModel>().StartAsync();
     }
 
-    private static ServiceProvider ConfigureServices()
+    private static ServiceProvider ConfigureServices(bool useFakeMedia)
     {
         var services = new ServiceCollection();
+
+        if (useFakeMedia)
+            services.AddSingleton<IMediaService, FakeMediaService>(_ => new FakeMediaService());
+        else
+            services.AddSingleton<IMediaService, SmtcMediaService>();
+
         services.AddSingleton<NotchViewModel>();
+        services.AddSingleton<NowPlayingViewModel>();
         services.AddSingleton<NotchWindow>();
         return services.BuildServiceProvider();
     }

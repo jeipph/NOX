@@ -17,6 +17,7 @@ namespace NotchBar.App.Windows;
 public partial class NotchWindow : Window, IDisposable
 {
     private readonly NotchViewModel _viewModel;
+    private readonly NowPlayingViewModel _nowPlaying;
 
     // Solo corre mientras espera para contraer; en reposo no hay temporizadores activos.
     private readonly DispatcherTimer _collapseTimer;
@@ -25,12 +26,14 @@ public partial class NotchWindow : Window, IDisposable
     private nint _hwnd;
     private bool _isExpanded;
 
-    public NotchWindow(NotchViewModel viewModel)
+    public NotchWindow(NotchViewModel viewModel, NowPlayingViewModel nowPlaying)
     {
         InitializeComponent();
 
         _viewModel = viewModel;
         _viewModel.PropertyChanged += OnViewModelChanged;
+        _nowPlaying = nowPlaying;
+        Pill.DataContext = nowPlaying;
 
         _collapseTimer = new DispatcherTimer { Interval = (TimeSpan)FindResource("Hover.CollapseDelay") };
         _collapseTimer.Tick += (_, _) =>
@@ -169,6 +172,10 @@ public partial class NotchWindow : Window, IDisposable
     private string CollapsedBackgroundKey =>
         _viewModel.OnlyOnHover ? "Brush.HitArea" : "Brush.Background";
 
+    // El título corto solo cabe en la pastilla visible (no en el indicador ni en el modo invisible).
+    private bool ShowsCollapsedText =>
+        !_viewModel.OnlyOnHover && _viewModel.Style != NotchStyle.Indicator;
+
     // --- Expandir y contraer ---
 
     private void OnPillMouseEnter(object sender, MouseEventArgs e)
@@ -212,6 +219,8 @@ public partial class NotchWindow : Window, IDisposable
         Pill.BeginAnimation(HeightProperty, heightAnimation);
         Pill.SetResourceReference(Border.CornerRadiusProperty, expanded ? ExpandedRadiusKey : CollapsedRadiusKey);
         ExpandedContent.Visibility = expanded ? Visibility.Visible : Visibility.Collapsed;
+        CollapsedContent.Visibility = !expanded && ShowsCollapsedText ? Visibility.Visible : Visibility.Collapsed;
+        _nowPlaying.SetVisible(expanded);
     }
 
     // Aspecto contraído del estilo actual, sin animación.
@@ -228,6 +237,8 @@ public partial class NotchWindow : Window, IDisposable
         Pill.SetResourceReference(MarginProperty, MarginKey);
         Pill.SetResourceReference(Border.BackgroundProperty, CollapsedBackgroundKey);
         ExpandedContent.Visibility = Visibility.Collapsed;
+        CollapsedContent.Visibility = ShowsCollapsedText ? Visibility.Visible : Visibility.Collapsed;
+        _nowPlaying.SetVisible(false);
     }
 
     public void Dispose()

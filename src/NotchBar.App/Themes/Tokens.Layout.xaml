@@ -27,6 +27,15 @@
     <Thickness x:Key="Margin.Notch">0</Thickness>
     <Thickness x:Key="Margin.Capsule">0,8,0,0</Thickness>
 
+    <!-- Panel "Ahora suena" -->
+    <Thickness x:Key="Padding.Expanded">20,16,20,16</Thickness>
+    <sys:Double x:Key="Size.Cover">128</sys:Double>
+    <sys:Double x:Key="Size.IconButton">36</sys:Double>
+    <sys:Double x:Key="Size.Progress">3</sys:Double>
+    <Thickness x:Key="Space.Gap">16,0,0,0</Thickness>
+    <Thickness x:Key="Space.Below">0,0,0,8</Thickness>
+    <Thickness x:Key="Padding.Collapsed">16,0,16,0</Thickness>
+
     <!-- Tiempos -->
     <sys:TimeSpan x:Key="Duration.Expand">00:00:00.22</sys:TimeSpan>
     <sys:TimeSpan x:Key="Duration.Fast">00:00:00.12</sys:TimeSpan>
@@ -34,5 +43,14 @@
 
     <!-- Tipografía -->
     <FontFamily x:Key="Font.Main">Segoe UI Variable, Segoe UI</FontFamily>
+    <FontFamily x:Key="Font.Icons">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
     <sys:Double x:Key="FontSize.Title">15</sys:Double>
+    <sys:Double x:Key="FontSize.Small">12</sys:Double>
+    <sys:Double x:Key="FontSize.Micro">11</sys:Double>
+    <sys:Double x:Key="FontSize.Icon">16</sys:Double>
+    <sys:Double x:Key="FontSize.IconLarge">20</sys:Double>
+    <FontWeight x:Key="FontWeight.Title">SemiBold</FontWeight>
+
+    <!-- Tiempo entre redibujos de la barra de progreso (solo con el notch abierto y la música sonando). -->
+    <sys:TimeSpan x:Key="Progress.Interval">00:00:00.5</sys:TimeSpan>
 </ResourceDictionary>
