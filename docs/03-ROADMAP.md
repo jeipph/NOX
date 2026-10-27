@@ -28,11 +28,11 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 **Terminado cuando:** al ejecutar, aparece la pastilla arriba al centro, no sale en la barra de tareas, y "Salir" cierra la app. `dotnet build` y `dotnet test` pasan.
 
 ## M2 — Comportamiento del notch (≈2 h)
-- [ ] Estilos extendidos por P/Invoke (`WS_EX_TOOLWINDOW`, `WS_EX_NOACTIVATE`).
-- [ ] Expandir al entrar el ratón y contraer al salir (con retraso de ~400 ms), con animación de 220 ms.
-- [ ] Ajuste correcto con escalado de pantalla (DPI 100 %, 125 %, 150 %). Probar cambiando el escalado en Windows.
-- [ ] Ocultar cuando una app está en pantalla completa (aviso `ABN_FULLSCREENAPP` de una AppBar sin espacio reservado + `FullscreenRules`).
-- [ ] Prueba: contenido de relleno ("Hola") dentro del panel expandido.
+- [x] Estilos extendidos por P/Invoke (`WS_EX_TOOLWINDOW`, `WS_EX_NOACTIVATE`).
+- [x] Expandir al entrar el ratón y contraer al salir (con retraso de ~400 ms), con animación de 220 ms.
+- [ ] Ajuste correcto con escalado de pantalla (DPI 100 %, 125 %, 150 %). Probar cambiando el escalado en Windows. *(Código listo; la prueba con 125/150 % se hace en M11.)*
+- [x] Ocultar cuando una app está en pantalla completa (aviso `ABN_FULLSCREENAPP` de una AppBar sin espacio reservado + `FullscreenRules`).
+- [x] Prueba: contenido de relleno ("Hola") dentro del panel expandido.
 
 **Terminado cuando:** pasa el ratón → se despliega suave; sale → se pliega; abrir un video en pantalla completa lo oculta; al salir de pantalla completa vuelve.
 
