@@ -4,8 +4,8 @@ using NotchBar.Core.Models;
 
 namespace NotchBar.App.ViewModels;
 
-// Opciones de aspecto del notch, elegidas desde el menú de la bandeja.
-// De momento viven en memoria; en M9 (Ajustes) se guardarán en disco.
+// Opciones elegidas desde el menú de la bandeja. SettingsCoordinator las carga al arrancar
+// y las guarda en disco cada vez que cambian.
 public partial class NotchViewModel : ObservableObject
 {
     [ObservableProperty]
@@ -24,10 +24,43 @@ public partial class NotchViewModel : ObservableObject
     [ObservableProperty]
     private bool _lyricsEnabled = true;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSystemTheme), nameof(IsDarkTheme), nameof(IsLightTheme))]
+    private AppTheme _theme = AppTheme.System;
+
+    [ObservableProperty]
+    private bool _startWithWindows;
+
     public bool IsNotchStyle => Style == NotchStyle.Notch;
     public bool IsCapsuleStyle => Style == NotchStyle.Capsule;
     public bool IsIndicatorStyle => Style == NotchStyle.Indicator;
 
+    public bool IsSystemTheme => Theme == AppTheme.System;
+    public bool IsDarkTheme => Theme == AppTheme.Dark;
+    public bool IsLightTheme => Theme == AppTheme.Light;
+
     [RelayCommand]
     private void SetStyle(NotchStyle style) => Style = style;
+
+    [RelayCommand]
+    private void SetTheme(AppTheme theme) => Theme = theme;
+
+    public void Apply(AppSettings settings)
+    {
+        Style = settings.Style;
+        OnlyOnHover = settings.OnlyOnHover;
+        ReserveTopStrip = settings.ReserveTopStrip;
+        LyricsEnabled = settings.LyricsEnabled;
+        Theme = settings.Theme;
+    }
+
+    public AppSettings ToSettings(string? preferredSourceId) => new()
+    {
+        Style = Style,
+        OnlyOnHover = OnlyOnHover,
+        ReserveTopStrip = ReserveTopStrip,
+        LyricsEnabled = LyricsEnabled,
+        Theme = Theme,
+        PreferredSourceId = preferredSourceId,
+    };
 }

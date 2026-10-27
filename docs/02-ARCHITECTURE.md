@@ -37,7 +37,7 @@ NotchBar/
 │  │  ├─ Audio/         NAudioVolumeService.cs
 │  │  ├─ Clipboard/     ClipboardMonitor.cs
 │  │  ├─ Shell/         NativeMethods.cs (P/Invoke), WindowHelper.cs, AppBar.cs (pantalla completa y franja reservada), EscapeKeyHook.cs, AutoStart.cs
-│  │  └─ Storage/       JsonSettingsStore.cs
+│  │  └─ Shell/         SystemTheme.cs, AutoStart.cs (registro de Windows)
 │  └─ NotchBar.App/                   (WPF, net10.0-windows10.0.19041.0, WinExe)
 │     ├─ App.xaml / App.xaml.cs       (arranque, DI, bandeja)
 │     ├─ Windows/       NotchWindow.xaml(.cs), SettingsWindow.xaml(.cs)
@@ -120,7 +120,8 @@ Implementado en `VinylView`: la animación se quita (y el disco queda en su áng
 - Escritura **atómica**: escribir a `.tmp` y renombrar.
 
 ### 8. Ajustes, tema, arranque (hito M9)
-- `AppSettings` (Core) serializado con `System.Text.Json`.
+- `AppSettings` y `JsonSettingsStore` (los dos en Core, con pruebas: solo usan archivos y JSON) en `%APPDATA%NotchBarsettings.json`, enums como texto. Archivo dañado → se aparta como `.bad` y se usan los valores por defecto.
+- `SettingsCoordinator` (App) carga al arrancar y guarda en cada cambio; `ThemeService` (App) reemplaza el diccionario de colores. Sin ventana de ajustes: todo está en el menú de la bandeja.
 - Tema: `Dark | Light | System`. Cambiar reemplazando el `ResourceDictionary` de tokens en `Application.Resources.MergedDictionaries`. Detectar el tema de Windows leyendo `HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize\AppsUseLightTheme` y suscribirse a `SystemEvents.UserPreferenceChanged`.
 - Arranque con Windows: valor en `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` (sin permisos de administrador).
 - Módulos activables: cada widget tiene un booleano en `AppSettings`.

@@ -1,13 +1,17 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Windows;
 using H.NotifyIcon;
 using Microsoft.Extensions.DependencyInjection;
+using NotchBar.App.Services;
 using NotchBar.App.ViewModels;
 using NotchBar.App.Windows;
 using NotchBar.Core.Abstractions;
 using NotchBar.Core.Lyrics;
 using NotchBar.Core.Media;
+using NotchBar.Core.Settings;
 using NotchBar.Windows.Lyrics;
 using NotchBar.Windows.Media;
+using NotchBar.Windows.Shell;
 
 namespace NotchBar.App;
 
@@ -37,28 +41,43 @@ public partial class App : Application
         _trayIcon.DataContext = _services.GetRequiredService<NotchViewModel>();
         _trayIcon.ForceCreate();
 
-        _services.GetRequiredService<NotchWindow>().Show();
-        _ = _services.GetRequiredService<NotchContentViewModel>().StartAsync();
+        _ = StartAsync(_services);
+    }
+
+    // Primero las opciones guardadas (tema incluido, para no ver un parpadeo de colores),
+    // luego la ventana y por último la música.
+    private static async Task StartAsync(IServiceProvider services)
+    {
+        await services.GetRequiredService<SettingsCoordinator>().LoadAsync();
+        services.GetRequiredService<NotchWindow>().Show();
+        await services.GetRequiredService<NotchContentViewModel>().StartAsync();
     }
 
     private static ServiceProvider ConfigureServices(bool useFakeMedia)
     {
         var services = new ServiceCollection();
 
-        // --fake: todo de mentira (canción y letra), sin reproductor ni internet.
+        // --fake: todo de mentira (canción y letra), sin reproductor ni internet,
+        // y con sus propias opciones para no tocar las de verdad.
         if (useFakeMedia)
         {
             services.AddSingleton<IMediaService, FakeMediaService>(_ => new FakeMediaService());
             services.AddSingleton<ILyricsSource, FakeLyricsSource>();
             services.AddSingleton<ILyricsCache, MemoryLyricsCache>();
+            services.AddSingleton<ISettingsStore>(_ =>
+                new JsonSettingsStore(Path.Combine(Path.GetTempPath(), "NotchBar-fake-settings.json")));
         }
         else
         {
             services.AddSingleton<IMediaService, SmtcMediaService>();
             services.AddSingleton<ILyricsSource, LrclibClient>();
             services.AddSingleton<ILyricsCache>(_ => new FileLyricsCache());
+            services.AddSingleton<ISettingsStore>(_ => new JsonSettingsStore());
         }
         services.AddSingleton<ILyricsService, LyricsService>();
+        services.AddSingleton<IAutoStart, AutoStart>();
+        services.AddSingleton<ThemeService>();
+        services.AddSingleton<SettingsCoordinator>();
 
         services.AddSingleton<NotchViewModel>();
         services.AddSingleton<NowPlayingViewModel>();

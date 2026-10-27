@@ -106,11 +106,11 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [ ] Carpeta configurable.
 
 ## M9 — Ajustes y temas (≈3 h)
-- [ ] `AppSettings` + `JsonSettingsStore` (con valores por defecto y tolerancia a archivo dañado).
-- [ ] `SettingsWindow`: tema (Oscuro/Claro/Sistema), módulos activables, tamaño del notch, desfase de letras por defecto, arranque con Windows, activar/desactivar letras.
-- [ ] Cambio de tema **en vivo** sin reiniciar.
-- [ ] Arranque con Windows por `HKCU\...\Run`.
-- [ ] (Para el MVP basta con el tema; el resto puede esperar.)
+- [x] `AppSettings` + `JsonSettingsStore` (con valores por defecto y tolerancia a archivo dañado).
+- [x] ~~`SettingsWindow`~~ → **todo en el menú de la bandeja** (decisión 2026-10-27, por sencillez): Tema, Estilo, Solo al pasar el ratón, Reservar franja, Buscar letras, Iniciar con Windows. Módulos activables y desfase por defecto: no hacen falta por ahora.
+- [x] Cambio de tema **en vivo** sin reiniciar. *(Probado Claro/Oscuro; "Sistema" sigue a Windows con `UserPreferenceChanged`, sin probar para no tocar la configuración de Windows.)*
+- [x] Arranque con Windows por `HKCU\...\Run`.
+- [x] (Para el MVP basta con el tema.) Además se guardan todas las opciones y el reproductor fijado.
 
 ## M9b — Atajos globales (≈1 h) *(añadido tras la investigación)*
 - [ ] Atajos configurables con `RegisterHotKey`: mostrar/ocultar notch, play/pausa, letra −0.5 s, letra +0.5 s, reiniciar desfase (idea de LyricIsland).
@@ -152,3 +152,4 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - **2026-10-27 — M4, ajustes tras pruebas.** "La letra desaparece al pausar": no era un fallo; al pausar desde YouTube Music el ratón sale del notch y este se cierra. Se añadieron ⏮ ⏯ ⏭ en la pestaña Letras. Comprobado: en pausa la letra se queda quieta. Hallazgo: lrclib.net a veces responde 503 "ServerOverloaded"; ahora se reintenta (3 veces con Retry-After y luego hasta 3 veces cada 30 s, mostrando "reintento N de 3"). Letra sincronizada real vista en el notch. Falta: confirmar de oído que va al ritmo, importar .lrc y la casilla de privacidad.
 - **2026-10-27 — M4 terminado.** La persona usuaria confirmó que la letra va al ritmo. Se quitó "Importar .lrc" (lo pidió: sobraba). 100 pruebas. Solo queda probar la casilla de privacidad "Buscar letras en internet". Siguiente: M5 (vinilo).
 - **2026-10-27 — M5.** Pestaña Vinilo: disco con surcos y la carátula como etiqueta, gira solo con el notch abierto, la pestaña a la vista y la música sonando (pedido expreso de la persona usuaria). CPU medida: ~6 % de un núcleo girando, ~0,6 % cerrado. Siguiente: M6 (volumen y reloj) o M9 (tema) para completar el MVP.
+- **2026-10-27 — M9. MVP completo (M0–M5 + M9).** Opciones guardadas en settings.json, tema Sistema/Oscuro/Claro en vivo, Iniciar con Windows. Sin ventana de ajustes: todo en el menú de la bandeja (más simple). Probado con UI Automation: cambio de tema, persistencia tras reiniciar, registro de arranque. 105 pruebas. Siguiente: M10 (empaquetado) o funciones extra (M6 volumen/reloj, M7 portapapeles, M8 notas).

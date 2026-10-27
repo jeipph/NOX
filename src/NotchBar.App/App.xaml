@@ -47,7 +47,23 @@
                                   IsChecked="{Binding LyricsEnabled}"
                                   ToolTip="Envía título, artista y duración de la canción a lrclib.net" />
                         <Separator />
-                        <MenuItem Header="Ajustes (pendiente)" IsEnabled="False" />
+                        <MenuItem Header="Tema">
+                            <MenuItem Header="Sistema (como Windows)"
+                                      IsChecked="{Binding IsSystemTheme, Mode=OneWay}"
+                                      Command="{Binding SetThemeCommand}"
+                                      CommandParameter="{x:Static models:AppTheme.System}" />
+                            <MenuItem Header="Oscuro"
+                                      IsChecked="{Binding IsDarkTheme, Mode=OneWay}"
+                                      Command="{Binding SetThemeCommand}"
+                                      CommandParameter="{x:Static models:AppTheme.Dark}" />
+                            <MenuItem Header="Claro"
+                                      IsChecked="{Binding IsLightTheme, Mode=OneWay}"
+                                      Command="{Binding SetThemeCommand}"
+                                      CommandParameter="{x:Static models:AppTheme.Light}" />
+                        </MenuItem>
+                        <MenuItem Header="Iniciar con Windows"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding StartWithWindows}" />
                         <Separator />
                         <MenuItem Header="Salir" Click="OnExitClick" />
                     </ContextMenu>
