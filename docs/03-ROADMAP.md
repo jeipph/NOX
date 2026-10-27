@@ -101,9 +101,9 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [x] `ClipboardView`: lista, clic para copiar, botón fijar (se guarda en `pinned-clips.json`), "Borrar historial" (los fijados se quedan).
 
 ## M8 — Notas rápidas (≈1.5 h)
-- [ ] `NotesView`: cuadro de texto, Ctrl+Enter guarda `.md` de forma atómica.
-- [ ] Lista de las últimas 10 notas; clic abre el archivo.
-- [ ] Carpeta configurable.
+- [x] `NotesView`: cuadro de texto, Ctrl+Enter guarda `.md` de forma atómica (nunca sobrescribe: `-2.md` si coincide el segundo). "Modo escritura": al hacer clic en el cuadro el notch acepta el teclado y no se cierra; Esc lo cierra y devuelve el teclado a tu ventana. Probado con ratón y teclado reales.
+- [x] Lista de las últimas 10 notas (también las creadas fuera); clic abre el archivo con el programa de Windows. Botón "Abrir carpeta".
+- [x] Carpeta configurable desde el menú de la bandeja ("Carpeta de notas…"), guardada en settings.json. *(El diálogo no se probó.)*
 
 ## M9 — Ajustes y temas (≈3 h)
 - [x] `AppSettings` + `JsonSettingsStore` (con valores por defecto y tolerancia a archivo dañado).

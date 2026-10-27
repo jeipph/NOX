@@ -26,4 +26,7 @@ public sealed record AppSettings
 
     /// <summary>Reproductor fijado con la etiqueta del notch; null = automático.</summary>
     public string? PreferredSourceId { get; init; }
+
+    /// <summary>Carpeta de las notas rápidas; null = Documentos\NotchBar\notes.</summary>
+    public string? NotesFolder { get; init; }
 }

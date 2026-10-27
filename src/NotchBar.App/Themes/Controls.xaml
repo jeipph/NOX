@@ -101,6 +101,29 @@
         </Setter>
     </Style>
 
+    <!-- Cuadro de texto de las notas: fondo de tarjeta, sin borde, varias líneas. -->
+    <Style x:Key="NoteTextBox" TargetType="TextBox">
+        <Setter Property="AcceptsReturn" Value="True" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Hidden" />
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Text}" />
+        <Setter Property="CaretBrush" Value="{DynamicResource Brush.Text}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource Brush.TextMuted}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Font.Main}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Small}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border Background="{DynamicResource Brush.Surface}"
+                            CornerRadius="{DynamicResource Radius.Control}"
+                            Padding="{DynamicResource Padding.NoteBox}">
+                        <ScrollViewer x:Name="PART_ContentHost" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Pestaña del notch abierto: como la etiqueta, pero sin fondo si no está activa. -->
     <Style x:Key="TabButton" TargetType="Button" BasedOn="{StaticResource ChipButton}">
         <Setter Property="Background" Value="Transparent" />

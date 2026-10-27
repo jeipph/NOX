@@ -12,6 +12,7 @@ public enum NotchPanel
     Lyrics,
     Vinyl,
     Clipboard,
+    Notes,
 }
 
 /// <summary>Contenido de la pastilla: qué panel se ve, el texto del notch cerrado y avisos de visibilidad.</summary>
@@ -23,19 +24,20 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
     private bool _isExpanded;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsNowPlayingActive), nameof(IsLyricsActive), nameof(IsVinylActive), nameof(IsClipboardActive))]
+    [NotifyPropertyChangedFor(nameof(IsNowPlayingActive), nameof(IsLyricsActive), nameof(IsVinylActive), nameof(IsClipboardActive), nameof(IsNotesActive))]
     private NotchPanel _activePanel = NotchPanel.NowPlaying;
 
     /// <summary>Texto del notch cerrado: el título de la canción o, si no suena nada, la hora.</summary>
     [ObservableProperty]
     private string _collapsedText = "";
 
-    public NotchContentViewModel(NowPlayingViewModel nowPlaying, LyricsViewModel lyrics, VolumeViewModel volume, ClipboardViewModel clipboard)
+    public NotchContentViewModel(NowPlayingViewModel nowPlaying, LyricsViewModel lyrics, VolumeViewModel volume, ClipboardViewModel clipboard, NotesViewModel notes)
     {
         NowPlaying = nowPlaying;
         Lyrics = lyrics;
         Volume = volume;
         Clipboard = clipboard;
+        Notes = notes;
 
         _clockTimer.Tick += (_, _) => UpdateCollapsedText();
         NowPlaying.PropertyChanged += OnNowPlayingChanged;
@@ -50,6 +52,8 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
 
     public ClipboardViewModel Clipboard { get; }
 
+    public NotesViewModel Notes { get; }
+
     public bool IsNowPlayingActive => ActivePanel == NotchPanel.NowPlaying;
 
     public bool IsLyricsActive => ActivePanel == NotchPanel.Lyrics;
@@ -57,6 +61,8 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
     public bool IsVinylActive => ActivePanel == NotchPanel.Vinyl;
 
     public bool IsClipboardActive => ActivePanel == NotchPanel.Clipboard;
+
+    public bool IsNotesActive => ActivePanel == NotchPanel.Notes;
 
     public Task StartAsync() => NowPlaying.StartAsync();
 
@@ -77,6 +83,7 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
     {
         NowPlaying.SetVisible(_isExpanded && IsNowPlayingActive);
         Lyrics.SetVisible(_isExpanded && IsLyricsActive);
+        Notes.SetVisible(_isExpanded && IsNotesActive);
     }
 
     private void OnNowPlayingChanged(object? sender, PropertyChangedEventArgs e)

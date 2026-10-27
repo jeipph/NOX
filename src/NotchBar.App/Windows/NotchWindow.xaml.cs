@@ -28,6 +28,10 @@ public partial class NotchWindow : Window, IDisposable
     private nint _hwnd;
     private bool _isExpanded;
 
+    // "Modo escritura" (pestaña Notas): el notch acepta el teclado y no se cierra solo.
+    private bool _isTyping;
+    private nint _windowBeforeTyping;
+
     public NotchWindow(NotchViewModel viewModel, NotchContentViewModel content, ClipboardMonitor clipboard)
     {
         InitializeComponent();
@@ -42,11 +46,15 @@ public partial class NotchWindow : Window, IDisposable
         _collapseTimer.Tick += (_, _) =>
         {
             _collapseTimer.Stop();
-            SetExpanded(false);
+            if (!_isTyping)
+                SetExpanded(false);
         };
 
         // El gancho de teclado llama desde dentro de Windows: responder rápido y animar después.
         _escapeKey.EscapePressed += () => Dispatcher.BeginInvoke(() => SetExpanded(false));
+
+        Pill.PreviewMouseLeftButtonDown += OnPillPreviewMouseDown;
+        Deactivated += (_, _) => ExitTyping(returnFocus: false);
 
         ApplyCollapsedLook();
     }
@@ -70,8 +78,9 @@ public partial class NotchWindow : Window, IDisposable
 
     private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
     {
-        // Clic en el notch sin quitarle el foco a la ventana en la que escribías.
-        if (msg == WindowHelper.WmMouseActivate)
+        // Clic en el notch sin quitarle el foco a la ventana en la que escribías
+        // (salvo en modo escritura, donde sí queremos el teclado).
+        if (msg == WindowHelper.WmMouseActivate && !_isTyping)
         {
             handled = true;
             return WindowHelper.MaNoActivate;
@@ -90,6 +99,69 @@ public partial class NotchWindow : Window, IDisposable
             Dispatcher.BeginInvoke(PlaceWindow);
 
         return 0;
+    }
+
+    // --- Modo escritura ---
+
+    private void OnPillPreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.OriginalSource is DependencyObject clicked && FindAncestor<TextBox>(clicked) is not null)
+            EnterTyping();
+    }
+
+    private void EnterTyping()
+    {
+        if (_isTyping)
+            return;
+
+        _isTyping = true;
+        RememberUserWindow();
+        WindowHelper.SetActivatable(_hwnd, true);
+        Activate();
+    }
+
+    /// <param name="returnFocus">True (con Esc): devolver el teclado a la ventana de antes.</param>
+    private void ExitTyping(bool returnFocus)
+    {
+        if (!_isTyping)
+            return;
+
+        _isTyping = false;
+        Keyboard.ClearFocus();
+        WindowHelper.SetActivatable(_hwnd, false);
+        if (returnFocus)
+            WindowHelper.Activate(_windowBeforeTyping);
+        if (!Pill.IsMouseOver)
+            _collapseTimer.Start();
+    }
+
+    // La ventana donde estabas trabajando, para devolverle el teclado al salir del modo escritura.
+    // Probado: al hacer clic en el cuadro de nota, Windows a veces ya ha activado el notch,
+    // así que se recuerda también al abrir el notch y nunca se guarda el propio notch.
+    private void RememberUserWindow()
+    {
+        nint active = WindowHelper.ActiveWindow();
+        if (active != 0 && active != _hwnd)
+            _windowBeforeTyping = active;
+    }
+
+    protected override void OnPreviewKeyDown(KeyEventArgs e)
+    {
+        base.OnPreviewKeyDown(e);
+        if (e.Key == Key.Escape && _isTyping)
+        {
+            e.Handled = true;
+            SetExpanded(false);
+        }
+    }
+
+    private static T? FindAncestor<T>(DependencyObject? element) where T : DependencyObject
+    {
+        while (element is not null and not T)
+            element = element is Visual or System.Windows.Media.Media3D.Visual3D
+                ? VisualTreeHelper.GetParent(element)
+                : LogicalTreeHelper.GetParent(element);
+        return element as T;
     }
 
     private void OnViewModelChanged(object? sender, PropertyChangedEventArgs e)
@@ -201,6 +273,10 @@ public partial class NotchWindow : Window, IDisposable
 
     private void SetExpanded(bool expanded)
     {
+        // Cerrar (Esc, o el temporizador) termina el modo escritura y devuelve el teclado a donde estaba.
+        if (!expanded)
+            ExitTyping(returnFocus: true);
+
         if (expanded == _isExpanded)
             return;
         _isExpanded = expanded;
@@ -214,6 +290,7 @@ public partial class NotchWindow : Window, IDisposable
 
         if (expanded)
         {
+            RememberUserWindow();
             Pill.SetResourceReference(Border.BackgroundProperty, "Brush.Background");
             _escapeKey.Start();
         }
@@ -239,6 +316,7 @@ public partial class NotchWindow : Window, IDisposable
     // Aspecto contraído del estilo actual, sin animación.
     private void ApplyCollapsedLook()
     {
+        ExitTyping(returnFocus: false);
         _isExpanded = false;
         _escapeKey.Stop();
 

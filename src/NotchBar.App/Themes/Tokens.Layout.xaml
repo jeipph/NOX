@@ -43,6 +43,14 @@
     <Thickness x:Key="Padding.Collapsed">16,0,16,0</Thickness>
     <Thickness x:Key="Padding.Chip">8,2,8,2</Thickness>
     <Thickness x:Key="Padding.Row">8,5,8,5</Thickness>
+
+    <!-- Panel "Notas" -->
+    <!-- Las columnas de WPF necesitan GridLength, no un número suelto -->
+    <GridLength x:Key="Size.NotesListWidth">210</GridLength>
+    <Thickness x:Key="Padding.NoteBox">8,6,8,6</Thickness>
+    <!-- Donde aparece el texto de ayuda: el relleno del cuadro + el margen interno del texto de WPF -->
+    <Thickness x:Key="Padding.Note">10,7,10,7</Thickness>
+    <Thickness x:Key="Space.GapAbove">16,6,0,0</Thickness>
     <Thickness x:Key="Space.TabBar">0,0,0,10</Thickness>
     <Thickness x:Key="Space.Inline">8,0,8,0</Thickness>
 

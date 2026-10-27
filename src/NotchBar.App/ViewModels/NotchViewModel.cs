@@ -1,6 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using NotchBar.Core.Models;
+using NotchBar.Core.Notes;
 
 namespace NotchBar.App.ViewModels;
 
@@ -31,6 +33,10 @@ public partial class NotchViewModel : ObservableObject
     [ObservableProperty]
     private bool _startWithWindows;
 
+    /// <summary>Carpeta de las notas rápidas; null = la de por defecto.</summary>
+    [ObservableProperty]
+    private string? _notesFolder;
+
     public bool IsNotchStyle => Style == NotchStyle.Notch;
     public bool IsCapsuleStyle => Style == NotchStyle.Capsule;
     public bool IsIndicatorStyle => Style == NotchStyle.Indicator;
@@ -45,6 +51,18 @@ public partial class NotchViewModel : ObservableObject
     [RelayCommand]
     private void SetTheme(AppTheme theme) => Theme = theme;
 
+    [RelayCommand]
+    private void ChooseNotesFolder()
+    {
+        var dialog = new OpenFolderDialog
+        {
+            Title = "Carpeta para las notas rápidas",
+            InitialDirectory = NotesFolder ?? NotesStore.DefaultFolder,
+        };
+        if (dialog.ShowDialog() == true)
+            NotesFolder = dialog.FolderName;
+    }
+
     public void Apply(AppSettings settings)
     {
         Style = settings.Style;
@@ -52,6 +70,7 @@ public partial class NotchViewModel : ObservableObject
         ReserveTopStrip = settings.ReserveTopStrip;
         LyricsEnabled = settings.LyricsEnabled;
         Theme = settings.Theme;
+        NotesFolder = settings.NotesFolder;
     }
 
     public AppSettings ToSettings(string? preferredSourceId) => new()
@@ -62,5 +81,6 @@ public partial class NotchViewModel : ObservableObject
         LyricsEnabled = LyricsEnabled,
         Theme = Theme,
         PreferredSourceId = preferredSourceId,
+        NotesFolder = NotesFolder,
     };
 }

@@ -61,6 +61,8 @@
                                       Command="{Binding SetThemeCommand}"
                                       CommandParameter="{x:Static models:AppTheme.Light}" />
                         </MenuItem>
+                        <MenuItem Header="Carpeta de notas…"
+                                  Command="{Binding ChooseNotesFolderCommand}" />
                         <MenuItem Header="Iniciar con Windows"
                                   IsCheckable="True"
                                   IsChecked="{Binding StartWithWindows}" />

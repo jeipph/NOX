@@ -9,6 +9,7 @@ using NotchBar.Core.Abstractions;
 using NotchBar.Core.Clipboard;
 using NotchBar.Core.Lyrics;
 using NotchBar.Core.Media;
+using NotchBar.Core.Notes;
 using NotchBar.Core.Settings;
 using NotchBar.Windows.Audio;
 using NotchBar.Windows.Clipboard;
@@ -36,6 +37,13 @@ public partial class App : Application
 
         base.OnStartup(e);
 
+        // Un error no previsto en la interfaz se muestra y se apunta, en vez de perderse en silencio.
+        DispatcherUnhandledException += (_, args) =>
+        {
+            args.Handled = true;
+            ReportFatal(args.Exception);
+        };
+
         // --fake: canción de mentira para probar la interfaz sin reproductor.
         bool useFakeMedia = e.Args.Contains("--fake", StringComparer.OrdinalIgnoreCase);
         _services = ConfigureServices(useFakeMedia);
@@ -49,11 +57,38 @@ public partial class App : Application
 
     // Primero las opciones guardadas (tema incluido, para no ver un parpadeo de colores),
     // luego la ventana y por último la música.
-    private static async Task StartAsync(IServiceProvider services)
+    private async Task StartAsync(IServiceProvider services)
     {
-        await services.GetRequiredService<SettingsCoordinator>().LoadAsync();
-        services.GetRequiredService<NotchWindow>().Show();
-        await services.GetRequiredService<NotchContentViewModel>().StartAsync();
+        try
+        {
+            await services.GetRequiredService<SettingsCoordinator>().LoadAsync();
+            services.GetRequiredService<NotchWindow>().Show();
+            await services.GetRequiredService<NotchContentViewModel>().StartAsync();
+        }
+        catch (Exception error)
+        {
+            ReportFatal(error);
+        }
+    }
+
+    // Guarda el error en %LOCALAPPDATA%\NotchBar\logs\error.log (sin datos personales: solo el error técnico),
+    // lo muestra y cierra la app.
+    private void ReportFatal(Exception error)
+    {
+        Exception cause = error.InnerException ?? error;
+        try
+        {
+            string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NotchBar", "logs");
+            Directory.CreateDirectory(folder);
+            File.AppendAllText(Path.Combine(folder, "error.log"), $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}{Environment.NewLine}{error}{Environment.NewLine}{Environment.NewLine}");
+        }
+        catch (Exception)
+        {
+        }
+
+        MessageBox.Show($"NotchBar encontró un error y se va a cerrar:\n\n{cause.GetType().Name}: {cause.Message}\n\nDetalles en %LOCALAPPDATA%\\NotchBar\\logs\\error.log",
+            "NotchBar", MessageBoxButton.OK, MessageBoxImage.Error);
+        Shutdown();
     }
 
     private static ServiceProvider ConfigureServices(bool useFakeMedia)
@@ -83,6 +118,7 @@ public partial class App : Application
         services.AddSingleton<ClipboardMonitor>();
         services.AddSingleton<IClipboardService>(s => s.GetRequiredService<ClipboardMonitor>());
         services.AddSingleton(_ => new PinnedClipsStore());
+        services.AddSingleton<NotesStore>();
         services.AddSingleton<ThemeService>();
         services.AddSingleton<SettingsCoordinator>();
 
@@ -91,6 +127,7 @@ public partial class App : Application
         services.AddSingleton<LyricsViewModel>();
         services.AddSingleton<VolumeViewModel>();
         services.AddSingleton<ClipboardViewModel>();
+        services.AddSingleton<NotesViewModel>();
         services.AddSingleton<NotchContentViewModel>();
         services.AddSingleton<NotchWindow>();
         return services.BuildServiceProvider();

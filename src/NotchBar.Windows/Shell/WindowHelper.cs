@@ -23,6 +23,27 @@ public static class WindowHelper
     }
 
     /// <summary>
+    /// Permite o impide que la ventana se active (reciba el teclado). El notch normalmente no se activa;
+    /// solo mientras se escribe una nota.
+    /// </summary>
+    public static void SetActivatable(nint hwnd, bool activatable)
+    {
+        long style = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+        style = activatable ? style & ~WS_EX_NOACTIVATE : style | WS_EX_NOACTIVATE;
+        SetWindowLongPtr(hwnd, GWL_EXSTYLE, (nint)style);
+    }
+
+    /// <summary>La ventana que tiene el teclado ahora mismo.</summary>
+    public static nint ActiveWindow() => GetForegroundWindow();
+
+    /// <summary>Devuelve el teclado a otra ventana (solo funciona si nosotros lo tenemos).</summary>
+    public static void Activate(nint hwnd)
+    {
+        if (hwnd != 0)
+            SetForegroundWindow(hwnd);
+    }
+
+    /// <summary>
     /// Monitor principal en píxeles físicos: <c>Bounds</c> es la pantalla entera y
     /// <c>WorkArea</c> lo que queda sin la barra de tareas (y sin franjas reservadas).
     /// </summary>

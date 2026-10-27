@@ -118,6 +118,7 @@ Implementado en `VinylView`: la animación se quita (y el disco queda en su áng
 - Lista de las últimas 10 notas; clic abre el archivo con la app predeterminada.
 - Formato simple, compatible con Morrow (misma carpeta si la persona lo desea: opción "Carpeta de notas").
 - Escritura **atómica**: escribir a `.tmp` y renombrar.
+- **Modo escritura (hecho):** el notch tiene `WS_EX_NOACTIVATE` para no robar el foco. Al hacer clic en el cuadro de nota se quita ese estilo y se activa la ventana (`WindowHelper.SetActivatable`); mientras tanto el temporizador de cierre no actúa. Al salir (Esc, cerrar el notch o clic en otra ventana) se vuelve a poner y, con Esc, se devuelve el teclado a la ventana que se recordó al abrir el notch.
 
 ### 8. Ajustes, tema, arranque (hito M9)
 - `AppSettings` y `JsonSettingsStore` (los dos en Core, con pruebas: solo usan archivos y JSON) en `%APPDATA%NotchBarsettings.json`, enums como texto. Archivo dañado → se aparta como `.bad` y se usan los valores por defecto.
