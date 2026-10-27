@@ -67,4 +67,4 @@ NOX se llamó **NotchBar** hasta el 2026-10-27; al arrancar traslada solo los da
 
 ## Programa 2
 
-El lector de cómics, manga y libros está planeado en `../Marginalia/`.
+El lector de cómics, manga y libros está planeado en `../MOON/`.
