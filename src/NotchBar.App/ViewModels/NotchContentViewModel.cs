@@ -13,36 +13,50 @@ public enum NotchPanel
     Vinyl,
     Clipboard,
     Notes,
+    Focus,
 }
 
 /// <summary>Contenido de la pastilla: qué panel se ve, el texto del notch cerrado y avisos de visibilidad.</summary>
 public partial class NotchContentViewModel : ObservableObject, IDisposable
 {
     // Reloj del notch cerrado: despierta una vez por minuto, justo al cambiar el minuto,
-    // y solo mientras no suena nada (si suena, se muestra el título).
+    // y solo mientras no suena nada ni hay una sesión de concentración.
     private readonly DispatcherTimer _clockTimer = new();
     private bool _isExpanded;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsNowPlayingActive), nameof(IsLyricsActive), nameof(IsVinylActive), nameof(IsClipboardActive), nameof(IsNotesActive))]
+    [NotifyPropertyChangedFor(nameof(IsNowPlayingActive), nameof(IsLyricsActive), nameof(IsVinylActive),
+        nameof(IsClipboardActive), nameof(IsNotesActive), nameof(IsFocusActive))]
     private NotchPanel _activePanel = NotchPanel.NowPlaying;
 
-    /// <summary>Texto del notch cerrado: el título de la canción o, si no suena nada, la hora.</summary>
+    /// <summary>Texto del notch cerrado, por prioridad: tiempo de concentración, canción, hora.</summary>
     [ObservableProperty]
     private string _collapsedText = "";
 
-    public NotchContentViewModel(NowPlayingViewModel nowPlaying, LyricsViewModel lyrics, VolumeViewModel volume, ClipboardViewModel clipboard, NotesViewModel notes)
+    public NotchContentViewModel(
+        NowPlayingViewModel nowPlaying,
+        LyricsViewModel lyrics,
+        VolumeViewModel volume,
+        ClipboardViewModel clipboard,
+        NotesViewModel notes,
+        FocusViewModel focus)
     {
         NowPlaying = nowPlaying;
         Lyrics = lyrics;
         Volume = volume;
         Clipboard = clipboard;
         Notes = notes;
+        Focus = focus;
 
         _clockTimer.Tick += (_, _) => UpdateCollapsedText();
-        NowPlaying.PropertyChanged += OnNowPlayingChanged;
+        NowPlaying.PropertyChanged += OnPartChanged;
+        Focus.PropertyChanged += OnPartChanged;
+        Focus.Finished += OnFocusFinished;
         UpdateCollapsedText();
     }
+
+    /// <summary>Algo importante (fin de la concentración): la ventana abre el notch un momento.</summary>
+    public event Action? AttentionRequested;
 
     public NowPlayingViewModel NowPlaying { get; }
 
@@ -54,6 +68,8 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
 
     public NotesViewModel Notes { get; }
 
+    public FocusViewModel Focus { get; }
+
     public bool IsNowPlayingActive => ActivePanel == NotchPanel.NowPlaying;
 
     public bool IsLyricsActive => ActivePanel == NotchPanel.Lyrics;
@@ -63,6 +79,8 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
     public bool IsClipboardActive => ActivePanel == NotchPanel.Clipboard;
 
     public bool IsNotesActive => ActivePanel == NotchPanel.Notes;
+
+    public bool IsFocusActive => ActivePanel == NotchPanel.Focus;
 
     public Task StartAsync() => NowPlaying.StartAsync();
 
@@ -86,15 +104,33 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
         Notes.SetVisible(_isExpanded && IsNotesActive);
     }
 
-    private void OnNowPlayingChanged(object? sender, PropertyChangedEventArgs e)
+    private void OnFocusFinished()
     {
-        if (e.PropertyName is nameof(NowPlayingViewModel.ShortTitle) or nameof(NowPlayingViewModel.HasMedia))
+        ActivePanel = NotchPanel.Focus;
+        AttentionRequested?.Invoke();
+    }
+
+    private void OnPartChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(NowPlayingViewModel.ShortTitle) or nameof(NowPlayingViewModel.HasMedia)
+            or nameof(FocusViewModel.RemainingText) or nameof(FocusViewModel.State))
             UpdateCollapsedText();
     }
 
     private void UpdateCollapsedText()
     {
         _clockTimer.Stop();
+
+        if (Focus.IsActive)
+        {
+            CollapsedText = Focus.IsPaused ? $"En pausa · {Focus.RemainingText}" : $"Concentración · {Focus.RemainingText}";
+            return;
+        }
+        if (Focus.IsFinished)
+        {
+            CollapsedText = "¡Tiempo cumplido!";
+            return;
+        }
         if (NowPlaying.HasMedia)
         {
             CollapsedText = NowPlaying.ShortTitle;
@@ -110,6 +146,8 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         _clockTimer.Stop();
-        NowPlaying.PropertyChanged -= OnNowPlayingChanged;
+        NowPlaying.PropertyChanged -= OnPartChanged;
+        Focus.PropertyChanged -= OnPartChanged;
+        Focus.Finished -= OnFocusFinished;
     }
 }

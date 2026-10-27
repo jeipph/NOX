@@ -61,6 +61,13 @@
     <!-- Cuánto sube la línea nueva al aparecer -->
     <sys:Double x:Key="Lyric.SlideDistance">10</sys:Double>
 
+    <!-- Panel "Enfoque" -->
+    <sys:Double x:Key="FontSize.Timer">40</sys:Double>
+    <sys:Double x:Key="Size.FocusProgress">260</sys:Double>
+    <Thickness x:Key="Space.Chip">4</Thickness>
+    <!-- Cuánto se queda abierto el notch al avisar de que terminó la concentración -->
+    <sys:TimeSpan x:Key="Attention.Duration">00:00:06</sys:TimeSpan>
+
     <!-- Panel "Vinilo" -->
     <sys:Double x:Key="Size.Vinyl">150</sys:Double>
     <sys:Double x:Key="Size.VinylGrooveOuter">128</sys:Double>

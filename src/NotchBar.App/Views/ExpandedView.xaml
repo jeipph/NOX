@@ -27,6 +27,8 @@
                              Visibility="{Binding DataContext.IsClipboardActive, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibleIfTrue}}" />
         <views:NotesView DataContext="{Binding Notes}"
                          Visibility="{Binding DataContext.IsNotesActive, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibleIfTrue}}" />
+        <views:FocusView DataContext="{Binding Focus}"
+                         Visibility="{Binding DataContext.IsFocusActive, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibleIfTrue}}" />
 
         <!-- Pestañas -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="{DynamicResource Space.TabBar}">
@@ -98,6 +100,21 @@
                     <Style TargetType="Button" BasedOn="{StaticResource TabButton}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsNotesActive}" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource Brush.Text}" />
+                                <Setter Property="Background" Value="{DynamicResource Brush.Surface}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Content="Enfoque"
+                    Command="{Binding ShowPanelCommand}"
+                    CommandParameter="{x:Static vm:NotchPanel.Focus}"
+                    AutomationProperties.Name="Pestaña Enfoque">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource TabButton}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsFocusActive}" Value="True">
                                 <Setter Property="Foreground" Value="{DynamicResource Brush.Text}" />
                                 <Setter Property="Background" Value="{DynamicResource Brush.Surface}" />
                             </DataTrigger>

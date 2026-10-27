@@ -82,9 +82,9 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - (Batería descartada: la app es para un PC de escritorio.)
 
 ## M6b — Enfoque (≈1.5 h) *(añadido tras la investigación)*
-- [ ] Temporizador Pomodoro (25/5 por defecto, configurable) y cronómetro.
+- [x] Temporizador de concentración con varias duraciones (15 min – 1 h 30). *(Sin descanso automático ni cronómetro: no se pidieron.)*
 - [ ] **Keep-awake:** evitar que el PC se suspenda (`SetThreadExecutionState`).
-- [ ] Temporizadores solo activos cuando se usan.
+- [x] Temporizadores solo activos cuando se usan (un tic por segundo mientras corre).
 
 ## M6c — Monitor del sistema (≈2 h) *(añadido tras la investigación)*
 - [ ] CPU y RAM con `PerformanceCounter` o contadores de Windows; red por interfaz.
@@ -154,3 +154,4 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - **2026-10-27 — M5.** Pestaña Vinilo: disco con surcos y la carátula como etiqueta, gira solo con el notch abierto, la pestaña a la vista y la música sonando (pedido expreso de la persona usuaria). CPU medida: ~6 % de un núcleo girando, ~0,6 % cerrado. Siguiente: M6 (volumen y reloj) o M9 (tema) para completar el MVP.
 - **2026-10-27 — M9. MVP completo (M0–M5 + M9).** Opciones guardadas en settings.json, tema Sistema/Oscuro/Claro en vivo, Iniciar con Windows. Sin ventana de ajustes: todo en el menú de la bandeja (más simple). Probado con UI Automation: cambio de tema, persistencia tras reiniciar, registro de arranque. 105 pruebas. Siguiente: M10 (empaquetado) o funciones extra (M6 volumen/reloj, M7 portapapeles, M8 notas).
 - **2026-10-27 — M6, M7 y M8.** Volumen (dentro de Ahora suena) y reloj en el notch cerrado; Portapapeles (historial de 50, fijados en disco, ignora gestores de contraseñas); Notas (.md con Ctrl+Enter y "modo escritura"). Errores encontrados probando: (1) un token de ancho con el tipo equivocado hacía que la ventana no se creara y el error se perdía → ahora los errores se muestran y se registran; (2) al salir de una nota con Esc el teclado no volvía a tu ventana → se recuerda al abrir el notch. Un script de prueba hizo clic a ciegas cuando falló la app; ahora los scripts se detienen si no encuentran un botón. 128 pruebas.
+- **2026-10-27 — M6b (parcial): Enfoque.** Temporizador de concentración con duraciones de un clic (15, 25, 30, 45 min, 1 h, 1 h 30); pausar/continuar/cancelar; cuenta atrás en el notch cerrado; al terminar, sonido y el notch se abre 6 s. Probado de punta a punta en `--fake` (tiene una duración extra de 10 s solo para pruebas). Sin cronómetro ni "mantener despierto" (no se pidieron). Añadido `.gitattributes`. 143 pruebas.

@@ -28,6 +28,8 @@ public partial class NotchWindow : Window, IDisposable
     private nint _hwnd;
     private bool _isExpanded;
 
+    private readonly DispatcherTimer _attentionTimer;
+
     // "Modo escritura" (pestaña Notas): el notch acepta el teclado y no se cierra solo.
     private bool _isTyping;
     private nint _windowBeforeTyping;
@@ -55,6 +57,16 @@ public partial class NotchWindow : Window, IDisposable
 
         Pill.PreviewMouseLeftButtonDown += OnPillPreviewMouseDown;
         Deactivated += (_, _) => ExitTyping(returnFocus: false);
+
+        // Aviso (fin de la concentración): abrir el notch un momento sin necesidad de pasar el ratón.
+        _attentionTimer = new DispatcherTimer { Interval = (TimeSpan)FindResource("Attention.Duration") };
+        _attentionTimer.Tick += (_, _) =>
+        {
+            _attentionTimer.Stop();
+            if (!Pill.IsMouseOver && !_isTyping)
+                SetExpanded(false);
+        };
+        _content.AttentionRequested += OnAttentionRequested;
 
         ApplyCollapsedLook();
     }
@@ -99,6 +111,19 @@ public partial class NotchWindow : Window, IDisposable
             Dispatcher.BeginInvoke(PlaceWindow);
 
         return 0;
+    }
+
+    // --- Avisos ---
+
+    private void OnAttentionRequested()
+    {
+        // Con una app en pantalla completa el notch está oculto: basta con el sonido.
+        if (!IsVisible)
+            return;
+
+        SetExpanded(true);
+        _attentionTimer.Stop();
+        _attentionTimer.Start();
     }
 
     // --- Modo escritura ---

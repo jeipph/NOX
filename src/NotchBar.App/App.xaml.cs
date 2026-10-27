@@ -128,6 +128,7 @@ public partial class App : Application
         services.AddSingleton<VolumeViewModel>();
         services.AddSingleton<ClipboardViewModel>();
         services.AddSingleton<NotesViewModel>();
+        services.AddSingleton(_ => new FocusViewModel(includeTestPreset: useFakeMedia));
         services.AddSingleton<NotchContentViewModel>();
         services.AddSingleton<NotchWindow>();
         return services.BuildServiceProvider();
