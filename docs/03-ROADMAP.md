@@ -125,7 +125,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [ ] Investigar firma gratuita para código abierto (SignPath, usada por un proyecto similar). No confirmado que aplique.
 
 ## M11 — Pulido y calidad
-- [ ] Revisar consumo (Administrador de tareas): objetivo **≤150 MB de RAM y ~0 % de CPU en reposo** con 1 monitor.
+- [x] Revisar consumo (Administrador de tareas): objetivo **≤150 MB de RAM y ~0 % de CPU en reposo** con 1 monitor. *(2026-10-27, Release con todas las pestañas abiertas: 90 MB de memoria privada —lo que muestra el Administrador de tareas—, 0 ms de CPU en 10 s de reposo.)*
 - [ ] Probar con un juego o video en pantalla completa: el notch se oculta y no baja los FPS.
 - [ ] Probar con 1 y 2 monitores, y con escalados distintos.
 - [ ] Revisar excepciones y mensajes de log.
