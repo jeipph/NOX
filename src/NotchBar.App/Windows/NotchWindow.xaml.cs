@@ -76,6 +76,11 @@ public partial class NotchWindow : Window, IDisposable
         if (_appBar?.HandleMessage(msg, wParam, lParam) == true)
             handled = true;
 
+        // Windows actualiza el área de trabajo un poco después de reservar o liberar la franja;
+        // al llegar este aviso se recoloca con los valores ya actualizados.
+        if (WindowHelper.IsWorkAreaChanged(msg, wParam))
+            Dispatcher.BeginInvoke(PlaceWindow);
+
         return 0;
     }
 

@@ -37,19 +37,19 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 **Terminado cuando:** pasa el ratón → se despliega suave; sale → se pliega; abrir un video en pantalla completa lo oculta; al salir de pantalla completa vuelve.
 
 ## M2b — Estilos y modos de visibilidad (≈1.5 h) *(añadido tras la investigación)*
-- [ ] Tres estilos de la pastilla: **Notch** (pegado arriba), **Cápsula** (separada del borde), **Indicador** (puntito mínimo).
-- [ ] Modo "visible solo al pasar el ratón por el borde superior".
-- [ ] Tecla Esc contrae el notch.
-- [ ] Opción "No reservar la franja superior" (por defecto) frente a "Reservarla" con la API de barra de aplicaciones (`SHAppBarMessage`) — solo si se desea.
+- [x] Tres estilos de la pastilla: **Notch** (pegado arriba), **Cápsula** (separada del borde), **Indicador** (puntito mínimo).
+- [x] Modo "visible solo al pasar el ratón por el borde superior".
+- [x] Tecla Esc contrae el notch.
+- [x] Opción "No reservar la franja superior" (por defecto) frente a "Reservarla" con la API de barra de aplicaciones (`SHAppBarMessage`) — solo si se desea.
 
 ## M3 — Ahora suena (≈3 h)
-- [ ] Interfaz `IMediaService` + modelo `MediaInfo` en Core.
-- [ ] `SmtcMediaService` con los eventos descritos en la arquitectura.
-- [ ] Vista `NowPlayingView`: carátula, título, artista, botones ⏮ ⏯ ⏭, barra de progreso.
-- [ ] En el estado contraído mostrar título corto (máx. ~24 caracteres con "…").
-- [ ] Probar con: YouTube Music en Chrome/Edge (y su app de escritorio si se usa) y música local con MusicBee / foobar2000 / Reproductor multimedia. Comprobar cuál publica bien en SMTC (MusicBee puede necesitar activar su integración con los controles de Windows; no confirmado).
-- [ ] Manejo de "no suena nada": mostrar texto discreto "Nada en reproducción".
-- [ ] **`FakeMediaService`** (canción y letra de mentira) para probar la interfaz sin abrir un reproductor; activable con el argumento `--fake` (idea del modo `--selftest` de Oyenza).
+- [x] Interfaz `IMediaService` + modelo `MediaInfo` en Core.
+- [x] `SmtcMediaService` con los eventos descritos en la arquitectura.
+- [x] Vista `NowPlayingView`: carátula, título, artista, botones ⏮ ⏯ ⏭, barra de progreso.
+- [x] En el estado contraído mostrar título corto (máx. ~24 caracteres con "…").
+- [ ] *(YouTube Music en Chrome verificado 2026-10-27: datos, carátula y los 3 botones. Falta MusicBee/carpetas locales.)* Probar con: YouTube Music en Chrome/Edge (y su app de escritorio si se usa) y música local con MusicBee / foobar2000 / Reproductor multimedia. Comprobar cuál publica bien en SMTC (MusicBee puede necesitar activar su integración con los controles de Windows; no confirmado).
+- [x] Manejo de "no suena nada": mostrar texto discreto "Nada en reproducción".
+- [x] **`FakeMediaService`** (canción y letra de mentira) para probar la interfaz sin abrir un reproductor; activable con el argumento `--fake` (idea del modo `--selftest` de Oyenza).
 
 ## M3b — Varios reproductores (≈1 h) *(añadido tras la investigación)*
 - [ ] Listar todas las sesiones SMTC activas (`GetSessions()`), no solo la actual.
@@ -145,3 +145,4 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - **2026-10-27 — Clones y reparto.** Se estudiaron boring.notch, BetterLyrics, WindowsMediaController (MIT), Poricom y Clone-Wars (ver `07-RESEARCH…` §6). Se creó `../REPARTO-MODELOS.md` (qué modelo hace cada tarea). Pendiente: decidir si usar `Dubya.WindowsMediaController` o `Windows.Media.Control` directo. Siguiente paso: M0.
 - **2026-10-27 — M0 terminado.** .NET SDK 10.0.403 instalado, VS Code + C# Dev Kit, telemetría de la CLI desactivada (`DOTNET_CLI_TELEMETRY_OPTOUT=1`). Los proyectos se movieron de OneDrive a `C:\Dev\NotchBar` y `C:\Dev\Marginalia` (OneDrive bloquea `bin/obj`). Repositorio git creado. Siguiente paso: M1.
 - **2026-10-27 — M1 y decisión de música.** Esqueleto creado (4 proyectos, notch 220×34, bandeja, instancia única); compila sin avisos, 54 MB RAM. Falta la verificación visual de la persona usuaria para marcar M1. Música: opción A (YouTube Music + reproductor externo para carpetas locales, todo vía SMTC con `Windows.Media.Control`).
+- **2026-10-27 — M2b y M3.** Estilos, modo invisible, Esc y franja reservada probados con UI Automation y capturas. M3 funciona con YouTube Music en Chrome (datos, carátula, botones). Errores encontrados en las pruebas y corregidos: carátula con el logo de Chrome, parpadeo de "Nada en reproducción" al cambiar de canción (Chrome cierra y reabre su sesión; ahora se esperan 1,5 s) y notch desplazado tras quitar la franja reservada (ahora se recoloca con `WM_SETTINGCHANGE`). Pendiente: probar música local con MusicBee. Siguiente: M3b.

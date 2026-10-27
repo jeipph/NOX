@@ -9,6 +9,10 @@ public static class WindowHelper
     public const int WmMouseActivate = WM_MOUSEACTIVATE;
     public const int MaNoActivate = MA_NOACTIVATE;
 
+    /// <summary>True si el mensaje avisa de que cambió el área de trabajo (barra de tareas, franjas reservadas).</summary>
+    public static bool IsWorkAreaChanged(int msg, nint wParam) =>
+        msg == WM_SETTINGCHANGE && (int)wParam == SPI_SETWORKAREA;
+
     /// <summary>Quita la ventana de Alt+Tab y evita que robe el foco al hacer clic.</summary>
     public static void MakeOverlay(nint hwnd)
     {

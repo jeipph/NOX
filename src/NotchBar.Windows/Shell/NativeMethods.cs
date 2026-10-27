@@ -14,6 +14,9 @@ internal static partial class NativeMethods
     public const int WM_MOUSEACTIVATE = 0x0021;
     public const int MA_NOACTIVATE = 3;
 
+    public const int WM_SETTINGCHANGE = 0x001A;
+    public const int SPI_SETWORKAREA = 0x002F;
+
     public const uint ABM_NEW = 0x0;
     public const uint ABM_REMOVE = 0x1;
     public const uint ABM_QUERYPOS = 0x2;
