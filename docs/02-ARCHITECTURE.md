@@ -98,6 +98,7 @@ Se construye como una ventana WPF "flotante":
 
 ### 4. Vinilo (hito M5)
 Vista con la carátula recortada en círculo y un `RotateTransform` animado (`DoubleAnimation` 0→360, repetición infinita). **Pausar la animación** cuando no suena nada o el notch está contraído, para no gastar CPU.
+Implementado en `VinylView`: la animación se quita (y el disco queda en su ángulo) cuando la vista deja de verse (`IsVisible`) o la música se pausa; se vuelve a crear desde ese ángulo al reanudar. `DesiredFrameRate` = 30.
 
 ### 5. Volumen y reloj (hito M6)
 - **Volumen:** `NAudio` → `MMDeviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia).AudioEndpointVolume`. Evento `OnVolumeNotification` para reflejar cambios externos.

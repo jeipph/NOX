@@ -47,6 +47,17 @@
     <!-- Cuánto sube la línea nueva al aparecer -->
     <sys:Double x:Key="Lyric.SlideDistance">10</sys:Double>
 
+    <!-- Panel "Vinilo" -->
+    <sys:Double x:Key="Size.Vinyl">150</sys:Double>
+    <sys:Double x:Key="Size.VinylGrooveOuter">128</sys:Double>
+    <sys:Double x:Key="Size.VinylGrooveInner">106</sys:Double>
+    <sys:Double x:Key="Size.VinylLabel">72</sys:Double>
+    <sys:Double x:Key="Size.VinylHole">8</sys:Double>
+    <!-- Tiempo de una vuelta completa -->
+    <sys:TimeSpan x:Key="Vinyl.TurnDuration">00:00:04</sys:TimeSpan>
+    <!-- Imágenes por segundo del giro (60 sería el máximo de WPF) -->
+    <sys:Int32 x:Key="Vinyl.FrameRate">30</sys:Int32>
+
     <!-- Tiempos -->
     <sys:TimeSpan x:Key="Duration.Expand">00:00:00.22</sys:TimeSpan>
     <sys:TimeSpan x:Key="Duration.Fast">00:00:00.12</sys:TimeSpan>

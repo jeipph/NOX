@@ -72,9 +72,9 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 *(Verificado de oído por la persona usuaria el 2026-10-27.)*
 
 ## M5 — Vinilo (≈1.5 h)
-- [ ] `VinylView`: carátula circular con giro, brazo opcional simple.
-- [ ] Pausar animación si no suena o está contraído.
-- [ ] Botón o clic para alternar entre Carátula / Vinilo / Letras.
+- [x] `VinylView`: carátula circular con giro (sin brazo, por sencillez). Una vuelta cada 4 s a 30 imágenes/s (`Vinyl.TurnDuration`, `Vinyl.FrameRate`).
+- [x] Pausar animación si no suena o está contraído (también si la pestaña Vinilo no está a la vista). Medido: ~6 % de un núcleo girando, ~0,6 % con el notch cerrado.
+- [x] Pestañas abajo: Ahora suena / Letras / Vinilo.
 
 ## M6 — Volumen y reloj (≈1.5 h)
 - [ ] `IVolumeService` con NAudio, control deslizante y botón de silencio.
@@ -151,3 +151,4 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - **2026-10-27 — M4.** Letras de LRCLIB con caché en disco, pestañas Ahora suena / Letras, desfase ±5 s, importar .lrc, opción de privacidad en la bandeja. 99 pruebas. Verificado: búsqueda real (una canción solo tenía letra sin tiempos en LRCLIB, comprobado con su API) y letra sincronizada con `--fake` (avance y desfase). Pendiente de probar: letra no avanza en pausa, importar .lrc, desactivar letras.
 - **2026-10-27 — M4, ajustes tras pruebas.** "La letra desaparece al pausar": no era un fallo; al pausar desde YouTube Music el ratón sale del notch y este se cierra. Se añadieron ⏮ ⏯ ⏭ en la pestaña Letras. Comprobado: en pausa la letra se queda quieta. Hallazgo: lrclib.net a veces responde 503 "ServerOverloaded"; ahora se reintenta (3 veces con Retry-After y luego hasta 3 veces cada 30 s, mostrando "reintento N de 3"). Letra sincronizada real vista en el notch. Falta: confirmar de oído que va al ritmo, importar .lrc y la casilla de privacidad.
 - **2026-10-27 — M4 terminado.** La persona usuaria confirmó que la letra va al ritmo. Se quitó "Importar .lrc" (lo pidió: sobraba). 100 pruebas. Solo queda probar la casilla de privacidad "Buscar letras en internet". Siguiente: M5 (vinilo).
+- **2026-10-27 — M5.** Pestaña Vinilo: disco con surcos y la carátula como etiqueta, gira solo con el notch abierto, la pestaña a la vista y la música sonando (pedido expreso de la persona usuaria). CPU medida: ~6 % de un núcleo girando, ~0,6 % cerrado. Siguiente: M6 (volumen y reloj) o M9 (tema) para completar el MVP.
