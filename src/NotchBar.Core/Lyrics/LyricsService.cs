@@ -33,15 +33,4 @@ public sealed class LyricsService(ILyricsSource source, ILyricsCache cache) : IL
         await cache.SaveAsync(key, found, cancellationToken);
         return found;
     }
-
-    public async Task<LyricsResult> ImportAsync(MediaInfo song, string lrcText, CancellationToken cancellationToken)
-    {
-        // Un .lrc sin tiempos se guarda como letra sin sincronizar.
-        LyricsResult result = LyricsResult.FromText(lrcText, lrcText);
-        string key = LyricsKey.For(song);
-
-        await cache.SaveAsync(key, result, cancellationToken);
-        _notFound.TryRemove(key, out _);
-        return result;
-    }
 }

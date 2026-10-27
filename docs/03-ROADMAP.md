@@ -65,10 +65,11 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [x] `LyricsView`: línea actual resaltada y la anterior/siguiente atenuadas; desplazamiento suave.
 - [x] Ajuste de desfase −5…+5 s con botones.
 - [ ] Opción para desactivar letras (privacidad). *(Hecha en el menú de la bandeja: "Buscar letras en internet"; falta probarla.)*
-- [ ] *(Botón "Importar .lrc" hecho; falta probarlo con un archivo real.)* Importar un archivo `.lrc` manualmente para una canción sin letra. Opcional: carpeta de letras locales buscando `Artista - Título.lrc` (SMTC no da la ruta del archivo que suena, así que no se puede leer el `.lrc` "de al lado" automáticamente).
+- [x] ~~Importar un archivo `.lrc` manualmente~~ — **descartado** por la persona usuaria el 2026-10-27 (sobraba).
 - [x] Estado discreto "Sin letra sincronizada" (no es un error).
 
 **Terminado cuando:** una canción con letra sincronizada la muestra en tiempo con el audio y los tests pasan.
+*(Verificado de oído por la persona usuaria el 2026-10-27.)*
 
 ## M5 — Vinilo (≈1.5 h)
 - [ ] `VinylView`: carátula circular con giro, brazo opcional simple.
@@ -149,3 +150,4 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - **2026-10-27 — M3b.** Varios reproductores: se vigila play/pausa de todos y se muestra el que suena; etiqueta para fijar uno. Hallazgo en pruebas: al abrir un reproductor nuevo Windows no siempre manda `SessionsChanged`, así que la lista también se rehace con `CurrentSessionChanged`. 45 pruebas. Siguiente: M4 (letras).
 - **2026-10-27 — M4.** Letras de LRCLIB con caché en disco, pestañas Ahora suena / Letras, desfase ±5 s, importar .lrc, opción de privacidad en la bandeja. 99 pruebas. Verificado: búsqueda real (una canción solo tenía letra sin tiempos en LRCLIB, comprobado con su API) y letra sincronizada con `--fake` (avance y desfase). Pendiente de probar: letra no avanza en pausa, importar .lrc, desactivar letras.
 - **2026-10-27 — M4, ajustes tras pruebas.** "La letra desaparece al pausar": no era un fallo; al pausar desde YouTube Music el ratón sale del notch y este se cierra. Se añadieron ⏮ ⏯ ⏭ en la pestaña Letras. Comprobado: en pausa la letra se queda quieta. Hallazgo: lrclib.net a veces responde 503 "ServerOverloaded"; ahora se reintenta (3 veces con Retry-After y luego hasta 3 veces cada 30 s, mostrando "reintento N de 3"). Letra sincronizada real vista en el notch. Falta: confirmar de oído que va al ritmo, importar .lrc y la casilla de privacidad.
+- **2026-10-27 — M4 terminado.** La persona usuaria confirmó que la letra va al ritmo. Se quitó "Importar .lrc" (lo pidió: sobraba). 100 pruebas. Solo queda probar la casilla de privacidad "Buscar letras en internet". Siguiente: M5 (vinilo).

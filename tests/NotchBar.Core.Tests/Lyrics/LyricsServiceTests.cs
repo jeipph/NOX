@@ -82,25 +82,21 @@ public class LyricsServiceTests
     }
 
     [Fact]
-    public async Task Import_ReplacesNotFound()
+    public void FromText_WithTimes_IsSynced()
     {
-        var service = new LyricsService(new CountingSource(null), new MemoryLyricsCache());
-        await service.GetLyricsAsync(Song, allowNetwork: true, CancellationToken.None);
-
-        await service.ImportAsync(Song, "[00:01.00] I remember when", CancellationToken.None);
-        var result = await service.GetLyricsAsync(Song, allowNetwork: true, CancellationToken.None);
-
-        Assert.Equal(LyricsKind.Synced, result!.Kind);
+        Assert.Equal(LyricsKind.Synced, LyricsResult.FromText("[00:01.00] I remember when", "I remember when").Kind);
     }
 
     [Fact]
-    public async Task Import_WithoutTimes_IsPlainLyrics()
+    public void FromText_OnlyPlainText_IsPlain()
     {
-        var service = new LyricsService(new CountingSource(null), new MemoryLyricsCache());
+        Assert.Equal(LyricsKind.Plain, LyricsResult.FromText(null, "I remember when").Kind);
+    }
 
-        var result = await service.ImportAsync(Song, "I remember when\nI remember", CancellationToken.None);
-
-        Assert.Equal(LyricsKind.Plain, result.Kind);
+    [Fact]
+    public void FromText_Nothing_IsNotFound()
+    {
+        Assert.Equal(LyricsKind.NotFound, LyricsResult.FromText(null, "  ").Kind);
     }
 
     [Fact]

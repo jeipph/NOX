@@ -10,9 +10,6 @@ public interface ILyricsService
     /// Lanza excepción si falla la conexión (no se guarda nada en ese caso).
     /// </summary>
     Task<LyricsResult?> GetLyricsAsync(MediaInfo song, bool allowNetwork, CancellationToken cancellationToken);
-
-    /// <summary>Guarda una letra que la persona trae en un archivo .lrc para esta canción.</summary>
-    Task<LyricsResult> ImportAsync(MediaInfo song, string lrcText, CancellationToken cancellationToken);
 }
 
 /// <summary>Una fuente de letras en internet (LRCLIB).</summary>

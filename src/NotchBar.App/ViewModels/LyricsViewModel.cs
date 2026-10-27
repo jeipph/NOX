@@ -1,11 +1,9 @@
 using System.ComponentModel;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Win32;
 using NotchBar.Core.Abstractions;
 using NotchBar.Core.Lyrics;
 using NotchBar.Core.Media;
@@ -93,31 +91,6 @@ public partial class LyricsViewModel : ObservableObject, IDisposable
 
     [RelayCommand]
     private void OffsetLater() => ChangeOffset(-OffsetStep);
-
-    [RelayCommand]
-    private async Task ImportLrc()
-    {
-        if (_song is not { } song)
-            return;
-
-        var dialog = new OpenFileDialog
-        {
-            Title = $"Letra para «{song.Title}»",
-            Filter = "Letras LRC (*.lrc)|*.lrc|Texto (*.txt)|*.txt",
-        };
-        if (dialog.ShowDialog() != true)
-            return;
-
-        try
-        {
-            string text = await File.ReadAllTextAsync(dialog.FileName);
-            Apply(await _lyrics.ImportAsync(song, text, CancellationToken.None));
-        }
-        catch (Exception)
-        {
-            Status = "No se pudo leer el archivo";
-        }
-    }
 
     private void ChangeOffset(TimeSpan change)
     {

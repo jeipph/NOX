@@ -43,16 +43,8 @@
                        Style="{DynamicResource LyricDimLine}" />
         </StackPanel>
 
-        <!-- Abajo: importar .lrc a la izquierda, controles de música en el centro, desfase a la derecha -->
+        <!-- Abajo: controles de música en el centro, desfase a la derecha -->
         <Grid Grid.Row="1">
-            <Button Style="{DynamicResource ChipButton}"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
-                    Content="Importar .lrc"
-                    Command="{Binding ImportLrcCommand}"
-                    ToolTip="Usar una letra guardada en un archivo .lrc"
-                    AutomationProperties.Name="Importar letra" />
-
             <!-- Los mismos botones de "Ahora suena", para pausar sin cambiar de pestaña. -->
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Center"
