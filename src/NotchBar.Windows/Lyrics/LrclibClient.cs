@@ -13,6 +13,9 @@ namespace NotchBar.Windows.Lyrics;
 /// </summary>
 public sealed class LrclibClient : ILyricsSource, IDisposable
 {
+    private const int MaxAttempts = 3;
+    private static readonly TimeSpan MaxRetryWait = TimeSpan.FromSeconds(3);
+
     private readonly HttpClient _http = new()
     {
         BaseAddress = new Uri("https://lrclib.net/"),
@@ -58,7 +61,7 @@ public sealed class LrclibClient : ILyricsSource, IDisposable
         if (duration > TimeSpan.Zero)
             query.Add("duration=" + Math.Round(duration.TotalSeconds).ToString(CultureInfo.InvariantCulture));
 
-        using HttpResponseMessage response = await _http.GetAsync("api/get?" + string.Join('&', query), cancellationToken);
+        using HttpResponseMessage response = await SendAsync("api/get?" + string.Join('&', query), cancellationToken);
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
 
@@ -69,7 +72,10 @@ public sealed class LrclibClient : ILyricsSource, IDisposable
     private async Task<LrclibTrack?> SearchAsync(string title, string artist, TimeSpan duration, CancellationToken cancellationToken)
     {
         string url = $"api/search?track_name={Uri.EscapeDataString(title)}&artist_name={Uri.EscapeDataString(artist)}";
-        LrclibTrack[]? results = await _http.GetFromJsonAsync<LrclibTrack[]>(url, cancellationToken);
+        using HttpResponseMessage response = await SendAsync(url, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        LrclibTrack[]? results = await response.Content.ReadFromJsonAsync<LrclibTrack[]>(cancellationToken);
         if (results is null || results.Length == 0)
             return null;
 
@@ -78,6 +84,22 @@ public sealed class LrclibClient : ILyricsSource, IDisposable
             .ToList();
         int best = LyricsMatching.BestIndex(candidates, duration);
         return best >= 0 ? results[best] : null;
+    }
+
+    // LRCLIB responde 503 "ServerOverloaded" (con Retry-After: 1) cuando está saturado;
+    // su documentación pide esperar y reintentar. Visto en uso real el 2026-10-27.
+    private async Task<HttpResponseMessage> SendAsync(string url, CancellationToken cancellationToken)
+    {
+        for (int attempt = 1; ; attempt++)
+        {
+            HttpResponseMessage response = await _http.GetAsync(url, cancellationToken);
+            if (response.StatusCode != HttpStatusCode.ServiceUnavailable || attempt == MaxAttempts)
+                return response;
+
+            TimeSpan wait = response.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(1);
+            response.Dispose();
+            await Task.Delay(wait < MaxRetryWait ? wait : MaxRetryWait, cancellationToken);
+        }
     }
 
     // Respuesta JSON de LRCLIB (los nombres coinciden en camelCase).

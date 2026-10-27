@@ -90,6 +90,7 @@ Se construye como una ventana WPF "flotante":
 - **Parser (`LrcParser`, en Core):** convierte líneas `[mm:ss.xx] texto` en `LyricLine(TimeSpan Start, string Text)`. Manejar varias marcas por línea, líneas vacías y metadatos `[ar:]`, `[ti:]`.
 - **Sincronía (`LyricsSyncEngine`, en Core):** dada la posición actual + desfase del usuario (−5.0 s a +5.0 s), devuelve el índice de la línea activa con búsqueda binaria. Es lo más fácil de probar con xUnit.
 - **Validación:** descartar resultados cuya duración difiera más de ~3 s de la pista (suele ser otra versión).
+- **Saturación:** si LRCLIB responde 503 se espera `Retry-After` (máx. 3 s) y se reintenta hasta 3 veces; si sigue fallando, `LyricsViewModel` reintenta cada 30 s (máx. 3) mientras siga la misma canción.
 - **Búsqueda en tres pasos (`LrclibClient`):** 1) `/api/get` con todos los datos; 2) igual pero solo con el primer artista (`ArtistNames.Primary`: YouTube Music junta "A, B y C"); 3) `/api/search` y elegir con `LyricsMatching.BestIndex` (misma duración, prefiere sincronizada). LRCLIB responde 404 `TrackNotFound` si no existe y 503 si está saturado (se muestra "No se pudo conectar").
 - **Interfaz:** pestañas "Ahora suena" / "Letras" abajo del notch abierto (`ExpandedView`, `NotchContentViewModel`). La letra activa usa un temporizador que despierta justo al empezar la línea siguiente (`LyricsSyncEngine.TimeUntilNext`), solo con la pestaña visible y la música sonando.
 - **Caché:** guardar el resultado por hash de `artista|título|duración` para no volver a consultar.

@@ -37,6 +37,13 @@
         </Setter>
     </Style>
 
+    <!-- Versión pequeña del botón de icono (fila de abajo de la pestaña Letras). -->
+    <Style x:Key="SmallIconButton" TargetType="Button" BasedOn="{StaticResource IconButton}">
+        <Setter Property="Width" Value="{DynamicResource Size.IconButtonSmall}" />
+        <Setter Property="Height" Value="{DynamicResource Size.IconButtonSmall}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.IconSmall}" />
+    </Style>
+
     <!-- Etiqueta pequeña que se puede pulsar (por ejemplo, el reproductor elegido). -->
     <Style x:Key="ChipButton" TargetType="Button">
         <Setter Property="Focusable" Value="False" />

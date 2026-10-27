@@ -1,5 +1,7 @@
 using System.ComponentModel;
 using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -16,6 +18,8 @@ public partial class LyricsViewModel : ObservableObject, IDisposable
     private const string PauseMark = "♪";
     private static readonly TimeSpan OffsetStep = TimeSpan.FromMilliseconds(500);
     private static readonly TimeSpan MinimumWait = TimeSpan.FromMilliseconds(50);
+    private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(30);
+    private const int MaxRetries = 3;
 
     private readonly IMediaService _media;
     private readonly ILyricsService _lyrics;
@@ -25,6 +29,10 @@ public partial class LyricsViewModel : ObservableObject, IDisposable
     // Se programa para despertar justo cuando empieza la línea siguiente,
     // y solo con las letras a la vista y la música sonando.
     private readonly DispatcherTimer _lineTimer;
+
+    // Solo se arma tras un fallo de conexión: un único intento más pasado un rato.
+    private readonly DispatcherTimer _retryTimer;
+    private int _retries;
     private CancellationTokenSource? _loading;
     private MediaInfo? _song;
     private string? _songKey;
@@ -60,6 +68,14 @@ public partial class LyricsViewModel : ObservableObject, IDisposable
 
         _lineTimer = new DispatcherTimer();
         _lineTimer.Tick += (_, _) => UpdateLines();
+
+        _retryTimer = new DispatcherTimer { Interval = RetryDelay };
+        _retryTimer.Tick += (_, _) =>
+        {
+            _retryTimer.Stop();
+            if (_song is not null)
+                _ = LoadAsync(_song);
+        };
 
         _media.MediaChanged += OnMediaChanged;
         _options.PropertyChanged += OnOptionsChanged;
@@ -128,6 +144,8 @@ public partial class LyricsViewModel : ObservableObject, IDisposable
         if (key != _songKey)
         {
             _songKey = key;
+            _retryTimer.Stop();
+            _retries = 0;
             _offset = TimeSpan.Zero;
             OffsetLabel = FormatOffset(_offset);
             if (song is null)
@@ -154,9 +172,23 @@ public partial class LyricsViewModel : ObservableObject, IDisposable
             if (!loading.IsCancellationRequested)
                 Apply(result);
         }
-        catch (Exception) when (!loading.IsCancellationRequested)
+        catch (Exception error) when (!loading.IsCancellationRequested)
         {
-            Status = "No se pudo conectar con lrclib.net";
+            string problem = error is HttpRequestException { StatusCode: HttpStatusCode.ServiceUnavailable }
+                ? "lrclib.net está saturado"
+                : "No se pudo conectar con lrclib.net";
+
+            // Reintento automático, unas pocas veces y solo mientras siga la misma canción.
+            if (_retries < MaxRetries)
+            {
+                _retries++;
+                Status = $"{problem}; reintento {_retries} de {MaxRetries} en {RetryDelay.TotalSeconds:0} s";
+                _retryTimer.Start();
+            }
+            else
+            {
+                Status = problem;
+            }
         }
         catch (OperationCanceledException)
         {
@@ -214,6 +246,7 @@ public partial class LyricsViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         _lineTimer.Stop();
+        _retryTimer.Stop();
         _loading?.Cancel();
         _media.MediaChanged -= OnMediaChanged;
         _options.PropertyChanged -= OnOptionsChanged;
