@@ -1,0 +1,132 @@
+<UserControl x:Class="Nox.App.Views.MixerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:Nox.App.ViewModels"
+             xmlns:views="clr-namespace:Nox.App.Views">
+    <!-- DataContext: MixerViewModel. Se abre desde "Ahora suena" (botón Mezclador). -->
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="VisibleIfTrue" />
+    </UserControl.Resources>
+
+    <Grid Margin="{DynamicResource Padding.Expanded}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Margin="{DynamicResource Space.Below}">
+            <!-- E72B: flecha atrás -->
+            <Button DockPanel.Dock="Left"
+                    Style="{DynamicResource SmallIconButton}"
+                    Content="&#xE72B;"
+                    ToolTip="Volver a Ahora suena"
+                    AutomationProperties.Name="Volver a Ahora suena"
+                    Command="{Binding DataContext.ShowPanelCommand, RelativeSource={RelativeSource AncestorType=views:ExpandedView}}"
+                    CommandParameter="{x:Static vm:NotchPanel.NowPlaying}" />
+            <TextBlock DockPanel.Dock="Left"
+                       Text="Mezclador"
+                       VerticalAlignment="Center"
+                       Margin="{DynamicResource Space.Inline}"
+                       FontFamily="{DynamicResource Font.Main}"
+                       FontSize="{DynamicResource FontSize.Title}"
+                       FontWeight="{DynamicResource FontWeight.Title}"
+                       Foreground="{DynamicResource Brush.Text}" />
+            <!-- Salida: con varias, cada clic pasa a la siguiente; con una sola, solo se muestra. -->
+            <Button DockPanel.Dock="Right"
+                    HorizontalAlignment="Right"
+                    Content="{Binding OutputLabel}"
+                    Command="{Binding NextOutputCommand}"
+                    IsHitTestVisible="{Binding CanSwitchOutput}"
+                    ToolTip="Clic: pasar a la siguiente salida de audio"
+                    AutomationProperties.Name="Salida de audio">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource ChipButton}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CanSwitchOutput}" Value="False">
+                                <Setter Property="Background" Value="Transparent" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </DockPanel>
+
+        <TextBlock Grid.Row="1"
+                   Text="{Binding Status}"
+                   VerticalAlignment="Bottom"
+                   TextWrapping="Wrap"
+                   FontFamily="{DynamicResource Font.Main}"
+                   FontSize="{DynamicResource FontSize.Micro}"
+                   Foreground="{DynamicResource Brush.Danger}"
+                   Visibility="{Binding HasStatus, Converter={StaticResource VisibleIfTrue}}" />
+
+        <TextBlock Grid.Row="1"
+                   Text="Ninguna app está sonando ahora."
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontFamily="{DynamicResource Font.Main}"
+                   FontSize="{DynamicResource FontSize.Small}"
+                   Foreground="{DynamicResource Brush.TextMuted}">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasApps}" Value="True">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Focusable="False">
+            <ItemsControl ItemsSource="{Binding Apps}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:MixerRowViewModel}">
+                        <Grid Margin="{DynamicResource Space.MixerRow}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="{DynamicResource Size.MixerPercent}" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Name}"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"
+                                       FontFamily="{DynamicResource Font.Main}"
+                                       FontSize="{DynamicResource FontSize.Small}"
+                                       Foreground="{DynamicResource Brush.Text}" />
+                            <!-- E767 altavoz, E74F silenciado -->
+                            <Button Grid.Column="1"
+                                    Command="{Binding ToggleMuteCommand}"
+                                    AutomationProperties.Name="{Binding Name, StringFormat=Silenciar {0}}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource SmallIconButton}">
+                                        <Setter Property="Content" Value="&#xE767;" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsMuted}" Value="True">
+                                                <Setter Property="Content" Value="&#xE74F;" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <Slider Grid.Column="2"
+                                    Style="{DynamicResource ThinSlider}"
+                                    Width="{DynamicResource Size.VolumeSlider}"
+                                    VerticalAlignment="Center"
+                                    Value="{Binding Level}"
+                                    AutomationProperties.Name="{Binding Name, StringFormat=Volumen de {0}}" />
+                            <TextBlock Grid.Column="3"
+                                       Text="{Binding LevelText}"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       FontFamily="{DynamicResource Font.Main}"
+                                       FontSize="{DynamicResource FontSize.Micro}"
+                                       Foreground="{DynamicResource Brush.TextMuted}" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

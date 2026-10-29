@@ -15,6 +15,9 @@ public enum NotchPanel
     Notes,
     Focus,
     Pet,
+
+    /// <summary>Sin pestaña propia: se abre desde "Ahora suena".</summary>
+    Mixer,
 }
 
 /// <summary>Contenido de la pastilla: qué panel se ve, el texto del notch cerrado y avisos de visibilidad.</summary>
@@ -27,7 +30,7 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNowPlayingActive), nameof(IsLyricsActive), nameof(IsVinylActive),
-        nameof(IsClipboardActive), nameof(IsNotesActive), nameof(IsFocusActive), nameof(IsPetActive))]
+        nameof(IsClipboardActive), nameof(IsNotesActive), nameof(IsFocusActive), nameof(IsPetActive), nameof(IsMixerActive))]
     private NotchPanel _activePanel = NotchPanel.NowPlaying;
 
     /// <summary>Texto del notch cerrado, por prioridad: tiempo de concentración, canción, hora.</summary>
@@ -41,9 +44,11 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
         ClipboardViewModel clipboard,
         NotesViewModel notes,
         FocusViewModel focus,
-        PetViewModel pet)
+        PetViewModel pet,
+        MixerViewModel mixer)
     {
         Pet = pet;
+        Mixer = mixer;
         NowPlaying = nowPlaying;
         Lyrics = lyrics;
         Volume = volume;
@@ -77,6 +82,10 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
 
     public bool IsPetActive => ActivePanel == NotchPanel.Pet;
 
+    public MixerViewModel Mixer { get; }
+
+    public bool IsMixerActive => ActivePanel == NotchPanel.Mixer;
+
     public bool IsNowPlayingActive => ActivePanel == NotchPanel.NowPlaying;
 
     public bool IsLyricsActive => ActivePanel == NotchPanel.Lyrics;
@@ -109,6 +118,7 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
         NowPlaying.SetVisible(_isExpanded && IsNowPlayingActive);
         Lyrics.SetVisible(_isExpanded && IsLyricsActive);
         Notes.SetVisible(_isExpanded && IsNotesActive);
+        Mixer.SetVisible(_isExpanded && IsMixerActive);
     }
 
     private void OnFocusFinished()

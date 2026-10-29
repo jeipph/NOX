@@ -79,6 +79,10 @@
     <!-- Imágenes por segundo del giro (60 sería el máximo de WPF) -->
     <sys:Int32 x:Key="Vinyl.FrameRate">30</sys:Int32>
 
+    <!-- Panel "Mezclador" -->
+    <Thickness x:Key="Space.MixerRow">0,0,0,4</Thickness>
+    <GridLength x:Key="Size.MixerPercent">32</GridLength>
+
     <!-- Panel "Mascota": cada píxel del dibujo se ve como un cuadrado de 4×4 -->
     <sys:Double x:Key="Pet.Scale">4</sys:Double>
     <!-- 20 imágenes por segundo: suficiente para pixel art y gasta poco -->

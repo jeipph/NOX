@@ -155,6 +155,8 @@ public partial class App : Application
         services.AddSingleton<NotesViewModel>();
         services.AddSingleton(_ => new FocusViewModel(includeTestPreset: useFakeMedia));
         services.AddSingleton<PetViewModel>();
+        services.AddSingleton<IAudioMixer, NAudioMixer>();
+        services.AddSingleton<MixerViewModel>();
         services.AddSingleton(s => new BreakService(s.GetRequiredService<NotchViewModel>(), fast: useFakeMedia));
         services.AddSingleton<NotchContentViewModel>();
         services.AddSingleton<NotchWindow>();

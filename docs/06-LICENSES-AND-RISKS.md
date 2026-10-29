@@ -35,6 +35,7 @@ Los nombres, logos e iconos de esas apps **no** se usan. La app tiene su propio 
 | Pantalla completa mal detectada | Media | Notch visible sobre un juego | Ajuste "No mostrar sobre estas apps" (futuro) |
 | Contenido sensible del portapapeles | Media | Privacidad | Ignorar formatos de gestores de contraseñas; no registrar contenido; solo fijados en disco; opción de pausar el historial |
 | Alcance demasiado grande | Alta | Proyecto sin terminar | Seguir el MVP: M0–M4 primero |
+| Cambiar la salida de audio usa `IPolicyConfig`, interfaz **no documentada** de Windows (M6d) | Baja (la usan Windows, EarTrumpet y SoundSwitch desde Windows 7) | El botón de salida deja de funcionar | Si Windows la rechaza, NOX muestra un aviso y la salida se cambia desde el icono de sonido de la barra de tareas; el resto del mezclador sigue funcionando |
 
 ## Privacidad
 - Sin telemetría, sin cuentas, sin anuncios.

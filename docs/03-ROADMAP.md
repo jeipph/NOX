@@ -87,8 +87,10 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [x] Temporizadores solo activos cuando se usan (un tic por segundo mientras corre).
 
 ## M6d — Salida de audio y mezclador (≈2 h) *(añadido tras la investigación)*
-- [ ] Listar dispositivos de salida y cambiar el predeterminado (requiere una API no documentada de Windows; evaluar riesgo antes: si es frágil, solo mostrar el dispositivo actual).
-- [ ] Volumen por aplicación con `AudioSessionManager` de NAudio.
+- [x] Listar salidas y cambiar la predeterminada: botón «Salida: …» del mezclador; con varias salidas, cada clic pasa a la siguiente (para los tres usos: general, multimedia y llamadas). Usa `IPolicyConfig` (no documentada; riesgo evaluado: bajo, ver `06-LICENSES-AND-RISKS.md`); si Windows la rechaza, se avisa.
+- [x] Volumen y silencio por app con `AudioSessionManager` de NAudio (`NAudioMixer`). Las sesiones de una misma app van juntas (Chrome abre varias), NOX no sale, «Sonidos del sistema» al final (`MixerApps` en Core, 6 pruebas). Sin sondeo: se lee al abrir el mezclador y Windows avisa si aparece una app con sonido o cambian las salidas.
+- [x] Panel **Mezclador** (sin pestaña propia): botón «Mezclador» en «Ahora suena», junto al volumen (también cuando no suena nada); flecha para volver.
+- *Verificado por Claude (2026-10-29, `--fake`): lista la salida (Altavoces Realtek, la única activa en este PC) y «Sonidos del sistema»; silenciar y quitar el silencio llega a Windows; volver funciona. Se encontró y corrigió un fallo: tras un aviso de cambio de salida, el mezclador decía «Sin salida de audio». El cambio de salida solo se probó poniendo la misma (en este PC hay una sola): falta probarlo con dos salidas (p. ej. auriculares).*
 
 ## M7 — Portapapeles (≈2.5 h)
 - [x] Tests de `ClipboardHistory` (límite 50, sin duplicados: una copia repetida sube arriba, fijar, borrar sin tocar fijados).
@@ -149,6 +151,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [ ] ¿Repositorio privado en GitHub? **Sí** (2026-10-27); falta instalar `gh` y `gh auth login` (pasos de la persona usuaria).
 
 ## Registro de sesiones
+- **2026-10-29 — M6d mezclador.** Volumen y silencio por app y cambio de salida de audio, desde «Ahora suena» → «Mezclador». 235 pruebas. Queda: M11 (monitores/escalados, logs, barra de título oscura en la ventana de atajos) e instalador 0.2.0.
 - **2026-10-29 — M12 ampliado.** Aviso de descanso cada 40 min con la mascota por la pantalla, posturas nuevas, juguetes (ovillo, pelota, ratón), reacción al ratón y mascota en el notch cerrado. La persona lo aprobó. Queda: M6d (mezclador), M11 (monitores/escalados, logs) y un instalador nuevo (0.2.0).
 - **2026-10-29 — M12 mascota.** Pestaña «Mascota» con gato gris (ojos amarillos), gato atigrado o beagle en pixel art propio, jugando con un ovillo y saltando. 199 pruebas. Queda: M6d (mezclador) y M11 (monitores/escalados, revisar logs).
 - **2026-10-29 — M9b atajos globales.** Cinco atajos Ctrl+Alt configurables desde la bandeja, con aviso de conflictos. `settings.json` ya no escapa el «+» (`+`). 169 pruebas. Siguiente: M12 (mascota pixel art) o M6d (mezclador).

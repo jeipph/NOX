@@ -8,7 +8,7 @@ Versión **0.1.0**.
 
 | Pestaña | Para qué |
 |---|---|
-| **Ahora suena** | Lo que suena en YouTube Music (navegador), Spotify, MusicBee… con carátula, ⏮ ⏯ ⏭, barra de progreso y volumen. Con varios reproductores abiertos, muestra el que suena (o el que fijes con la etiqueta de arriba a la derecha). |
+| **Ahora suena** | Lo que suena en YouTube Music (navegador), Spotify, MusicBee… con carátula, ⏮ ⏯ ⏭, barra de progreso y volumen. Con varios reproductores abiertos, muestra el que suena (o el que fijes con la etiqueta de arriba a la derecha). El botón **Mezclador** abre el volumen de cada app y la salida de audio (con varias, un clic pasa a la siguiente). |
 | **Letras** | Letra sincronizada de la canción (de lrclib.net), con ajuste de desfase. |
 | **Vinilo** | La carátula como un disco que gira (solo mientras lo miras y suena música). |
 | **Portapapeles** | Tus últimas 50 copias de texto; clic para volver a copiar, chinche para fijar. Ignora lo que copian los gestores de contraseñas. |

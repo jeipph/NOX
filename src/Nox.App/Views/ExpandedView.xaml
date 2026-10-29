@@ -29,6 +29,8 @@
                          Visibility="{Binding DataContext.IsNotesActive, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibleIfTrue}}" />
         <views:FocusView DataContext="{Binding Focus}"
                          Visibility="{Binding DataContext.IsFocusActive, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibleIfTrue}}" />
+        <views:MixerView DataContext="{Binding Mixer}"
+                         Visibility="{Binding DataContext.IsMixerActive, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibleIfTrue}}" />
         <!-- La mascota solo se anima mientras se ve: lo decide PetView con IsVisible. -->
         <views:PetView DataContext="{Binding Pet}"
                        Visibility="{Binding DataContext.IsPetActive, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibleIfTrue}}" />
@@ -43,6 +45,11 @@
                     <Style TargetType="Button" BasedOn="{StaticResource TabButton}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsNowPlayingActive}" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource Brush.Text}" />
+                                <Setter Property="Background" Value="{DynamicResource Brush.Surface}" />
+                            </DataTrigger>
+                            <!-- El mezclador cuelga de "Ahora suena": su pestaña sigue marcada. -->
+                            <DataTrigger Binding="{Binding IsMixerActive}" Value="True">
                                 <Setter Property="Foreground" Value="{DynamicResource Brush.Text}" />
                                 <Setter Property="Background" Value="{DynamicResource Brush.Surface}" />
                             </DataTrigger>
