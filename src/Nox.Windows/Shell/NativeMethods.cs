@@ -84,6 +84,11 @@ internal static partial class NativeMethods
     [LibraryImport("user32.dll")]
     public static partial nint MonitorFromWindow(nint hwnd, uint dwFlags);
 
+    public const int MDT_EFFECTIVE_DPI = 0;
+
+    [LibraryImport("shcore.dll")]
+    public static partial int GetDpiForMonitor(nint hmonitor, int dpiType, out uint dpiX, out uint dpiY);
+
     [LibraryImport("user32.dll", EntryPoint = "GetMonitorInfoW")]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool GetMonitorInfo(nint hMonitor, ref MONITORINFO lpmi);
@@ -175,6 +180,24 @@ internal static partial class NativeMethods
 
     [LibraryImport("shell32.dll")]
     public static partial nuint SHAppBarMessage(uint dwMessage, ref APPBARDATA pData);
+
+    // --- Avisos de cambio de ventana activa ---
+
+    public const uint EVENT_SYSTEM_FOREGROUND = 0x0003;
+    public const uint WINEVENT_OUTOFCONTEXT = 0x0000;
+
+    [LibraryImport("user32.dll")]
+    public static partial nint SetWinEventHook(uint eventMin, uint eventMax, nint hmodWinEventProc, nint lpfnWinEventProc,
+        uint idProcess, uint idThread, uint dwFlags);
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool UnhookWinEvent(nint hWinEventHook);
+
+    // --- Barra de título oscura ---
+
+    [LibraryImport("dwmapi.dll")]
+    public static partial int DwmSetWindowAttribute(nint hwnd, int attribute, ref int value, int size);
 
     // --- Atajos globales ---
 

@@ -17,6 +17,12 @@ public sealed class ThemeService : IDisposable
     private AppTheme _theme = AppTheme.System;
     private bool? _isLight;
 
+    /// <summary>Los colores en uso son los claros.</summary>
+    public bool IsLight => _isLight == true;
+
+    /// <summary>Cambiaron los colores (para lo que no usa DynamicResource, como la barra de título).</summary>
+    public event Action? Changed;
+
     public ThemeService()
     {
         // Solo importa con el tema "Sistema": si cambias el modo de Windows, la app lo sigue.
@@ -54,6 +60,7 @@ public sealed class ThemeService : IDisposable
             dictionaries[index] = replacement;
         else
             dictionaries.Add(replacement);
+        Changed?.Invoke();
     }
 
     private static int IndexOfColors(IList<ResourceDictionary> dictionaries)

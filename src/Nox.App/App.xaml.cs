@@ -7,6 +7,7 @@ using Nox.App.ViewModels;
 using Nox.App.Windows;
 using Nox.Core.Abstractions;
 using Nox.Core.Clipboard;
+using Nox.Core.Diagnostics;
 using Nox.Core.Lyrics;
 using Nox.Core.Media;
 using Nox.Core.Notes;
@@ -37,11 +38,22 @@ public partial class App : Application
 
         base.OnStartup(e);
 
-        // Un error no previsto en la interfaz se muestra y se apunta, en vez de perderse en silencio.
+        // Un error no previsto se apunta en vez de perderse en silencio. En la interfaz, NOX sigue
+        // funcionando (se avisa solo la primera vez); los de tareas en segundo plano solo se apuntan.
         DispatcherUnhandledException += (_, args) =>
         {
             args.Handled = true;
-            ReportFatal(args.Exception);
+            ReportError(args.Exception);
+        };
+        TaskScheduler.UnobservedTaskException += (_, args) =>
+        {
+            args.SetObserved();
+            ErrorLog.Write(args.Exception, "tarea en segundo plano", DateTime.Now);
+        };
+        AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+        {
+            if (args.ExceptionObject is Exception error)
+                ErrorLog.Write(error, "error que cerró NOX", DateTime.Now);
         };
 
         // --fake: canción de mentira para probar la interfaz sin reproductor.
@@ -92,24 +104,30 @@ public partial class App : Application
         }
     }
 
-    // Guarda el error en %LOCALAPPDATA%\NOX\logs\error.log (sin datos personales: solo el error técnico),
-    // lo muestra y cierra la app.
+    // %LOCALAPPDATA%\NOX\logs\error.log: solo el error técnico, sin datos personales.
+    private static readonly ErrorLogFile ErrorLog = new();
+    private bool _errorShown;
+
+    // Error al arrancar: sin ventana ni opciones NOX no sirve, así que se avisa y se cierra.
     private void ReportFatal(Exception error)
     {
+        ErrorLog.Write(error, "al arrancar", DateTime.Now);
         Exception cause = error.InnerException ?? error;
-        try
-        {
-            string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NOX", "logs");
-            Directory.CreateDirectory(folder);
-            File.AppendAllText(Path.Combine(folder, "error.log"), $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}{Environment.NewLine}{error}{Environment.NewLine}{Environment.NewLine}");
-        }
-        catch (Exception)
-        {
-        }
-
-        MessageBox.Show($"NOX encontró un error y se va a cerrar:\n\n{cause.GetType().Name}: {cause.Message}\n\nDetalles en %LOCALAPPDATA%\\NOX\\logs\\error.log",
+        MessageBox.Show($"NOX encontró un error y se va a cerrar:\n\n{cause.GetType().Name}: {cause.Message}\n\nDetalles en {ErrorLog.Path}",
             "NOX", MessageBoxButton.OK, MessageBoxImage.Error);
         Shutdown();
+    }
+
+    // Error con NOX ya funcionando: se apunta y se sigue. Solo se avisa la primera vez (no una ventana por error).
+    private void ReportError(Exception error)
+    {
+        ErrorLog.Write(error, "interfaz", DateTime.Now);
+        if (_errorShown)
+            return;
+        _errorShown = true;
+        Exception cause = error.InnerException ?? error;
+        MessageBox.Show($"NOX tuvo un error, pero sigue funcionando:\n\n{cause.GetType().Name}: {cause.Message}\n\nDetalles en {ErrorLog.Path}",
+            "NOX", MessageBoxButton.OK, MessageBoxImage.Warning);
     }
 
     private static ServiceProvider ConfigureServices(bool useFakeMedia)
@@ -174,7 +192,8 @@ public partial class App : Application
             return;
         }
         _hotkeysWindow = new HotkeysWindow(new HotkeysViewModel(
-            services.GetRequiredService<NotchViewModel>(), services.GetRequiredService<HotkeyService>()));
+            services.GetRequiredService<NotchViewModel>(), services.GetRequiredService<HotkeyService>()),
+            services.GetRequiredService<ThemeService>());
         _hotkeysWindow.Closed += (_, _) => _hotkeysWindow = null;
         _hotkeysWindow.Show();
         _hotkeysWindow.Activate();

@@ -12,8 +12,13 @@ namespace Nox.Windows.Shell;
 /// </summary>
 public sealed class AppBar : IDisposable
 {
+    private delegate void WinEventProc(nint hook, uint eventType, nint hwnd, int idObject, int idChild, uint thread, uint time);
+
     private readonly nint _hwnd;
     private readonly uint _callbackMessage;
+    // Se guarda en un campo para que el recolector de basura no lo borre mientras Windows lo usa.
+    private readonly WinEventProc _onForegroundChanged;
+    private nint _foregroundHook;
     private bool _registered;
 
     public event Action<bool>? FullscreenChanged;
@@ -29,6 +34,7 @@ public sealed class AppBar : IDisposable
     public AppBar(nint hwnd)
     {
         _hwnd = hwnd;
+        _onForegroundChanged = OnForegroundChanged;
         _callbackMessage = RegisterWindowMessage("Nox.AppBarCallback");
         Register();
     }
@@ -42,12 +48,7 @@ public sealed class AppBar : IDisposable
         switch ((int)wParam)
         {
             case ABN_FULLSCREENAPP:
-                bool isFullscreen = lParam != 0 && ForegroundCoversOurMonitor();
-                if (isFullscreen != IsFullscreen)
-                {
-                    IsFullscreen = isFullscreen;
-                    FullscreenChanged?.Invoke(isFullscreen);
-                }
+                SetFullscreen(lParam != 0 && ForegroundCoversOurMonitor());
                 break;
 
             case ABN_POSCHANGED:
@@ -56,6 +57,43 @@ public sealed class AppBar : IDisposable
                 break;
         }
         return true;
+    }
+
+    private void SetFullscreen(bool isFullscreen)
+    {
+        if (isFullscreen == IsFullscreen)
+            return;
+        IsFullscreen = isFullscreen;
+        // Mientras el notch está escondido se escucha cada cambio de ventana activa: Windows no
+        // siempre avisa de que la pantalla completa terminó, y el notch no debe quedarse escondido.
+        if (isFullscreen)
+            StartWatchingForeground();
+        else
+            StopWatchingForeground();
+        FullscreenChanged?.Invoke(isFullscreen);
+    }
+
+    private void StartWatchingForeground()
+    {
+        if (_foregroundHook != 0)
+            return;
+        _foregroundHook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, 0,
+            Marshal.GetFunctionPointerForDelegate(_onForegroundChanged), 0, 0, WINEVENT_OUTOFCONTEXT);
+    }
+
+    private void StopWatchingForeground()
+    {
+        if (_foregroundHook == 0)
+            return;
+        UnhookWinEvent(_foregroundHook);
+        _foregroundHook = 0;
+    }
+
+    // Llega en el hilo de la ventana (el aviso se pidió desde él), así que se puede avisar directamente.
+    private void OnForegroundChanged(nint hook, uint eventType, nint hwnd, int idObject, int idChild, uint thread, uint time)
+    {
+        if (IsFullscreen && !ForegroundCoversOurMonitor())
+            SetFullscreen(false);
     }
 
     /// <summary>
@@ -108,7 +146,8 @@ public sealed class AppBar : IDisposable
         return FullscreenRules.IsFullscreen(
             WindowHelper.ToPixelRect(windowRect),
             WindowHelper.ToPixelRect(info.rcMonitor),
-            GetClassName(foreground));
+            GetClassName(foreground),
+            GetWindowLongPtr(foreground, GWL_EXSTYLE));
     }
 
     private static unsafe string GetClassName(nint hwnd)
@@ -143,6 +182,7 @@ public sealed class AppBar : IDisposable
 
     public void Dispose()
     {
+        StopWatchingForeground();
         Unregister();
         Reserved = null;
     }

@@ -238,13 +238,15 @@ public partial class NotchWindow : Window, IDisposable
         if (_hwnd == 0 || _appBar is null)
             return;
 
-        DpiScale dpi = VisualTreeHelper.GetDpi(this);
+        // El escalado del monitor principal (donde vive el notch), no el de donde esté la ventana ahora:
+        // con monitores de distinto escalado, la primera vez la ventana puede nacer en el otro.
+        double scale = WindowHelper.GetPrimaryMonitorScale();
         var (bounds, workArea) = WindowHelper.GetPrimaryMonitor();
         PixelRect area = workArea;
 
         if (_viewModel.ReserveTopStrip)
         {
-            int stripHeight = (int)Math.Round(CollapsedStripHeight() * dpi.DpiScaleY);
+            int stripHeight = (int)Math.Round(CollapsedStripHeight() * scale);
             area = _appBar.ReserveTop(bounds, stripHeight);
         }
         else
@@ -252,7 +254,7 @@ public partial class NotchWindow : Window, IDisposable
             _appBar.ReleaseReservation();
         }
 
-        WindowHelper.PlaceTopCenter(_hwnd, area, (int)Math.Round(Width * dpi.DpiScaleX));
+        WindowHelper.PlaceTopCenter(_hwnd, area, (int)Math.Round(Width * scale));
     }
 
     // Alto que ocupa la pastilla contraída, contando su separación del borde.

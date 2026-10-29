@@ -1,8 +1,11 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
+using Nox.App.Services;
 using Nox.App.ViewModels;
 using Nox.Core.Hotkeys;
+using Nox.Windows.Shell;
 
 namespace Nox.App.Windows;
 
@@ -10,12 +13,28 @@ namespace Nox.App.Windows;
 public partial class HotkeysWindow : Window
 {
     private readonly HotkeysViewModel _viewModel;
+    private readonly ThemeService _theme;
 
-    public HotkeysWindow(HotkeysViewModel viewModel)
+    public HotkeysWindow(HotkeysViewModel viewModel, ThemeService theme)
     {
         InitializeComponent();
         DataContext = _viewModel = viewModel;
-        Closed += (_, _) => _viewModel.Dispose();
+        _theme = theme;
+        _theme.Changed += UpdateTitleBar;
+        SourceInitialized += (_, _) => UpdateTitleBar();
+        Closed += (_, _) =>
+        {
+            _theme.Changed -= UpdateTitleBar;
+            _viewModel.Dispose();
+        };
+    }
+
+    // La barra de título la dibuja Windows: hay que pedirle la oscura cuando NOX está en oscuro.
+    private void UpdateTitleBar()
+    {
+        nint hwnd = new WindowInteropHelper(this).Handle;
+        if (hwnd != 0)
+            TitleBar.SetDark(hwnd, !_theme.IsLight);
     }
 
     // Mientras un cuadro tiene el foco, los atajos se apartan: si no, Windows se quedaría la combinación.

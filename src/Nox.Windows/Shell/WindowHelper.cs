@@ -55,6 +55,16 @@ public static class WindowHelper
         return (ToPixelRect(info.rcMonitor), ToPixelRect(info.rcWork));
     }
 
+    /// <summary>
+    /// Escalado del monitor principal (1 = 100 %, 1,25 = 125 %…). Las ventanas de NOX viven ahí:
+    /// se usa este y no el del monitor donde Windows creó la ventana al principio, que puede ser otro.
+    /// </summary>
+    public static double GetPrimaryMonitorScale()
+    {
+        nint monitor = MonitorFromPoint(new POINT(), MONITOR_DEFAULTTOPRIMARY);
+        return GetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, out uint dpi, out _) == 0 && dpi > 0 ? dpi / 96.0 : 1.0;
+    }
+
     /// <summary>Coloca la ventana arriba al centro de <paramref name="area"/> y la mantiene encima de todo.</summary>
     public static void PlaceTopCenter(nint hwnd, PixelRect area, int pixelWidth)
     {

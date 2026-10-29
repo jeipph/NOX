@@ -40,15 +40,16 @@ public partial class BreakWindow : Window
         WindowHelper.MakeOverlay(_hwnd); // no aparece en Alt+Tab ni quita el foco
 
         // Todo el ancho de la pantalla, abajo, justo encima de la barra de tareas.
-        DpiScale dpi = VisualTreeHelper.GetDpi(this);
+        // Escalado del monitor principal: la ventana puede nacer en el otro monitor y luego pasar a este.
+        double screenScale = WindowHelper.GetPrimaryMonitorScale();
         var (_, work) = WindowHelper.GetPrimaryMonitor();
         double scale = (double)FindResource("Pet.BreakScale");
-        Width = work.Width / dpi.DpiScaleX;
+        Width = work.Width / screenScale;
         double stageHeight = PetPlayground.StageHeight * scale;
         Measure(new Size(Width, double.PositiveInfinity));
         Height = stageHeight + ((FrameworkElement)Content).DesiredSize.Height;
 
-        int pixelHeight = (int)Math.Ceiling(Height * dpi.DpiScaleY);
+        int pixelHeight = (int)Math.Ceiling(Height * screenScale);
         WindowHelper.PlaceTopmost(_hwnd, new PixelRect(work.Left, work.Bottom - pixelHeight, work.Right, work.Bottom));
 
         Stage.Scale = scale;

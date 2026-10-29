@@ -30,7 +30,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 ## M2 — Comportamiento del notch (≈2 h)
 - [x] Estilos extendidos por P/Invoke (`WS_EX_TOOLWINDOW`, `WS_EX_NOACTIVATE`).
 - [x] Expandir al entrar el ratón y contraer al salir (con retraso de ~400 ms), con animación de 220 ms.
-- [ ] Ajuste correcto con escalado de pantalla (DPI 100 %, 125 %, 150 %). Probar cambiando el escalado en Windows. *(Código listo; la prueba con 125/150 % se hace en M11.)*
+- [ ] Ajuste correcto con escalado de pantalla (DPI 100 %, 125 %, 150 %). Probar cambiando el escalado en Windows. *(Código listo y revisado en M11; 100 % probado. Falta 125/150 %: lo cambia la persona.)*
 - [x] Ocultar cuando una app está en pantalla completa (aviso `ABN_FULLSCREENAPP` de una AppBar sin espacio reservado + `FullscreenRules`).
 - [x] Prueba: contenido de relleno ("Hola") dentro del panel expandido.
 
@@ -124,8 +124,10 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 
 ## M11 — Pulido y calidad
 - [x] Revisar consumo (Administrador de tareas): objetivo **≤150 MB de RAM y ~0 % de CPU en reposo** con 1 monitor. *(2026-10-27, Release con todas las pestañas abiertas: 90 MB de memoria privada —lo que muestra el Administrador de tareas—, 0 ms de CPU en 10 s de reposo.)*
-- [ ] Probar con 1 y 2 monitores, y con escalados distintos.
-- [ ] Revisar excepciones y mensajes de log.
+- [~] Probar con 1 y 2 monitores, y con escalados distintos. *(2026-10-29: con los dos monitores de la persona —S24F350 principal y DELL P2412H a la izquierda, ambos 1920×1080 al 100 %— el notch, la ventana de atajos y el aviso de descanso salen en el principal y nada en el secundario. El notch y el aviso usan ahora el escalado del monitor principal (`WindowHelper.GetPrimaryMonitorScale`), no el del monitor donde nace la ventana. **Falta probar 125 % y 150 %**: hay que cambiar el escalado en Configuración → Pantalla, y eso lo hace la persona.)*
+- [x] Revisar excepciones y mensajes de log. *(NOX nunca había escrito `error.log`. Ahora `ErrorLogFile` (Core, 3 pruebas) apunta también los errores de tareas en segundo plano y los que cierran la app; un error de la interfaz ya no cierra NOX: se apunta y se avisa solo la primera vez; solo un fallo al arrancar cierra. El archivo no pasa de 512 KB: el viejo se aparta como `error.old.log`.)*
+- [x] **Fallo encontrado y corregido:** las capas transparentes que ocupan la pantalla (la del control de Claude, la de NVIDIA con Alt+Z, grabadores) se tomaban por pantalla completa y el notch se escondía, a veces para siempre porque Windows no avisa de que «terminó». Ahora `FullscreenRules` ignora las ventanas que dejan pasar el ratón o no aceptan el teclado (`WS_EX_TRANSPARENT`, `WS_EX_NOACTIVATE`; 3 pruebas), y mientras el notch está escondido se escucha cada cambio de ventana activa (`SetWinEventHook`, sin sondeo) para volver a mostrarlo. *(Comprobado: con la capa de Claude delante el notch ya no se esconde. El regreso tras una pantalla completa de verdad no se pudo probar: necesita un juego o vídeo a pantalla completa.)*
+- [x] Barra de título oscura en la ventana de atajos (`TitleBar.SetDark`, sigue al tema de NOX).
 - [x] README de usuario (sin capturas por ahora).
 - [x] Revisar `THIRD-PARTY-NOTICES.md` (creado: todas MIT, copyright leído de cada repositorio oficial).
 
@@ -151,6 +153,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [ ] ¿Repositorio privado en GitHub? **Sí** (2026-10-27); falta instalar `gh` y `gh auth login` (pasos de la persona usuaria).
 
 ## Registro de sesiones
+- **2026-10-29 — M11.** Dos monitores probados (100 %); escalado tomado del monitor principal; registro de errores que no cierra NOX; corregido el notch que se escondía con capas transparentes; barra de título oscura. 242 pruebas. Falta: escalado 125/150 % (lo cambia la persona) y el instalador 0.2.0.
 - **2026-10-29 — M6d mezclador.** Volumen y silencio por app y cambio de salida de audio, desde «Ahora suena» → «Mezclador». 235 pruebas. Queda: M11 (monitores/escalados, logs, barra de título oscura en la ventana de atajos) e instalador 0.2.0.
 - **2026-10-29 — M12 ampliado.** Aviso de descanso cada 40 min con la mascota por la pantalla, posturas nuevas, juguetes (ovillo, pelota, ratón), reacción al ratón y mascota en el notch cerrado. La persona lo aprobó. Queda: M6d (mezclador), M11 (monitores/escalados, logs) y un instalador nuevo (0.2.0).
 - **2026-10-29 — M12 mascota.** Pestaña «Mascota» con gato gris (ojos amarillos), gato atigrado o beagle en pixel art propio, jugando con un ovillo y saltando. 199 pruebas. Queda: M6d (mezclador) y M11 (monitores/escalados, revisar logs).

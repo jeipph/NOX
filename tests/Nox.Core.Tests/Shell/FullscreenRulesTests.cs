@@ -42,6 +42,21 @@ public class FullscreenRulesTests
         Assert.False(FullscreenRules.IsFullscreen(Monitor, Monitor, windowClass));
     }
 
+    [Theory]
+    [InlineData(0x8280028L)]                             // la capa de Claude (medida en este PC)
+    [InlineData(FullscreenRules.TransparentStyle)]
+    [InlineData(FullscreenRules.NoActivateStyle | 0x80L)]
+    public void TransparentOverlays_AreNotFullscreen(long extendedStyle)
+    {
+        Assert.False(FullscreenRules.IsFullscreen(Monitor, Monitor, "Chrome_WidgetWin_1", extendedStyle));
+    }
+
+    [Fact]
+    public void NormalFullscreenStyles_StillCount()
+    {
+        Assert.True(FullscreenRules.IsFullscreen(Monitor, Monitor, "UnityWndClass", 0x40000L)); // WS_EX_APPWINDOW
+    }
+
     [Fact]
     public void PixelRect_ComputesSize()
     {
