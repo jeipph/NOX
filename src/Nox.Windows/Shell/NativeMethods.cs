@@ -175,4 +175,13 @@ internal static partial class NativeMethods
 
     [LibraryImport("shell32.dll")]
     public static partial nuint SHAppBarMessage(uint dwMessage, ref APPBARDATA pData);
+
+    // --- Mantener despierto ---
+
+    public const uint ES_SYSTEM_REQUIRED = 0x00000001;
+    public const uint ES_DISPLAY_REQUIRED = 0x00000002;
+    public const uint ES_CONTINUOUS = 0x80000000;
+
+    [LibraryImport("kernel32.dll")]
+    public static partial uint SetThreadExecutionState(uint esFlags);
 }

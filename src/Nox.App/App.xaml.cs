@@ -131,6 +131,8 @@ public partial class App : Application
         services.AddSingleton<ILyricsService, LyricsService>();
         services.AddSingleton<IAutoStart, AutoStart>();
         services.AddSingleton<IVolumeService, NAudioVolumeService>();
+        services.AddSingleton<KeepAwake>();
+        services.AddSingleton<IKeepAwake>(s => s.GetRequiredService<KeepAwake>());
         services.AddSingleton<ClipboardMonitor>();
         services.AddSingleton<IClipboardService>(s => s.GetRequiredService<ClipboardMonitor>());
         services.AddSingleton(_ => new PinnedClipsStore());

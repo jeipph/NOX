@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
+using Nox.Core.Abstractions;
 using Nox.Core.Models;
 using Nox.Core.Notes;
 
@@ -10,6 +11,24 @@ namespace Nox.App.ViewModels;
 // y las guarda en disco cada vez que cambian.
 public partial class NotchViewModel : ObservableObject
 {
+    private readonly IKeepAwake _keepAwake;
+
+    public NotchViewModel(IKeepAwake keepAwake) => _keepAwake = keepAwake;
+
+    /// <summary>
+    /// El PC no se suspende ni apaga la pantalla. No se guarda: al abrir NOX empieza apagado,
+    /// para no dejar el PC encendido toda la noche por olvido.
+    /// </summary>
+    [ObservableProperty]
+    private bool _keepAwakeEnabled;
+
+    partial void OnKeepAwakeEnabledChanged(bool value)
+    {
+        _keepAwake.SetEnabled(value);
+        if (_keepAwake.IsEnabled != value)
+            KeepAwakeEnabled = _keepAwake.IsEnabled; // Windows no lo aceptó
+    }
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotchStyle), nameof(IsCapsuleStyle), nameof(IsIndicatorStyle))]
     private NotchStyle _style = NotchStyle.Notch;

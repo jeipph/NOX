@@ -58,3 +58,4 @@ Añade aquí cada término nuevo que aparezca. Explicaciones cortas y sin jerga.
 - **Interfaz (`IMediaService`):** contrato que dice *qué* se puede hacer, sin decir *cómo*. Core define interfaces; Windows las implementa.
 - **Self-contained:** programa publicado con su propio .NET dentro (no necesita instalar nada, pero pesa más).
 - **Atómico (escritura atómica):** escribir a un archivo temporal y renombrarlo, para que un fallo no deje el archivo a medias.
+- **Keep-awake (`SetThreadExecutionState`):** aviso a Windows de "estoy trabajando, no te suspendas ni apagues la pantalla". No toca las opciones de energía; Windows lo olvida en cuanto el programa se cierra.

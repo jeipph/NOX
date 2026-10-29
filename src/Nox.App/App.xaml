@@ -41,6 +41,10 @@
                                   IsCheckable="True"
                                   IsChecked="{Binding LyricsEnabled}"
                                   ToolTip="Envía título, artista y duración de la canción a lrclib.net" />
+                        <MenuItem Header="Mantener el PC despierto"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding KeepAwakeEnabled}"
+                                  ToolTip="Mientras esté marcado, el PC no se suspende ni apaga la pantalla. Se desmarca al cerrar NOX." />
                         <Separator />
                         <MenuItem Header="Tema">
                             <MenuItem Header="Sistema (como Windows)"

@@ -83,7 +83,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 
 ## M6b — Enfoque (≈1.5 h) *(añadido tras la investigación)*
 - [x] Temporizador de concentración con varias duraciones (15 min – 1 h 30). *(Sin descanso automático ni cronómetro: no se pidieron.)*
-- [ ] **Keep-awake:** evitar que el PC se suspenda (`SetThreadExecutionState`).
+- [x] **Keep-awake:** «Mantener el PC despierto» en el menú de la bandeja (`IKeepAwake` → `KeepAwake` con `SetThreadExecutionState`: ni suspensión ni pantalla apagada). No se guarda: cada vez que se abre NOX empieza apagado, y al cerrar NOX se deshace solo. *(2026-10-29: comprobado con un script que Windows acepta y retira la petición; el menú no se pudo abrir en la prueba —clic derecho en la bandeja no permitido—: falta que la persona lo vea.)*
 - [x] Temporizadores solo activos cuando se usan (un tic por segundo mientras corre).
 
 ## M6c — Monitor del sistema (≈2 h) *(añadido tras la investigación)*
@@ -141,6 +141,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [ ] ¿Repositorio privado en GitHub? **Sí** (2026-10-27); falta instalar `gh` y `gh auth login` (pasos de la persona usuaria).
 
 ## Registro de sesiones
+- **2026-10-29 — M6b keep-awake.** Opción «Mantener el PC despierto» en la bandeja (no se guarda entre aperturas). 148 pruebas. Falta que la persona la marque y vea que el PC no se suspende. Siguientes pendientes: M6c (monitor del sistema), M9b (atajos), M6d (mezclador), M11 (pruebas con juegos y monitores).
 - **2026-10-26 — Planificación.** Se analizaron Kissa, Nock, Morrow y OrbitDrop. Se decidió: Programa 1 en C#/.NET 8/WPF, estilo minimalista blanco/negro con tema cambiable. Documentos creados. No hay código ni .NET instalado todavía. Siguiente paso: M0.
 - **2026-10-26 — Investigación.** Se buscaron proyectos similares (ver `07-RESEARCH-SIMILAR-PROJECTS.md`). Cambios: se quitó la batería; se pasó a **.NET 10** (.NET 8 termina soporte en nov. 2026); se añadieron M2b, M3b, M6b, M6c, M6d, M9b; objetivo de RAM ≤150 MB. Instalar con `winget install Microsoft.DotNet.SDK.10`.
 - **2026-10-27 — Clones y reparto.** Se estudiaron boring.notch, BetterLyrics, WindowsMediaController (MIT), Poricom y Clone-Wars (ver `07-RESEARCH…` §6). Se creó `../REPARTO-MODELOS.md` (qué modelo hace cada tarea). Pendiente: decidir si usar `Dubya.WindowsMediaController` o `Windows.Media.Control` directo. Siguiente paso: M0.
