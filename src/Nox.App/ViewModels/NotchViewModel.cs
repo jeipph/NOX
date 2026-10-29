@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using Nox.Core.Abstractions;
 using Nox.Core.Hotkeys;
+using Nox.Core.Pets;
 using Nox.Core.Models;
 using Nox.Core.Notes;
 
@@ -60,6 +61,9 @@ public partial class NotchViewModel : ObservableObject
     [ObservableProperty]
     private HotkeySettings _hotkeys = new();
 
+    [ObservableProperty]
+    private PetKind _pet = PetKind.GrayCat;
+
     /// <summary>Atajos que no funcionan (ocupados, repetidos…): se avisa en el menú.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HotkeysMenuHeader))]
@@ -110,6 +114,7 @@ public partial class NotchViewModel : ObservableObject
         Theme = settings.Theme;
         NotesFolder = settings.NotesFolder;
         Hotkeys = settings.Hotkeys;
+        Pet = settings.Pet;
     }
 
     public AppSettings ToSettings(string? preferredSourceId) => new()
@@ -122,5 +127,6 @@ public partial class NotchViewModel : ObservableObject
         PreferredSourceId = preferredSourceId,
         NotesFolder = NotesFolder,
         Hotkeys = Hotkeys,
+        Pet = Pet,
     };
 }

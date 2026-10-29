@@ -151,6 +151,7 @@ public partial class App : Application
         services.AddSingleton<ClipboardViewModel>();
         services.AddSingleton<NotesViewModel>();
         services.AddSingleton(_ => new FocusViewModel(includeTestPreset: useFakeMedia));
+        services.AddSingleton<PetViewModel>();
         services.AddSingleton<NotchContentViewModel>();
         services.AddSingleton<NotchWindow>();
         return services.BuildServiceProvider();

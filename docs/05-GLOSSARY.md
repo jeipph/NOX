@@ -59,5 +59,6 @@ Añade aquí cada término nuevo que aparezca. Explicaciones cortas y sin jerga.
 - **Self-contained:** programa publicado con su propio .NET dentro (no necesita instalar nada, pero pesa más).
 - **Atómico (escritura atómica):** escribir a un archivo temporal y renombrarlo, para que un fallo no deje el archivo a medias.
 - **Atajo global (`RegisterHotKey`):** combinación de teclas que Windows reserva para una app y le avisa al pulsarla, aunque estés en otra ventana. Si otra app ya la tiene, Windows la rechaza.
+- **Sprite / pixel art:** dibujo pequeño hecho píxel a píxel (aquí 20×14). Para verlo grande sin que se emborrone se amplía con `NearestNeighbor` (cada píxel se vuelve un cuadrado).
 - **AltGr:** en teclados español y latino equivale a Ctrl+Alt; por eso un atajo Ctrl+Alt+Q taparía la @.
 - **Keep-awake (`SetThreadExecutionState`):** aviso a Windows de "estoy trabajando, no te suspendas ni apagues la pantalla". No toca las opciones de energía; Windows lo olvida en cuanto el programa se cierra.

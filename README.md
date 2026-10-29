@@ -14,6 +14,7 @@ Versión **0.1.0**.
 | **Portapapeles** | Tus últimas 50 copias de texto; clic para volver a copiar, chinche para fijar. Ignora lo que copian los gestores de contraseñas. |
 | **Notas** | Notas rápidas: Ctrl+Enter guarda un `.md` en `Documentos\NOX\notes`. |
 | **Enfoque** | Temporizador de concentración (15 min – 1 h 30); avisa al terminar. |
+| **Mascota** | Un gato gris de ojos amarillos en pixel art que juega con un ovillo y salta. Arriba puedes cambiarlo por un gato atigrado o un beagle. |
 
 Con el notch cerrado se ve el título de la canción, la cuenta atrás de la concentración o la hora. Se oculta solo cuando una app está en pantalla completa.
 

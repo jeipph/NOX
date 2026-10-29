@@ -14,6 +14,7 @@ public enum NotchPanel
     Clipboard,
     Notes,
     Focus,
+    Pet,
 }
 
 /// <summary>Contenido de la pastilla: qué panel se ve, el texto del notch cerrado y avisos de visibilidad.</summary>
@@ -26,7 +27,7 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNowPlayingActive), nameof(IsLyricsActive), nameof(IsVinylActive),
-        nameof(IsClipboardActive), nameof(IsNotesActive), nameof(IsFocusActive))]
+        nameof(IsClipboardActive), nameof(IsNotesActive), nameof(IsFocusActive), nameof(IsPetActive))]
     private NotchPanel _activePanel = NotchPanel.NowPlaying;
 
     /// <summary>Texto del notch cerrado, por prioridad: tiempo de concentración, canción, hora.</summary>
@@ -39,8 +40,10 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
         VolumeViewModel volume,
         ClipboardViewModel clipboard,
         NotesViewModel notes,
-        FocusViewModel focus)
+        FocusViewModel focus,
+        PetViewModel pet)
     {
+        Pet = pet;
         NowPlaying = nowPlaying;
         Lyrics = lyrics;
         Volume = volume;
@@ -69,6 +72,10 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
     public NotesViewModel Notes { get; }
 
     public FocusViewModel Focus { get; }
+
+    public PetViewModel Pet { get; }
+
+    public bool IsPetActive => ActivePanel == NotchPanel.Pet;
 
     public bool IsNowPlayingActive => ActivePanel == NotchPanel.NowPlaying;
 

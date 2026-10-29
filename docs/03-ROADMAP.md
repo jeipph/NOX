@@ -128,9 +128,11 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [x] Revisar `THIRD-PARTY-NOTICES.md` (creado: todas MIT, copyright leído de cada repositorio oficial).
 
 ## M12 — Mascota pixel art (≈3 h) *(pedido 2026-10-29)*
-- [ ] Animación en pixel art (dibujo propio, sin sprites ajenos): un **gato gris oscuro de ojos amarillos** que juega y salta.
-- [ ] Elegir mascota: gato gris oscuro, **gato amarillo atigrado** o **perro beagle**.
-- [ ] Animar solo mientras se ve (como el vinilo): sin gasto de CPU con el notch cerrado.
+- [x] Pestaña **Mascota**: pixel art propio (`Nox.Core/Pets/PetSprites.cs`, dibujos de 20×14 escritos como letras; cada letra es un color de la paleta del dibujo). Un **gato gris oscuro de ojos amarillos** se sienta y parpadea, anda, persigue un ovillo, le da zarpazos y salta (`PetPlayground`, determinista con semilla; 30 pruebas).
+- [x] Elegir mascota arriba del panel: **Gato gris**, **Gato atigrado** (amarillo con rayas, ojos verdes) o **Beagle**. Se guarda en `settings.json` → `Pet`.
+- [x] Solo se anima mientras se ve (20 imágenes/s con `DispatcherTimer`), ampliado ×4 sin suavizar (`NearestNeighbor`). Medido en Debug: **2,5 %** de un núcleo con la pestaña a la vista, **0 %** con el notch cerrado.
+- Las paletas de las mascotas están en Core junto a los dibujos: son parte del dibujo, no del tema (la regla de colores en `Themes/*.xaml` es para la interfaz).
+- *Verificado por Claude (2026-10-29, `--fake`): las tres mascotas andan, golpean el ovillo, saltan y se giran; el cambio se guarda. Falta que lo vea la persona.*
 
 ---
 
@@ -141,6 +143,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [ ] ¿Repositorio privado en GitHub? **Sí** (2026-10-27); falta instalar `gh` y `gh auth login` (pasos de la persona usuaria).
 
 ## Registro de sesiones
+- **2026-10-29 — M12 mascota.** Pestaña «Mascota» con gato gris (ojos amarillos), gato atigrado o beagle en pixel art propio, jugando con un ovillo y saltando. 199 pruebas. Queda: M6d (mezclador) y M11 (monitores/escalados, revisar logs).
 - **2026-10-29 — M9b atajos globales.** Cinco atajos Ctrl+Alt configurables desde la bandeja, con aviso de conflictos. `settings.json` ya no escapa el «+» (`+`). 169 pruebas. Siguiente: M12 (mascota pixel art) o M6d (mezclador).
 - **2026-10-29 — Cambios de alcance.** La persona quitó M6c (monitor del sistema) y la prueba con juegos en pantalla completa de M11; añadió M12 (mascota pixel art: gato gris oscuro de ojos amarillos, gato amarillo atigrado o beagle).
 - **2026-10-29 — M6b keep-awake.** Opción «Mantener el PC despierto» en la bandeja (no se guarda entre aperturas). 148 pruebas. Falta que la persona la marque y vea que el PC no se suspende. Siguientes pendientes: M9b (atajos), M6d (mezclador), M11 (pruebas con monitores), M12 (mascota).
