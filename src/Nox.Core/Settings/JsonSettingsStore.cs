@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Nox.Core.Abstractions;
@@ -14,6 +15,8 @@ public sealed class JsonSettingsStore : ISettingsStore
     private static readonly JsonSerializerOptions Options = new()
     {
         WriteIndented = true,
+        // "Ctrl+Alt+N" y tildes tal cual (sin +): es un archivo local para leer, no una página web.
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         // "Dark" en vez de 1: el archivo se entiende al abrirlo.
         Converters = { new JsonStringEnumConverter() },
     };

@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Microsoft.Win32;
+using Nox.App.Services;
 using Nox.App.ViewModels;
 using Nox.Core.Models;
 using Nox.Core.Shell;
@@ -34,7 +35,11 @@ public partial class NotchWindow : Window, IDisposable
     private bool _isTyping;
     private nint _windowBeforeTyping;
 
-    public NotchWindow(NotchViewModel viewModel, NotchContentViewModel content, ClipboardMonitor clipboard)
+    private readonly GlobalHotkeys _hotkeys;
+    private readonly HotkeyService _hotkeyService;
+
+    public NotchWindow(NotchViewModel viewModel, NotchContentViewModel content, ClipboardMonitor clipboard,
+        GlobalHotkeys hotkeys, HotkeyService hotkeyService)
     {
         InitializeComponent();
 
@@ -42,6 +47,9 @@ public partial class NotchWindow : Window, IDisposable
         _viewModel.PropertyChanged += OnViewModelChanged;
         _content = content;
         _clipboard = clipboard;
+        _hotkeys = hotkeys;
+        _hotkeyService = hotkeyService;
+        _hotkeyService.ToggleNotchRequested += OnToggleRequested;
         Pill.DataContext = content;
 
         _collapseTimer = new DispatcherTimer { Interval = (TimeSpan)FindResource("Hover.CollapseDelay") };
@@ -83,6 +91,7 @@ public partial class NotchWindow : Window, IDisposable
         _appBar.FullscreenChanged += OnFullscreenChanged;
         _appBar.PositionChanged += PlaceWindow;
         _clipboard.Attach(_hwnd);
+        _hotkeys.Attach(_hwnd);
         SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
 
         PlaceWindow();
@@ -100,6 +109,10 @@ public partial class NotchWindow : Window, IDisposable
 
         // Avisos de "se copió algo" para la pestaña Portapapeles.
         if (_clipboard.HandleMessage(msg))
+            handled = true;
+
+        // Atajos de teclado globales (Ctrl+Alt+N…).
+        if (_hotkeys.HandleMessage(msg, wParam))
             handled = true;
 
         if (_appBar?.HandleMessage(msg, wParam, lParam) == true)
@@ -296,6 +309,15 @@ public partial class NotchWindow : Window, IDisposable
 
     private void OnPillMouseLeave(object sender, MouseEventArgs e) => _collapseTimer.Start();
 
+    // Atajo "abrir o cerrar": se queda abierto hasta pulsarlo otra vez, Esc o pasar el ratón y salir.
+    private void OnToggleRequested()
+    {
+        if (!IsVisible) // oculto por una app en pantalla completa
+            return;
+        _collapseTimer.Stop();
+        SetExpanded(!_isExpanded);
+    }
+
     private void SetExpanded(bool expanded)
     {
         // Cerrar (Esc, o el temporizador) termina el modo escritura y devuelve el teclado a donde estaba.
@@ -361,6 +383,7 @@ public partial class NotchWindow : Window, IDisposable
     {
         _collapseTimer.Stop();
         _escapeKey.Dispose();
+        _hotkeyService.ToggleNotchRequested -= OnToggleRequested;
         _viewModel.PropertyChanged -= OnViewModelChanged;
         SystemEvents.DisplaySettingsChanged -= OnDisplaySettingsChanged;
         _appBar?.Dispose();

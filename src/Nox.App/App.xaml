@@ -41,6 +41,8 @@
                                   IsCheckable="True"
                                   IsChecked="{Binding LyricsEnabled}"
                                   ToolTip="Envía título, artista y duración de la canción a lrclib.net" />
+                        <MenuItem Header="{Binding HotkeysMenuHeader}"
+                                  Command="{Binding OpenHotkeysCommand}" />
                         <MenuItem Header="Mantener el PC despierto"
                                   IsCheckable="True"
                                   IsChecked="{Binding KeepAwakeEnabled}"

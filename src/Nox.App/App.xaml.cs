@@ -79,7 +79,9 @@ public partial class App : Application
         {
             await services.GetRequiredService<SettingsCoordinator>().LoadAsync();
             services.GetRequiredService<NotchWindow>().Show();
-            await services.GetRequiredService<NotchContentViewModel>().StartAsync();
+            // Los atajos necesitan la ventana del notch ya creada (Windows le avisa a ella).
+            services.GetRequiredService<HotkeyService>().Start();
+            services.GetRequiredService<NotchViewModel>().HotkeysWindowRequested += () => OpenHotkeysWindow(services);            await services.GetRequiredService<NotchContentViewModel>().StartAsync();
         }
         catch (Exception error)
         {
@@ -131,6 +133,8 @@ public partial class App : Application
         services.AddSingleton<ILyricsService, LyricsService>();
         services.AddSingleton<IAutoStart, AutoStart>();
         services.AddSingleton<IVolumeService, NAudioVolumeService>();
+        services.AddSingleton<GlobalHotkeys>();
+        services.AddSingleton<HotkeyService>();
         services.AddSingleton<KeepAwake>();
         services.AddSingleton<IKeepAwake>(s => s.GetRequiredService<KeepAwake>());
         services.AddSingleton<ClipboardMonitor>();
@@ -150,6 +154,23 @@ public partial class App : Application
         services.AddSingleton<NotchContentViewModel>();
         services.AddSingleton<NotchWindow>();
         return services.BuildServiceProvider();
+    }
+
+    private HotkeysWindow? _hotkeysWindow;
+
+    // Una sola ventana de atajos: si ya está abierta, se trae al frente.
+    private void OpenHotkeysWindow(IServiceProvider services)
+    {
+        if (_hotkeysWindow is not null)
+        {
+            _hotkeysWindow.Activate();
+            return;
+        }
+        _hotkeysWindow = new HotkeysWindow(new HotkeysViewModel(
+            services.GetRequiredService<NotchViewModel>(), services.GetRequiredService<HotkeyService>()));
+        _hotkeysWindow.Closed += (_, _) => _hotkeysWindow = null;
+        _hotkeysWindow.Show();
+        _hotkeysWindow.Activate();
     }
 
     private void OnExitClick(object sender, RoutedEventArgs e) => Shutdown();

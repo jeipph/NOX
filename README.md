@@ -17,7 +17,16 @@ Versión **0.1.0**.
 
 Con el notch cerrado se ve el título de la canción, la cuenta atrás de la concentración o la hora. Se oculta solo cuando una app está en pantalla completa.
 
-**Opciones** (clic derecho en el icono **N** de la bandeja): estilo (Notch, Cápsula, Indicador), visible solo al pasar el ratón, reservar la franja superior, buscar letras en internet, tema, carpeta de notas, iniciar con Windows.
+**Opciones** (clic derecho en el icono **N** de la bandeja): estilo (Notch, Cápsula, Indicador), visible solo al pasar el ratón, reservar la franja superior, buscar letras en internet, atajos de teclado, mantener el PC despierto, tema, carpeta de notas, iniciar con Windows.
+
+**Atajos de teclado** (funcionan desde cualquier app; se cambian en «Atajos de teclado…»):
+
+| Atajo | Hace |
+|---|---|
+| Ctrl+Alt+N | Abrir o cerrar el notch |
+| Ctrl+Alt+P | Reproducir / pausar |
+| Ctrl+Alt+, / Ctrl+Alt+. | Letra 0,5 s antes / después |
+| Ctrl+Alt+0 | Letra sin desfase |
 
 ## Instalar
 

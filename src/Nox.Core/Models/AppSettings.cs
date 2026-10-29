@@ -29,4 +29,7 @@ public sealed record AppSettings
 
     /// <summary>Carpeta de las notas rápidas; null = Documentos\NOX\notes.</summary>
     public string? NotesFolder { get; init; }
+
+    /// <summary>Atajos de teclado globales.</summary>
+    public Hotkeys.HotkeySettings Hotkeys { get; init; } = new();
 }

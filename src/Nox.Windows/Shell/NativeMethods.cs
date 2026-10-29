@@ -176,6 +176,19 @@ internal static partial class NativeMethods
     [LibraryImport("shell32.dll")]
     public static partial nuint SHAppBarMessage(uint dwMessage, ref APPBARDATA pData);
 
+    // --- Atajos globales ---
+
+    public const int WM_HOTKEY = 0x0312;
+    public const uint MOD_NOREPEAT = 0x4000;
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool RegisterHotKey(nint hWnd, int id, uint fsModifiers, uint vk);
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool UnregisterHotKey(nint hWnd, int id);
+
     // --- Mantener despierto ---
 
     public const uint ES_SYSTEM_REQUIRED = 0x00000001;

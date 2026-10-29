@@ -41,7 +41,7 @@ Fecha: 2026-10-26. Fuente: búsqueda en GitHub (API) y lectura de los README. Lo
 | Modo "visible solo al pasar el ratón" | Oyenza | **Añadir (M2b)** |
 | Pomodoro / temporizador de enfoque | nabyscape, Oyenza | **Añadir (M6b)**, fácil |
 | Keep-awake (evitar suspensión) | nabyscape | **Añadir (M6b)**, muy fácil |
-| Monitor del sistema (CPU, RAM, red) | BrimDeck, Oyenza | **Añadir (M6c)**, útil en PC de escritorio |
+| Monitor del sistema (CPU, RAM, red) | BrimDeck, Oyenza | ~~Añadir (M6c)~~ Descartado por la persona (2026-10-29) |
 | Mezclador de volumen por app y cambio de salida de audio | nabyscape | **Añadir (M6d)** con NAudio |
 | Estante de archivos (file shelf) | nabyscape, Oyenza, DynamicWin | Idea para v2 / Programa 2 |
 | Portapapeles | nabyscape, Oyenza | Sí (M7) |

@@ -31,6 +31,7 @@ public sealed class JsonSettingsStoreTests : IDisposable
             ReserveTopStrip = true,
             LyricsEnabled = false,
             PreferredSourceId = "Chrome",
+            Hotkeys = new Nox.Core.Hotkeys.HotkeySettings { Enabled = false, PlayPause = "Ctrl+Alt+P" },
         };
 
         store.Save(saved);
@@ -44,6 +45,7 @@ public sealed class JsonSettingsStoreTests : IDisposable
         new JsonSettingsStore(SettingsPath).Save(new AppSettings { Theme = AppTheme.Dark });
 
         Assert.Contains("\"Theme\": \"Dark\"", File.ReadAllText(SettingsPath));
+        Assert.Contains("\"ToggleNotch\": \"Ctrl+Alt+N\"", File.ReadAllText(SettingsPath));
     }
 
     [Fact]

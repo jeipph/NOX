@@ -92,6 +92,9 @@ public partial class LyricsViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void OffsetLater() => ChangeOffset(-OffsetStep);
 
+    [RelayCommand]
+    private void ResetOffset() => ChangeOffset(-_offset);
+
     private void ChangeOffset(TimeSpan change)
     {
         _offset = LyricsSyncEngine.ClampOffset(_offset + change);

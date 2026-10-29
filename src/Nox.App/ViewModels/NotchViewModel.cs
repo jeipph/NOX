@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using Nox.Core.Abstractions;
+using Nox.Core.Hotkeys;
 using Nox.Core.Models;
 using Nox.Core.Notes;
 
@@ -56,6 +57,24 @@ public partial class NotchViewModel : ObservableObject
     [ObservableProperty]
     private string? _notesFolder;
 
+    [ObservableProperty]
+    private HotkeySettings _hotkeys = new();
+
+    /// <summary>Atajos que no funcionan (ocupados, repetidos…): se avisa en el menú.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HotkeysMenuHeader))]
+    private int _hotkeyProblemCount;
+
+    public string HotkeysMenuHeader => HotkeyProblemCount == 0
+        ? "Atajos de teclado…"
+        : $"Atajos de teclado… (⚠ {HotkeyProblemCount} sin funcionar)";
+
+    /// <summary>La ventana de atajos la abre App (necesita servicios que este ViewModel no conoce).</summary>
+    public event Action? HotkeysWindowRequested;
+
+    [RelayCommand]
+    private void OpenHotkeys() => HotkeysWindowRequested?.Invoke();
+
     public bool IsNotchStyle => Style == NotchStyle.Notch;
     public bool IsCapsuleStyle => Style == NotchStyle.Capsule;
     public bool IsIndicatorStyle => Style == NotchStyle.Indicator;
@@ -90,6 +109,7 @@ public partial class NotchViewModel : ObservableObject
         LyricsEnabled = settings.LyricsEnabled;
         Theme = settings.Theme;
         NotesFolder = settings.NotesFolder;
+        Hotkeys = settings.Hotkeys;
     }
 
     public AppSettings ToSettings(string? preferredSourceId) => new()
@@ -101,5 +121,6 @@ public partial class NotchViewModel : ObservableObject
         Theme = Theme,
         PreferredSourceId = preferredSourceId,
         NotesFolder = NotesFolder,
+        Hotkeys = Hotkeys,
     };
 }

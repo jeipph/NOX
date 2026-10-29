@@ -79,6 +79,12 @@
     <!-- Imágenes por segundo del giro (60 sería el máximo de WPF) -->
     <sys:Int32 x:Key="Vinyl.FrameRate">30</sys:Int32>
 
+    <!-- Ventana "Atajos de teclado" -->
+    <sys:Double x:Key="Size.HotkeysWindow.Width">460</sys:Double>
+    <Thickness x:Key="Padding.Window">20</Thickness>
+    <GridLength x:Key="Size.HotkeyBox">170</GridLength>
+    <Thickness x:Key="Space.Row">0,0,0,10</Thickness>
+
     <!-- Tiempos -->
     <sys:TimeSpan x:Key="Duration.Expand">00:00:00.22</sys:TimeSpan>
     <sys:TimeSpan x:Key="Duration.Fast">00:00:00.12</sys:TimeSpan>

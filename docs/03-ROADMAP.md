@@ -86,11 +86,6 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [x] **Keep-awake:** «Mantener el PC despierto» en el menú de la bandeja (`IKeepAwake` → `KeepAwake` con `SetThreadExecutionState`: ni suspensión ni pantalla apagada). No se guarda: cada vez que se abre NOX empieza apagado, y al cerrar NOX se deshace solo. *(2026-10-29: comprobado con un script que Windows acepta y retira la petición; el menú no se pudo abrir en la prueba —clic derecho en la bandeja no permitido—: falta que la persona lo vea.)*
 - [x] Temporizadores solo activos cuando se usan (un tic por segundo mientras corre).
 
-## M6c — Monitor del sistema (≈2 h) *(añadido tras la investigación)*
-- [ ] CPU y RAM con `PerformanceCounter` o contadores de Windows; red por interfaz.
-- [ ] Actualizar cada 1–2 s **solo** si la pestaña está visible y el notch expandido.
-- [ ] GPU: evaluar (puede requerir contadores de rendimiento de GPU o LibreHardwareMonitor, cuya licencia hay que revisar).
-
 ## M6d — Salida de audio y mezclador (≈2 h) *(añadido tras la investigación)*
 - [ ] Listar dispositivos de salida y cambiar el predeterminado (requiere una API no documentada de Windows; evaluar riesgo antes: si es frágil, solo mostrar el dispositivo actual).
 - [ ] Volumen por aplicación con `AudioSessionManager` de NAudio.
@@ -113,8 +108,9 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [x] (Para el MVP basta con el tema.) Además se guardan todas las opciones y el reproductor fijado.
 
 ## M9b — Atajos globales (≈1 h) *(añadido tras la investigación)*
-- [ ] Atajos configurables con `RegisterHotKey`: mostrar/ocultar notch, play/pausa, letra −0.5 s, letra +0.5 s, reiniciar desfase (idea de LyricIsland).
-- [ ] Detectar conflictos con atajos ya registrados y avisar.
+- [x] Atajos configurables con `RegisterHotKey` (`GlobalHotkeys` + `HotkeyService`; `Hotkey`/`HotkeySettings` en Core con 12 pruebas): abrir/cerrar el notch **Ctrl+Alt+N**, play/pausa **Ctrl+Alt+P**, letra 0,5 s antes **Ctrl+Alt+,**, después **Ctrl+Alt+.**, sin desfase **Ctrl+Alt+0**. Se guardan en `settings.json` → `Hotkeys`. Ventana **«Atajos de teclado…»** en el menú de la bandeja: clic en un cuadro y pulsar la combinación (Retroceso/Supr la quita), «Restablecer», casilla para desactivarlos todos.
+- [x] Conflictos: Windows rechaza un atajo que ya tiene otra app → «Ocupado por otra app» en rojo; también «Repetido» y «No se entiende». El menú dice «(⚠ N sin funcionar)».
+- *Verificado por Claude (2026-10-29, `--fake`): Ctrl+Alt+N abre y cierra, Ctrl+Alt+P pausa, Ctrl+Alt+, ×3 → +1,5 s y Ctrl+Alt+. → +1,0 s; Ctrl+Alt+0 ocupado por otro proceso → detectado; capturar una combinación repetida → aviso; Restablecer y guardado. **En este PC Ctrl+Alt+Espacio lo tiene otra app**: por eso play/pausa es Ctrl+Alt+P. Por defecto se evitan teclas que escriben algo con AltGr (= Ctrl+Alt) en teclados español/latino. No se pudo abrir el menú de la bandeja (clic derecho no permitido): falta que la persona lo vea. Pendiente menor: la barra de título de la ventana sale clara con el tema oscuro.*
 
 ## M10 — Empaquetado (≈2 h)
 - [x] `dotnet publish` **con .NET incluido** (`--self-contained true`), para poder enviarlo a PCs sin .NET. Comandos en `installer/README.md`.
@@ -126,11 +122,15 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 
 ## M11 — Pulido y calidad
 - [x] Revisar consumo (Administrador de tareas): objetivo **≤150 MB de RAM y ~0 % de CPU en reposo** con 1 monitor. *(2026-10-27, Release con todas las pestañas abiertas: 90 MB de memoria privada —lo que muestra el Administrador de tareas—, 0 ms de CPU en 10 s de reposo.)*
-- [ ] Probar con un juego o video en pantalla completa: el notch se oculta y no baja los FPS.
 - [ ] Probar con 1 y 2 monitores, y con escalados distintos.
 - [ ] Revisar excepciones y mensajes de log.
 - [x] README de usuario (sin capturas por ahora).
 - [x] Revisar `THIRD-PARTY-NOTICES.md` (creado: todas MIT, copyright leído de cada repositorio oficial).
+
+## M12 — Mascota pixel art (≈3 h) *(pedido 2026-10-29)*
+- [ ] Animación en pixel art (dibujo propio, sin sprites ajenos): un **gato gris oscuro de ojos amarillos** que juega y salta.
+- [ ] Elegir mascota: gato gris oscuro, **gato amarillo atigrado** o **perro beagle**.
+- [ ] Animar solo mientras se ve (como el vinilo): sin gasto de CPU con el notch cerrado.
 
 ---
 
@@ -141,7 +141,9 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [ ] ¿Repositorio privado en GitHub? **Sí** (2026-10-27); falta instalar `gh` y `gh auth login` (pasos de la persona usuaria).
 
 ## Registro de sesiones
-- **2026-10-29 — M6b keep-awake.** Opción «Mantener el PC despierto» en la bandeja (no se guarda entre aperturas). 148 pruebas. Falta que la persona la marque y vea que el PC no se suspende. Siguientes pendientes: M6c (monitor del sistema), M9b (atajos), M6d (mezclador), M11 (pruebas con juegos y monitores).
+- **2026-10-29 — M9b atajos globales.** Cinco atajos Ctrl+Alt configurables desde la bandeja, con aviso de conflictos. `settings.json` ya no escapa el «+» (`+`). 169 pruebas. Siguiente: M12 (mascota pixel art) o M6d (mezclador).
+- **2026-10-29 — Cambios de alcance.** La persona quitó M6c (monitor del sistema) y la prueba con juegos en pantalla completa de M11; añadió M12 (mascota pixel art: gato gris oscuro de ojos amarillos, gato amarillo atigrado o beagle).
+- **2026-10-29 — M6b keep-awake.** Opción «Mantener el PC despierto» en la bandeja (no se guarda entre aperturas). 148 pruebas. Falta que la persona la marque y vea que el PC no se suspende. Siguientes pendientes: M9b (atajos), M6d (mezclador), M11 (pruebas con monitores), M12 (mascota).
 - **2026-10-26 — Planificación.** Se analizaron Kissa, Nock, Morrow y OrbitDrop. Se decidió: Programa 1 en C#/.NET 8/WPF, estilo minimalista blanco/negro con tema cambiable. Documentos creados. No hay código ni .NET instalado todavía. Siguiente paso: M0.
 - **2026-10-26 — Investigación.** Se buscaron proyectos similares (ver `07-RESEARCH-SIMILAR-PROJECTS.md`). Cambios: se quitó la batería; se pasó a **.NET 10** (.NET 8 termina soporte en nov. 2026); se añadieron M2b, M3b, M6b, M6c, M6d, M9b; objetivo de RAM ≤150 MB. Instalar con `winget install Microsoft.DotNet.SDK.10`.
 - **2026-10-27 — Clones y reparto.** Se estudiaron boring.notch, BetterLyrics, WindowsMediaController (MIT), Poricom y Clone-Wars (ver `07-RESEARCH…` §6). Se creó `../REPARTO-MODELOS.md` (qué modelo hace cada tarea). Pendiente: decidir si usar `Dubya.WindowsMediaController` o `Windows.Media.Control` directo. Siguiente paso: M0.
