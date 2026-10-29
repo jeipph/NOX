@@ -41,6 +41,25 @@
                                   IsCheckable="True"
                                   IsChecked="{Binding LyricsEnabled}"
                                   ToolTip="Envía título, artista y duración de la canción a lrclib.net" />
+                        <MenuItem Header="Recordar descansar (la mascota aparece)">
+                            <MenuItem Header="Cada 20 min"
+                                      IsChecked="{Binding IsBreak20, Mode=OneWay}"
+                                      Command="{Binding SetBreakMinutesCommand}" CommandParameter="20" />
+                            <MenuItem Header="Cada 40 min"
+                                      IsChecked="{Binding IsBreak40, Mode=OneWay}"
+                                      Command="{Binding SetBreakMinutesCommand}" CommandParameter="40" />
+                            <MenuItem Header="Cada 60 min"
+                                      IsChecked="{Binding IsBreak60, Mode=OneWay}"
+                                      Command="{Binding SetBreakMinutesCommand}" CommandParameter="60" />
+                            <MenuItem Header="Nunca"
+                                      IsChecked="{Binding IsBreakOff, Mode=OneWay}"
+                                      Command="{Binding SetBreakMinutesCommand}" CommandParameter="0" />
+                            <Separator />
+                            <MenuItem Header="Descansar ahora" Command="{Binding BreakNowCommand}" />
+                        </MenuItem>
+                        <MenuItem Header="Mascota en el notch cerrado"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding PetInCollapsed}" />
                         <MenuItem Header="{Binding HotkeysMenuHeader}"
                                   Command="{Binding OpenHotkeysCommand}" />
                         <MenuItem Header="Mantener el PC despierto"

@@ -1,20 +1,18 @@
 <UserControl x:Class="Nox.App.Views.PetView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="clr-namespace:Nox.App.Views"
              xmlns:pets="clr-namespace:Nox.Core.Pets;assembly=Nox.Core">
-    <!-- DataContext: PetViewModel. La animación solo corre mientras se ve (PetView.xaml.cs). -->
+    <!-- DataContext: PetViewModel. La animación solo corre mientras se ve (PetStage). -->
     <Grid Margin="{DynamicResource Padding.Expanded}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- Elegir mascota -->
+        <!-- Elegir mascota y juguete -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Content="Gato gris"
-                    Margin="{DynamicResource Space.Chip}"
-                    Command="{Binding ChooseCommand}"
-                    CommandParameter="{x:Static pets:PetKind.GrayCat}"
+            <Button Content="Gato gris" Command="{Binding ChooseCommand}" CommandParameter="{x:Static pets:PetKind.GrayCat}"
                     AutomationProperties.Name="Mascota gato gris">
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource TabButton}">
@@ -27,10 +25,7 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <Button Content="Gato atigrado"
-                    Margin="{DynamicResource Space.Chip}"
-                    Command="{Binding ChooseCommand}"
-                    CommandParameter="{x:Static pets:PetKind.TabbyCat}"
+            <Button Content="Atigrado" Command="{Binding ChooseCommand}" CommandParameter="{x:Static pets:PetKind.TabbyCat}"
                     AutomationProperties.Name="Mascota gato atigrado">
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource TabButton}">
@@ -43,10 +38,7 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <Button Content="Beagle"
-                    Margin="{DynamicResource Space.Chip}"
-                    Command="{Binding ChooseCommand}"
-                    CommandParameter="{x:Static pets:PetKind.Beagle}"
+            <Button Content="Beagle" Command="{Binding ChooseCommand}" CommandParameter="{x:Static pets:PetKind.Beagle}"
                     AutomationProperties.Name="Mascota beagle">
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource TabButton}">
@@ -59,22 +51,51 @@
                     </Style>
                 </Button.Style>
             </Button>
+
+            <Rectangle Width="1" Margin="{DynamicResource Space.Inline}" Fill="{DynamicResource Brush.Border}" />
+
+            <Button Content="Ovillo" Command="{Binding ChooseToyCommand}" CommandParameter="{x:Static pets:PetToy.Yarn}"
+                    AutomationProperties.Name="Juguete ovillo">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource TabButton}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsYarn}" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource Brush.Text}" />
+                                <Setter Property="Background" Value="{DynamicResource Brush.Surface}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Content="Pelota" Command="{Binding ChooseToyCommand}" CommandParameter="{x:Static pets:PetToy.Ball}"
+                    AutomationProperties.Name="Juguete pelota">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource TabButton}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsBall}" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource Brush.Text}" />
+                                <Setter Property="Background" Value="{DynamicResource Brush.Surface}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Content="Ratón" Command="{Binding ChooseToyCommand}" CommandParameter="{x:Static pets:PetToy.Mouse}"
+                    AutomationProperties.Name="Juguete ratón">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource TabButton}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsMouse}" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource Brush.Text}" />
+                                <Setter Property="Background" Value="{DynamicResource Brush.Surface}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
         </StackPanel>
 
-        <!-- Escenario: suelo abajo; los píxeles se amplían sin suavizar (pixel art nítido). -->
-        <Canvas x:Name="Stage"
-                Grid.Row="1"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Bottom"
-                ClipToBounds="True"
-                RenderOptions.BitmapScalingMode="NearestNeighbor">
-            <Rectangle x:Name="Ground" Height="{DynamicResource Size.PetGround}" Fill="{DynamicResource Brush.Border}" />
-            <Image x:Name="BallImage" RenderTransformOrigin="0.5,0.5" />
-            <Image x:Name="PetImage" RenderTransformOrigin="0.5,0.5" AutomationProperties.Name="Mascota">
-                <Image.RenderTransform>
-                    <ScaleTransform x:Name="PetFlip" />
-                </Image.RenderTransform>
-            </Image>
-        </Canvas>
+        <!-- Escenario: pasa el ratón cerca de la mascota y se gira (o se despierta). -->
+        <views:PetStage x:Name="Stage" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
     </Grid>
 </UserControl>

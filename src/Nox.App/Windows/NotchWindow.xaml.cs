@@ -216,6 +216,9 @@ public partial class NotchWindow : Window, IDisposable
             case nameof(NotchViewModel.ReserveTopStrip):
                 PlaceWindow();
                 break;
+            case nameof(NotchViewModel.Pet) or nameof(NotchViewModel.PetInCollapsed):
+                UpdateCollapsedPet();
+                break;
         }
     }
 
@@ -357,7 +360,22 @@ public partial class NotchWindow : Window, IDisposable
         Pill.SetResourceReference(Border.CornerRadiusProperty, expanded ? ExpandedRadiusKey : CollapsedRadiusKey);
         ExpandedContent.Visibility = expanded ? Visibility.Visible : Visibility.Collapsed;
         CollapsedContent.Visibility = !expanded && ShowsCollapsedText ? Visibility.Visible : Visibility.Collapsed;
+        UpdateCollapsedPet();
         _content.SetExpanded(expanded);
+    }
+
+    // La mascota sentada a la izquierda del notch cerrado (solo donde también se ve el texto).
+    private void UpdateCollapsedPet()
+    {
+        bool show = !_isExpanded && ShowsCollapsedText && _viewModel.PetInCollapsed;
+        CollapsedPet.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+        CollapsedContent.SetResourceReference(MarginProperty, show ? "Padding.CollapsedWithPet" : "Padding.Collapsed");
+        if (!show)
+            return;
+        double scale = (double)FindResource("Pet.CollapsedScale");
+        CollapsedPet.Source = PetBitmaps.Pet(_viewModel.Pet, Nox.Core.Pets.PetPose.Sit);
+        CollapsedPet.Width = Nox.Core.Pets.PetSprites.Width * scale;
+        CollapsedPet.Height = Nox.Core.Pets.PetSprites.Height * scale;
     }
 
     // Aspecto contraído del estilo actual, sin animación.
@@ -376,6 +394,7 @@ public partial class NotchWindow : Window, IDisposable
         Pill.SetResourceReference(Border.BackgroundProperty, CollapsedBackgroundKey);
         ExpandedContent.Visibility = Visibility.Collapsed;
         CollapsedContent.Visibility = ShowsCollapsedText ? Visibility.Visible : Visibility.Collapsed;
+        UpdateCollapsedPet();
         _content.SetExpanded(false);
     }
 

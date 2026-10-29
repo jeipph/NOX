@@ -12,6 +12,19 @@ public enum PetKind
     Beagle,
 }
 
+/// <summary>Juguete con el que juega la mascota.</summary>
+public enum PetToy
+{
+    /// <summary>Ovillo de lana: rueda y se para pronto.</summary>
+    Yarn,
+
+    /// <summary>Pelota: bota y rueda lejos.</summary>
+    Ball,
+
+    /// <summary>Ratón de juguete: de vez en cuando se escapa solo.</summary>
+    Mouse,
+}
+
 /// <summary>Las posturas de la mascota (una imagen cada una).</summary>
 public enum PetPose
 {
@@ -22,6 +35,11 @@ public enum PetPose
     Crouch,
     Jump,
     Swipe,
+    SleepA,
+    SleepB,
+    Stretch,
+    LickA,
+    LickB,
 }
 
 /// <summary>
@@ -33,9 +51,9 @@ public static class PetSprites
 {
     public const int Width = 20;
     public const int Height = 14;
-    public const int BallSize = 5;
+    public const int ToySize = 5;
 
-    // Gato: o contorno, b pelo, s rayas, l claro (hocico, panza), e ojo, p pupila, n nariz.
+    // Gato: o contorno, b pelo, s rayas, l claro (hocico, panza), e ojo, p pupila, n nariz y lengua, z "zzz".
     private static readonly string[] CatHead =
     [
         ".............o...o..",
@@ -73,7 +91,45 @@ public static class PetSprites
         "...........olloollo.",
     ];
 
-    // Beagle: o contorno, w blanco, t canela, k manto negro, r oreja, e ojo, n nariz.
+    // Dormido: hecho una bola, con los ojos cerrados.
+    private static readonly string[] CatSleep =
+    [
+        "....................",
+        "....................",
+        "....................",
+        "....................",
+        "....................",
+        "....................",
+        "....................",
+        ".............o...o..",
+        "............obo.obo.",
+        "...oooooooooobbbbbo.",
+        "..obsbbsbbsbooobooo.",
+        "..obbbbbbbbbobbnbbo.",
+        "..obbbbbbbbbbblllbo.",
+        "..oooooooooooolloo..",
+    ];
+
+    // Estirándose: patas de delante estiradas, la cola arriba.
+    private static readonly string[] CatStretch =
+    [
+        "....................",
+        "....................",
+        "....................",
+        "....................",
+        ".o..................",
+        "obo.................",
+        ".obooooooo..........",
+        "..obsbbsbbo...o...o.",
+        "..obbsbbsbbo.obo.obo",
+        "..obbbbbbbbbbobbbbbo",
+        "..obbbbbbbbbbooobooo",
+        "..obbo.obbo..obbnbbo",
+        "..obo..obo..ollllllo",
+        "..olo..olo..oooooooo",
+    ];
+
+    // Beagle: o contorno, w blanco, t canela, k manto negro, r oreja, e ojo, n nariz, q lengua, z "zzz".
     private static readonly string[] DogHead =
     [
         "..o.........oooo....",
@@ -111,17 +167,80 @@ public static class PetSprites
         "..........owwoowwo..",
     ];
 
-    // Ovillo: o contorno, y lana, k hebra.
-    private static readonly string[][] BallFrames =
+    // Dormido: tumbado con la cabeza sobre las patas.
+    private static readonly string[] DogSleep =
     [
-        [".ooo.", "oykyo", "okyko", "oykyo", ".ooo."],
-        [".ooo.", "okyyo", "oykyo", "oyyko", ".ooo."],
-        [".ooo.", "oyyko", "oykyo", "okyyo", ".ooo."],
+        "....................",
+        "....................",
+        "....................",
+        "....................",
+        "....................",
+        "....................",
+        "....................",
+        ".............oooo...",
+        "...oooooooooottttoo.",
+        "..otkkkkkkkkorrtowwo",
+        "..ottkkkkkkkorrtwwwn",
+        "..otttttttttorrwwwo.",
+        ".owwwwwwwwwwwwwwwwo.",
+        "..oooooooooooooooo..",
     ];
 
-    public static int BallFrameCount => BallFrames.Length;
+    // La "reverencia" de juego: patas de delante estiradas y la cola arriba.
+    private static readonly string[] DogStretch =
+    [
+        "....................",
+        "....................",
+        "....................",
+        "....................",
+        "..o.................",
+        ".owo........oooo....",
+        ".oto.......otttto...",
+        "..otooooo..ottetoo..",
+        "...okkkkkkoorrttwwo.",
+        "...ottkkkkkorrtwwwno",
+        "...ottttttoorrwwwwo.",
+        "...owo.owo.owwwwwwo.",
+        "...owo.owo.oooooooo.",
+        "...owo.owo..........",
+    ];
 
-    public static IReadOnlyList<string> Ball(int frame) => BallFrames[((frame % BallFrames.Length) + BallFrames.Length) % BallFrames.Length];
+    // Una "Z" pequeña y otra grande, para el ir y venir del ronquido.
+    private static readonly (int Row, string Text)[] SmallZ =
+        [(4, "..................zz"), (5, "...................z"), (6, "..................zz")];
+    private static readonly (int Row, string Text)[] BigZ =
+        [(3, "................zzzz"), (4, "..................z."), (5, ".................z.."), (6, "................zzzz")];
+
+    // Juguetes de 5×5: o contorno; ovillo y lana, k hebra; pelota r rojo, w blanco; ratón g gris, k ojo, t cola.
+    private static readonly Dictionary<PetToy, string[][]> ToyFrames = new()
+    {
+        [PetToy.Yarn] =
+        [
+            [".ooo.", "oykyo", "okyko", "oykyo", ".ooo."],
+            [".ooo.", "okyyo", "oykyo", "oyyko", ".ooo."],
+            [".ooo.", "oyyko", "oykyo", "okyyo", ".ooo."],
+        ],
+        [PetToy.Ball] =
+        [
+            [".ooo.", "orrwo", "orwro", "owrro", ".ooo."],
+            [".ooo.", "owrro", "orrwo", "orwro", ".ooo."],
+            [".ooo.", "orwro", "owrro", "orrwo", ".ooo."],
+        ],
+        [PetToy.Mouse] =
+        [
+            [".....", "...o.", ".oggk", "tgggo", ".o.o."],
+            [".....", "...o.", ".oggk", "tgggo", "o.o.."],
+        ],
+    };
+
+    public static int ToyFrameCount(PetToy toy) => ToyFrames[toy].Length;
+
+    /// <summary>Imagen del juguete; el número de imagen da la vuelta solo (también si es negativo).</summary>
+    public static IReadOnlyList<string> Toy(PetToy toy, int frame)
+    {
+        string[][] frames = ToyFrames[toy];
+        return frames[((frame % frames.Length) + frames.Length) % frames.Length];
+    }
 
     /// <summary>Las filas del dibujo de esa mascota en esa postura.</summary>
     public static IReadOnlyList<string> Frame(PetKind kind, PetPose pose) =>
@@ -130,24 +249,38 @@ public static class PetSprites
     private static string[] CatFrame(PetPose pose) => pose switch
     {
         PetPose.Sit => CatSit,
-        PetPose.SitBlink => Replace(CatSit, 3, "............ooobooo."),
+        PetPose.SitBlink => Replace(CatSit, (3, "............ooobooo.")),
         PetPose.StandA => [.. CatHead, .. CatBody, .. Legs('b', 'l', apart: true)],
         PetPose.StandB => [.. CatHead, .. CatBody, .. Legs('b', 'l', apart: false)],
         // Agazapado: el cuerpo baja dos píxeles y las patas se doblan.
         PetPose.Crouch => [Empty, Empty, .. CatHead, .. CatBody, "...olo.olo...olo.olo"],
         PetPose.Jump => [.. CatHead, .. CatBody, .. JumpLegs('b')],
-        _ => [.. CatHead, .. CatBody[..3], "...obbbbbbbbbbllbool", CatBody[4], .. SwipeLegs('b', 'l')],
+        PetPose.Swipe => [.. CatHead, .. CatBody[..3], "...obbbbbbbbbbllbool", CatBody[4], .. SwipeLegs('b', 'l')],
+        PetPose.SleepA => Replace(CatSleep, SmallZ),
+        PetPose.SleepB => Replace(CatSleep, BigZ),
+        PetPose.Stretch => CatStretch,
+        // Lamiéndose la pata: ojos cerrados, la pata junto a la boca y la lengua fuera (o dentro).
+        PetPose.LickA => Replace(CatSit, (3, "............ooobooo."), (4, "............obbnbbol"),
+            (5, "............oblnlbol"), (6, "...........obbbbbbol")),
+        _ => Replace(CatSit, (3, "............ooobooo."), (4, "............obbnbbol"),
+            (5, "............oblllbol"), (6, "...........obbbbbbol")),
     };
 
     private static string[] DogFrame(PetPose pose) => pose switch
     {
         PetPose.Sit => DogSit,
-        PetPose.SitBlink => Replace(DogSit, 2, "...........ottotoo.."),
+        PetPose.SitBlink => Replace(DogSit, (2, "...........ottotoo..")),
         PetPose.StandA => [.. DogHead, .. DogBody, .. Legs('w', 'w', apart: true)],
         PetPose.StandB => [.. DogHead, .. DogBody, .. Legs('w', 'w', apart: false)],
         PetPose.Crouch => [Empty, Empty, .. DogHead, .. DogBody, "...owo.owo...owo.owo"],
         PetPose.Jump => [.. DogHead, .. DogBody, .. JumpLegs('w')],
-        _ => [.. DogHead, .. DogBody[..4], "...otttttttttttwwoow", DogBody[5], .. SwipeLegs('w', 'w')],
+        PetPose.Swipe => [.. DogHead, .. DogBody[..4], "...otttttttttttwwoow", DogBody[5], .. SwipeLegs('w', 'w')],
+        PetPose.SleepA => Replace(DogSleep, SmallZ),
+        PetPose.SleepB => Replace(DogSleep, BigZ),
+        PetPose.Stretch => DogStretch,
+        // Jadeando contento: ojo cerrado y la lengua fuera (o dentro).
+        PetPose.LickA => Replace(DogSit, (2, "...........ottotoo.."), (5, "...........orrwwwwoq")),
+        _ => Replace(DogSit, (2, "...........ottotoo..")),
     };
 
     private static readonly string Empty = new('.', Width);
@@ -165,10 +298,11 @@ public static class PetSprites
     private static string[] SwipeLegs(char fur, char paw) =>
         [$"...o{fur}o.o{fur}o...o{fur}o....", $"...o{fur}o.o{fur}o...o{fur}o....", $"...o{paw}o.o{paw}o...o{paw}o...."];
 
-    private static string[] Replace(string[] rows, int index, string row)
+    private static string[] Replace(string[] rows, params (int Row, string Text)[] changes)
     {
         string[] copy = [.. rows];
-        copy[index] = row;
+        foreach ((int row, string text) in changes)
+            copy[row] = text;
         return copy;
     }
 
@@ -179,23 +313,28 @@ public static class PetSprites
         {
             // Gris oscuro, pero no tanto que desaparezca sobre el notch negro.
             ['o'] = 0xFF1C1C21, ['b'] = 0xFF5A5A65, ['s'] = 0xFF474751, ['l'] = 0xFF888894,
-            ['e'] = 0xFFF7C51E, ['p'] = 0xFF101010, ['n'] = 0xFFE597AC,
+            ['e'] = 0xFFF7C51E, ['p'] = 0xFF101010, ['n'] = 0xFFE597AC, ['z'] = ZColor,
         },
         PetKind.TabbyCat => new Dictionary<char, uint>
         {
             ['o'] = 0xFF3D2410, ['b'] = 0xFFF2B33D, ['s'] = 0xFFC2721A, ['l'] = 0xFFFBE4AA,
-            ['e'] = 0xFF7CC243, ['p'] = 0xFF101010, ['n'] = 0xFFE597AC,
+            ['e'] = 0xFF7CC243, ['p'] = 0xFF101010, ['n'] = 0xFFE597AC, ['z'] = ZColor,
         },
         _ => new Dictionary<char, uint>
         {
             ['o'] = 0xFF2A1A10, ['w'] = 0xFFF4EFE6, ['t'] = 0xFFC98B4A, ['k'] = 0xFF2B2B2B,
-            ['r'] = 0xFF7A4A26, ['e'] = 0xFF2E1B10, ['n'] = 0xFF111111,
+            ['r'] = 0xFF7A4A26, ['e'] = 0xFF2E1B10, ['n'] = 0xFF111111, ['q'] = 0xFFE8768E, ['z'] = ZColor,
         },
     };
 
-    public static IReadOnlyDictionary<char, uint> BallPalette { get; } = new Dictionary<char, uint>
+    // Azul pálido: se ve sobre el notch negro y sobre el blanco.
+    private const uint ZColor = 0xFF8FB4E8;
+
+    public static IReadOnlyDictionary<char, uint> ToyPalette(PetToy toy) => toy switch
     {
-        ['o'] = 0xFF6B2D3F, ['y'] = 0xFFE0607E, ['k'] = 0xFFB03A57,
+        PetToy.Yarn => new Dictionary<char, uint> { ['o'] = 0xFF6B2D3F, ['y'] = 0xFFE0607E, ['k'] = 0xFFB03A57 },
+        PetToy.Ball => new Dictionary<char, uint> { ['o'] = 0xFF5A1414, ['r'] = 0xFFE23B3B, ['w'] = 0xFFF5F5F5 },
+        _ => new Dictionary<char, uint> { ['o'] = 0xFF3A3A40, ['g'] = 0xFFA9A9B4, ['k'] = 0xFF101010, ['t'] = 0xFFE597AC },
     };
 
     /// <summary>

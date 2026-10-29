@@ -64,6 +64,31 @@ public partial class NotchViewModel : ObservableObject
     [ObservableProperty]
     private PetKind _pet = PetKind.GrayCat;
 
+    [ObservableProperty]
+    private PetToy _petToy = PetToy.Yarn;
+
+    [ObservableProperty]
+    private bool _petInCollapsed = true;
+
+    /// <summary>Minutos entre avisos de descanso; 0 = nunca.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsBreak20), nameof(IsBreak40), nameof(IsBreak60), nameof(IsBreakOff))]
+    private int _breakMinutes = 40;
+
+    public bool IsBreak20 => BreakMinutes == 20;
+    public bool IsBreak40 => BreakMinutes == 40;
+    public bool IsBreak60 => BreakMinutes == 60;
+    public bool IsBreakOff => BreakMinutes <= 0;
+
+    [RelayCommand]
+    private void SetBreakMinutes(string minutes) => BreakMinutes = int.Parse(minutes);
+
+    /// <summary>"Descansar ahora": la mascota aparece ya (también sirve para verla sin esperar).</summary>
+    public event Action? BreakNowRequested;
+
+    [RelayCommand]
+    private void BreakNow() => BreakNowRequested?.Invoke();
+
     /// <summary>Atajos que no funcionan (ocupados, repetidos…): se avisa en el menú.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HotkeysMenuHeader))]
@@ -115,6 +140,9 @@ public partial class NotchViewModel : ObservableObject
         NotesFolder = settings.NotesFolder;
         Hotkeys = settings.Hotkeys;
         Pet = settings.Pet;
+        PetToy = settings.PetToy;
+        PetInCollapsed = settings.PetInCollapsed;
+        BreakMinutes = settings.BreakMinutes;
     }
 
     public AppSettings ToSettings(string? preferredSourceId) => new()
@@ -128,5 +156,8 @@ public partial class NotchViewModel : ObservableObject
         NotesFolder = NotesFolder,
         Hotkeys = Hotkeys,
         Pet = Pet,
+        PetToy = PetToy,
+        PetInCollapsed = PetInCollapsed,
+        BreakMinutes = BreakMinutes,
     };
 }

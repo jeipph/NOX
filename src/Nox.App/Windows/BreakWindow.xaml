@@ -1,0 +1,54 @@
+<Window x:Class="Nox.App.Windows.BreakWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:Nox.App.Views"
+        Title="NOX · Descanso"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        Topmost="True"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        WindowStartupLocation="Manual">
+    <!-- Franja transparente abajo de la pantalla: el ratón la atraviesa salvo en el mensaje y la mascota. -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border HorizontalAlignment="Center"
+                Width="{DynamicResource Size.BreakCard.Width}"
+                Padding="{DynamicResource Padding.BreakCard}"
+                Background="{DynamicResource Brush.Background}"
+                BorderBrush="{DynamicResource Brush.Border}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource Radius.Capsule.Expanded}">
+            <StackPanel>
+                <TextBlock Text="¡Hora de descansar!"
+                           HorizontalAlignment="Center"
+                           FontFamily="{DynamicResource Font.Main}"
+                           FontSize="{DynamicResource FontSize.Lyric}"
+                           FontWeight="{DynamicResource FontWeight.Title}"
+                           Foreground="{DynamicResource Brush.Text}" />
+                <TextBlock x:Name="Message"
+                           HorizontalAlignment="Center"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap"
+                           Margin="{DynamicResource Space.Above}"
+                           FontFamily="{DynamicResource Font.Main}"
+                           FontSize="{DynamicResource FontSize.Small}"
+                           Foreground="{DynamicResource Brush.TextMuted}" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="{DynamicResource Space.Above}">
+                    <Button Style="{StaticResource ChipButton}" Margin="{DynamicResource Space.Chip}"
+                            Content="Ya descansé" Click="OnDoneClick" AutomationProperties.Name="Ya descansé" />
+                    <Button Style="{StaticResource ChipButton}" Margin="{DynamicResource Space.Chip}"
+                            Content="5 min más" Click="OnSnoozeClick" AutomationProperties.Name="Recordar en 5 minutos" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <views:PetStage x:Name="Stage" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" ShowGround="False" ReactsToMouse="False" />
+    </Grid>
+</Window>

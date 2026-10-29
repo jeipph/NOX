@@ -78,7 +78,10 @@ public partial class App : Application
         try
         {
             await services.GetRequiredService<SettingsCoordinator>().LoadAsync();
-            services.GetRequiredService<NotchWindow>().Show();
+            var notch = services.GetRequiredService<NotchWindow>();
+            notch.Show();
+            // El notch se oculta solo cuando hay una app en pantalla completa: entonces el descanso espera.
+            services.GetRequiredService<BreakService>().Start(() => notch.IsVisible);
             // Los atajos necesitan la ventana del notch ya creada (Windows le avisa a ella).
             services.GetRequiredService<HotkeyService>().Start();
             services.GetRequiredService<NotchViewModel>().HotkeysWindowRequested += () => OpenHotkeysWindow(services);            await services.GetRequiredService<NotchContentViewModel>().StartAsync();
@@ -152,6 +155,7 @@ public partial class App : Application
         services.AddSingleton<NotesViewModel>();
         services.AddSingleton(_ => new FocusViewModel(includeTestPreset: useFakeMedia));
         services.AddSingleton<PetViewModel>();
+        services.AddSingleton(s => new BreakService(s.GetRequiredService<NotchViewModel>(), fast: useFakeMedia));
         services.AddSingleton<NotchContentViewModel>();
         services.AddSingleton<NotchWindow>();
         return services.BuildServiceProvider();

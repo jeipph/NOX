@@ -14,7 +14,9 @@ Versión **0.1.0**.
 | **Portapapeles** | Tus últimas 50 copias de texto; clic para volver a copiar, chinche para fijar. Ignora lo que copian los gestores de contraseñas. |
 | **Notas** | Notas rápidas: Ctrl+Enter guarda un `.md` en `Documentos\NOX\notes`. |
 | **Enfoque** | Temporizador de concentración (15 min – 1 h 30); avisa al terminar. |
-| **Mascota** | Un gato gris de ojos amarillos en pixel art que juega con un ovillo y salta. Arriba puedes cambiarlo por un gato atigrado o un beagle. |
+| **Mascota** | Un gato gris de ojos amarillos en pixel art que juega, salta, se lame, se estira y duerme. Arriba eliges la mascota (gato gris, atigrado o beagle) y el juguete (ovillo, pelota o ratón). Pasa el ratón cerca y se gira hacia ti. |
+
+**Descansos:** cada 40 minutos de uso, tu mascota cruza la parte de abajo de la pantalla para recordarte descansar («Ya descansé», «5 min más» o Esc). Se cambia en la bandeja → «Recordar descansar» (20, 40, 60 min o nunca). Si dejas el PC 5 minutos, cuenta como descanso.
 
 Con el notch cerrado se ve el título de la canción, la cuenta atrás de la concentración o la hora. Se oculta solo cuando una app está en pantalla completa.
 

@@ -132,7 +132,13 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [x] Elegir mascota arriba del panel: **Gato gris**, **Gato atigrado** (amarillo con rayas, ojos verdes) o **Beagle**. Se guarda en `settings.json` → `Pet`.
 - [x] Solo se anima mientras se ve (20 imágenes/s con `DispatcherTimer`), ampliado ×4 sin suavizar (`NearestNeighbor`). Medido en Debug: **2,5 %** de un núcleo con la pestaña a la vista, **0 %** con el notch cerrado.
 - Las paletas de las mascotas están en Core junto a los dibujos: son parte del dibujo, no del tema (la regla de colores en `Themes/*.xaml` es para la interfaz).
-- *Verificado por Claude (2026-10-29, `--fake`): las tres mascotas andan, golpean el ovillo, saltan y se giran; el cambio se guarda. Falta que lo vea la persona.*
+- *Verificado por Claude (2026-10-29, `--fake`): las tres mascotas andan, golpean el ovillo, saltan y se giran; el cambio se guarda.*
+- [x] Posturas nuevas: **dormir** (con «z»), **estirarse** (el beagle hace la reverencia de juego) y **lamerse** (el beagle jadea).
+- [x] Juguetes a elegir: **ovillo** (frena pronto), **pelota** (bota y rueda lejos) y **ratón** (se escapa solo). Se guarda en `PetToy`.
+- [x] Al pasar el ratón cerca, la mascota se gira hacia él y, si dormía, se despierta de un salto (como mucho una vez cada 2 s).
+- [x] **Mascota en el notch cerrado:** sentada a la izquierda, imagen quieta (no gasta nada). Opción en la bandeja.
+- [x] **Aviso de descanso** (`BreakReminder` en Core con 8 pruebas, `BreakService`, `BreakWindow`): cada **40 min** de uso la mascota cruza la parte de abajo de la pantalla, por encima de todo y sin robar el teclado, con «¡Hora de descansar!», **Ya descansé**, **5 min más** o Esc. Si dejas el PC 5 min cuenta como descanso (y cierra el aviso). Con una app en pantalla completa espera. Bandeja → «Recordar descansar»: cada 20/40/60 min, Nunca, o «Descansar ahora».
+- *Verificado por Claude (2026-10-29, `--fake`, donde los minutos son segundos): el aviso aparece a los 40 s, la mascota cruza la pantalla, «5 min más» lo vuelve a mostrar, el notch cerrado muestra al gato. CPU: 1,6 % con el aviso abierto. **La persona lo vio y quedó conforme.** 229 pruebas.*
 
 ---
 
@@ -143,6 +149,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [ ] ¿Repositorio privado en GitHub? **Sí** (2026-10-27); falta instalar `gh` y `gh auth login` (pasos de la persona usuaria).
 
 ## Registro de sesiones
+- **2026-10-29 — M12 ampliado.** Aviso de descanso cada 40 min con la mascota por la pantalla, posturas nuevas, juguetes (ovillo, pelota, ratón), reacción al ratón y mascota en el notch cerrado. La persona lo aprobó. Queda: M6d (mezclador), M11 (monitores/escalados, logs) y un instalador nuevo (0.2.0).
 - **2026-10-29 — M12 mascota.** Pestaña «Mascota» con gato gris (ojos amarillos), gato atigrado o beagle en pixel art propio, jugando con un ovillo y saltando. 199 pruebas. Queda: M6d (mezclador) y M11 (monitores/escalados, revisar logs).
 - **2026-10-29 — M9b atajos globales.** Cinco atajos Ctrl+Alt configurables desde la bandeja, con aviso de conflictos. `settings.json` ya no escapa el «+» (`+`). 169 pruebas. Siguiente: M12 (mascota pixel art) o M6d (mezclador).
 - **2026-10-29 — Cambios de alcance.** La persona quitó M6c (monitor del sistema) y la prueba con juegos en pantalla completa de M11; añadió M12 (mascota pixel art: gato gris oscuro de ojos amarillos, gato amarillo atigrado o beagle).

@@ -25,6 +25,15 @@
 
         <!-- DataContext de la pastilla: NotchContentViewModel (se asigna en el código). -->
         <Grid>
+            <!-- Contraído: la mascota sentada a la izquierda (imagen quieta, no gasta nada). -->
+            <Image x:Name="CollapsedPet"
+                   Visibility="Collapsed"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Center"
+                   Margin="{DynamicResource Margin.CollapsedPet}"
+                   RenderOptions.BitmapScalingMode="NearestNeighbor"
+                   AutomationProperties.Name="Mascota" />
+
             <!-- Contraído: título corto de la canción, o la hora si no suena nada. -->
             <TextBlock x:Name="CollapsedContent"
                        Text="{Binding CollapsedText}"

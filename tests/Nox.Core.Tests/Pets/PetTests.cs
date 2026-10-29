@@ -25,18 +25,22 @@ public sealed class PetTests
         Assert.Contains(pixels, p => p != 0);
     }
 
-    [Fact]
-    public void BallFrames_AreSquare_AndCycle()
+    [Theory]
+    [InlineData(PetToy.Yarn)]
+    [InlineData(PetToy.Ball)]
+    [InlineData(PetToy.Mouse)]
+    public void ToyFrames_AreSquare_AndCycle(PetToy toy)
     {
-        for (int i = 0; i < PetSprites.BallFrameCount; i++)
+        int count = PetSprites.ToyFrameCount(toy);
+        for (int i = 0; i < count; i++)
         {
-            IReadOnlyList<string> rows = PetSprites.Ball(i);
-            Assert.Equal(PetSprites.BallSize, rows.Count);
-            Assert.All(rows, row => Assert.Equal(PetSprites.BallSize, row.Length));
-            PetSprites.Render(rows, PetSprites.BallPalette);
+            IReadOnlyList<string> rows = PetSprites.Toy(toy, i);
+            Assert.Equal(PetSprites.ToySize, rows.Count);
+            Assert.All(rows, row => Assert.Equal(PetSprites.ToySize, row.Length));
+            PetSprites.Render(rows, PetSprites.ToyPalette(toy));
         }
-        Assert.Equal(PetSprites.Ball(0), PetSprites.Ball(PetSprites.BallFrameCount));
-        Assert.Equal(PetSprites.Ball(PetSprites.BallFrameCount - 1), PetSprites.Ball(-1));
+        Assert.Equal(PetSprites.Toy(toy, 0), PetSprites.Toy(toy, count));
+        Assert.Equal(PetSprites.Toy(toy, count - 1), PetSprites.Toy(toy, -1));
     }
 
     [Fact]
@@ -60,12 +64,12 @@ public sealed class PetTests
     }
 
     [Theory]
-    [InlineData(1)]
-    [InlineData(7)]
-    [InlineData(42)]
-    public void TwoMinutesOfPlay_StaysOnStage_AndPlaysAndJumps(int seed)
+    [InlineData(1, PetToy.Yarn)]
+    [InlineData(7, PetToy.Ball)]
+    [InlineData(42, PetToy.Mouse)]
+    public void TwoMinutesOfPlay_StaysOnStage_AndPlaysAndJumps(int seed, PetToy toy)
     {
-        var playground = new PetPlayground(seed);
+        var playground = new PetPlayground(seed) { Toy = toy };
         var poses = new HashSet<PetPose>();
         double highest = 0;
 
@@ -74,18 +78,99 @@ public sealed class PetTests
             playground.Step(0.05);
             poses.Add(playground.Pose);
             highest = Math.Max(highest, playground.PetY);
-
-            Assert.InRange(playground.PetX, 0, PetPlayground.StageWidth - PetSprites.Width);
-            Assert.InRange(playground.PetY, 0, PetPlayground.StageHeight - PetSprites.Height);
-            Assert.InRange(playground.BallX, 0, PetPlayground.StageWidth - PetSprites.BallSize);
-            Assert.True(playground.BallY >= 0);
+            AssertInside(playground);
         }
 
-        Assert.True(playground.Kicks > 0, "nunca tocó el ovillo");
+        Assert.True(playground.Kicks > 0, "nunca tocó el juguete");
         Assert.Contains(PetPose.Jump, poses);
         Assert.Contains(PetPose.Swipe, poses);
         Assert.Contains(PetPose.StandB, poses); // anduvo
         Assert.True(highest > 8, "los saltos son demasiado bajos");
+    }
+
+    [Fact]
+    public void LongPlay_AlsoSleepsStretchesAndGrooms()
+    {
+        var poses = new HashSet<PetPose>();
+        foreach (int seed in new[] { 1, 2, 3 })
+        {
+            var playground = new PetPlayground(seed);
+            for (int i = 0; i < 20 * 600; i++) // 10 minutos
+            {
+                playground.Step(0.05);
+                poses.Add(playground.Pose);
+            }
+        }
+
+        Assert.Contains(PetPose.SleepA, poses);
+        Assert.Contains(PetPose.SleepB, poses);
+        Assert.Contains(PetPose.Stretch, poses);
+        Assert.Contains(PetPose.LickA, poses);
+        Assert.Contains(PetPose.LickB, poses);
+    }
+
+    [Fact]
+    public void MouseToy_RunsAwayByItself()
+    {
+        var playground = new PetPlayground(9) { Toy = PetToy.Mouse };
+        double start = playground.ToyX;
+        bool moved = false;
+
+        // Unos segundos con la mascota quieta al principio: el ratón se escapa sin que nadie lo toque.
+        for (int i = 0; i < 20 * 8 && playground.Kicks == 0; i++)
+        {
+            playground.Step(0.05);
+            moved |= Math.Abs(playground.ToyX - start) > 5;
+        }
+
+        Assert.True(moved, "el ratón de juguete no se movió solo");
+    }
+
+    [Fact]
+    public void Poke_WakesASleepingPet()
+    {
+        var playground = new PetPlayground(2);
+        for (int i = 0; i < 20 * 900 && !playground.IsSleeping; i++)
+            playground.Step(0.05);
+        Assert.True(playground.IsSleeping, "no llegó a dormirse");
+
+        playground.Step(2.5); // pasado el tiempo mínimo entre reacciones
+        if (!playground.IsSleeping)
+            return; // se despertó solo justo ahora: no hay nada que probar
+        playground.Poke(0);
+        playground.Step(0.05);
+
+        Assert.False(playground.IsSleeping);
+        Assert.False(playground.FacingRight); // mira hacia donde estaba el ratón
+    }
+
+    [Fact]
+    public void Poke_IsIgnored_RightAfterAnother()
+    {
+        var playground = new PetPlayground(4);
+        playground.Step(3);
+        playground.Poke(PetPlayground.DefaultStageWidth); // a la derecha
+        bool facing = playground.FacingRight;
+
+        playground.Poke(0); // enseguida, a la izquierda: se ignora
+
+        Assert.Equal(facing, playground.FacingRight);
+    }
+
+    [Fact]
+    public void WideStage_PetUsesAllOfIt()
+    {
+        var playground = new PetPlayground(5, stageWidth: 480) { Toy = PetToy.Ball };
+        double leftmost = double.MaxValue, rightmost = 0;
+        for (int i = 0; i < 20 * 300; i++)
+        {
+            playground.Step(0.05);
+            AssertInside(playground);
+            leftmost = Math.Min(leftmost, playground.PetX);
+            rightmost = Math.Max(rightmost, playground.PetX);
+        }
+
+        Assert.True(rightmost - leftmost > 150, $"apenas se movió: {leftmost:0}–{rightmost:0}");
     }
 
     [Fact]
@@ -95,8 +180,7 @@ public sealed class PetTests
 
         playground.Step(30); // p. ej. el PC estuvo dormido
 
-        Assert.InRange(playground.PetX, 0, PetPlayground.StageWidth - PetSprites.Width);
-        Assert.InRange(playground.BallX, 0, PetPlayground.StageWidth - PetSprites.BallSize);
+        AssertInside(playground);
     }
 
     [Fact]
@@ -109,6 +193,14 @@ public sealed class PetTests
             a.Step(0.05);
             b.Step(0.05);
         }
-        Assert.Equal((a.PetX, a.PetY, a.Pose, a.BallX), (b.PetX, b.PetY, b.Pose, b.BallX));
+        Assert.Equal((a.PetX, a.PetY, a.Pose, a.ToyX), (b.PetX, b.PetY, b.Pose, b.ToyX));
+    }
+
+    private static void AssertInside(PetPlayground p)
+    {
+        Assert.InRange(p.PetX, 0, p.StageWidth - PetSprites.Width);
+        Assert.InRange(p.PetY, 0, PetPlayground.StageHeight - PetSprites.Height);
+        Assert.InRange(p.ToyX, 0, p.StageWidth - PetSprites.ToySize);
+        Assert.InRange(p.ToyY, 0, PetPlayground.StageHeight - PetSprites.ToySize);
     }
 }

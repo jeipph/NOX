@@ -62,5 +62,9 @@ public static class WindowHelper
         SetWindowPos(hwnd, HWND_TOPMOST, x, area.Top, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE);
     }
 
+    /// <summary>Coloca y dimensiona la ventana (en píxeles reales) encima de todo, sin activarla.</summary>
+    public static void PlaceTopmost(nint hwnd, PixelRect bounds) =>
+        SetWindowPos(hwnd, HWND_TOPMOST, bounds.Left, bounds.Top, bounds.Width, bounds.Height, SWP_NOACTIVATE);
+
     internal static PixelRect ToPixelRect(RECT r) => new(r.Left, r.Top, r.Right, r.Bottom);
 }

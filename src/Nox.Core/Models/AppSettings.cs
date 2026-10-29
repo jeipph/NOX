@@ -33,6 +33,14 @@ public sealed record AppSettings
     /// <summary>Mascota de la pestaña "Mascota".</summary>
     public Pets.PetKind Pet { get; init; } = Pets.PetKind.GrayCat;
 
+    public Pets.PetToy PetToy { get; init; } = Pets.PetToy.Yarn;
+
+    /// <summary>La mascota sentada a la izquierda del notch cerrado.</summary>
+    public bool PetInCollapsed { get; init; } = true;
+
+    /// <summary>Cada cuántos minutos aparece la mascota para recordar descansar; 0 = nunca.</summary>
+    public int BreakMinutes { get; init; } = 40;
+
     /// <summary>Atajos de teclado globales.</summary>
     public Hotkeys.HotkeySettings Hotkeys { get; init; } = new();
 }

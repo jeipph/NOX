@@ -84,6 +84,18 @@
     <!-- 20 imágenes por segundo: suficiente para pixel art y gasta poco -->
     <sys:TimeSpan x:Key="Pet.FrameInterval">00:00:00.05</sys:TimeSpan>
     <sys:Double x:Key="Size.PetGround">1</sys:Double>
+    <!-- Mascota pequeña en el notch cerrado (×2) -->
+    <sys:Double x:Key="Pet.CollapsedScale">2</sys:Double>
+    <Thickness x:Key="Margin.CollapsedPet">10,0,0,0</Thickness>
+    <!-- Con la mascota a la izquierda, el texto deja sitio -->
+    <Thickness x:Key="Padding.CollapsedWithPet">52,0,16,0</Thickness>
+
+    <!-- Aviso de descanso: franja abajo de la pantalla con la mascota (×5) y un mensaje -->
+    <sys:Double x:Key="Pet.BreakScale">5</sys:Double>
+    <sys:Double x:Key="Size.BreakCard.Width">420</sys:Double>
+    <Thickness x:Key="Padding.BreakCard">18,14,18,14</Thickness>
+    <!-- Cada cuánto se mira si toca descansar (no hace falta más precisión) -->
+    <sys:TimeSpan x:Key="Break.CheckInterval">00:00:30</sys:TimeSpan>
 
     <!-- Ventana "Atajos de teclado" -->
     <sys:Double x:Key="Size.HotkeysWindow.Width">460</sys:Double>
