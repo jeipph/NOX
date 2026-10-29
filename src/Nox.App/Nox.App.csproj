@@ -23,7 +23,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
 
     <!-- Datos que muestra Windows en Propiedades → Detalles -->
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <!-- Que la versión se vea "0.1.0" y no "0.1.0+<código de commit>" -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <Product>NOX</Product>

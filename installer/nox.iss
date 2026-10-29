@@ -2,7 +2,7 @@
 ; Se instala solo para el usuario actual: no pide permisos de administrador.
 
 #define AppName "NOX"
-#define AppVersion "0.1.0"
+#define AppVersion "0.2.0"
 #define AppExe "NOX.exe"
 
 [Setup]

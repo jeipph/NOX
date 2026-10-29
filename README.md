@@ -2,7 +2,7 @@
 
 Utilidad de escritorio para **Windows 10 (2004 o posterior) y Windows 11, de 64 bits**: una pastilla ("notch") minimalista en el borde superior de la pantalla que se abre al pasar el ratón. Hecha en **C# / .NET 10 / WPF**. Estilo minimalista en blanco o negro, con tema claro, oscuro o el de Windows.
 
-Versión **0.1.0**.
+Versión **0.2.0**.
 
 ## Qué hace
 
@@ -33,7 +33,7 @@ Con el notch cerrado se ve el título de la canción, la cuenta atrás de la con
 
 ## Instalar
 
-1. Ejecuta `NOX-0.1.0-instalador.exe`. No pide permisos de administrador: se instala solo para tu usuario.
+1. Ejecuta `NOX-0.2.0-instalador.exe`. No pide permisos de administrador: se instala solo para tu usuario.
 2. Windows puede avisar "Windows protegió tu PC" porque el instalador no tiene firma digital (es normal en programas personales): pulsa **Más información → Ejecutar de todas formas**.
 3. NOX aparece arriba al centro de la pantalla y en el menú Inicio. Para quitarlo: **Configuración → Aplicaciones → NOX → Desinstalar**.
 

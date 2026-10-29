@@ -153,6 +153,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [ ] ¿Repositorio privado en GitHub? **Sí** (2026-10-27); falta instalar `gh` y `gh auth login` (pasos de la persona usuaria).
 
 ## Registro de sesiones
+- **2026-10-29 — NOX 0.2.0.** Instalador `dist/NOX-0.2.0-instalador.exe` (47,5 MB, .NET incluido) e instalado en el PC de la persona (`%LOCALAPPDATA%\Programs\NOX`). La persona decidió no probar el escalado 125/150 %. Incluye todo lo de hoy: keep-awake, atajos, mascota y descansos, mezclador y las correcciones de M11.
 - **2026-10-29 — M11.** Dos monitores probados (100 %); escalado tomado del monitor principal; registro de errores que no cierra NOX; corregido el notch que se escondía con capas transparentes; barra de título oscura. 242 pruebas. Falta: escalado 125/150 % (lo cambia la persona) y el instalador 0.2.0.
 - **2026-10-29 — M6d mezclador.** Volumen y silencio por app y cambio de salida de audio, desde «Ahora suena» → «Mezclador». 235 pruebas. Queda: M11 (monitores/escalados, logs, barra de título oscura en la ventana de atajos) e instalador 0.2.0.
 - **2026-10-29 — M12 ampliado.** Aviso de descanso cada 40 min con la mascota por la pantalla, posturas nuevas, juguetes (ovillo, pelota, ratón), reacción al ratón y mascota en el notch cerrado. La persona lo aprobó. Queda: M6d (mezclador), M11 (monitores/escalados, logs) y un instalador nuevo (0.2.0).
