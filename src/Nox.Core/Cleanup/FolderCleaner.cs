@@ -59,6 +59,26 @@ public sealed class FolderCleaner
         return nowUtc - newest >= MinAge;
     }
 
+    /// <summary>
+    /// True si parece de verdad una carpeta de temporales: no es la raíz de un disco y su nombre lleva
+    /// «temp» o «tmp». Protege de un <c>%TEMP%</c> mal configurado (p. ej. <c>C:\</c>), que haría
+    /// borrar archivos viejos de todo el disco.
+    /// </summary>
+    public static bool IsSafeTempFolder(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return false;
+        string full = Path.TrimEndingDirectorySeparator(Path.GetFullPath(path));
+        if (IsRoot(full))
+            return false;
+        string name = Path.GetFileName(full);
+        return name.Contains("temp", StringComparison.OrdinalIgnoreCase) || name.Contains("tmp", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsRoot(string fullPath) =>
+        string.Equals(Path.TrimEndingDirectorySeparator(Path.GetPathRoot(fullPath) ?? ""),
+            Path.TrimEndingDirectorySeparator(fullPath), StringComparison.OrdinalIgnoreCase);
+
     /// <summary>True si <paramref name="path"/> está dentro de <paramref name="root"/> (no es la propia carpeta).</summary>
     public static bool IsInside(string root, string path)
     {
@@ -100,7 +120,8 @@ public sealed class FolderCleaner
     /// <summary>Borra los archivos viejos de la carpeta y luego las subcarpetas viejas que quedaron vacías.</summary>
     public CleanResult Clean(string root, DateTime nowUtc)
     {
-        if (!Directory.Exists(root))
+        // Nunca la raíz de un disco, pase lo que pase.
+        if (!Directory.Exists(root) || IsRoot(Path.GetFullPath(root)))
             return default;
 
         long freed = 0;

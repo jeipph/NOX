@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Windows;
 using H.NotifyIcon;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +16,7 @@ using Nox.Windows.Audio;
 using Nox.Windows.Clipboard;
 using Nox.Windows.Lyrics;
 using Nox.Windows.Media;
+using Nox.Windows.Memory;
 using Nox.Windows.Shell;
 
 namespace Nox.App;
@@ -26,6 +27,7 @@ public partial class App : Application
     private Mutex? _singleInstance;
     private TaskbarIcon? _trayIcon;
     private ServiceProvider? _services;
+    private bool _fake;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -58,6 +60,7 @@ public partial class App : Application
 
         // --fake: canción de mentira para probar la interfaz sin reproductor.
         bool useFakeMedia = e.Args.Contains("--fake", StringComparer.OrdinalIgnoreCase);
+        _fake = useFakeMedia;
         if (!useFakeMedia)
             MigrateFromNotchBar();
         _services = ConfigureServices(useFakeMedia);
@@ -92,11 +95,18 @@ public partial class App : Application
             await services.GetRequiredService<SettingsCoordinator>().LoadAsync();
             var notch = services.GetRequiredService<NotchWindow>();
             notch.Show();
-            // El notch se oculta solo cuando hay una app en pantalla completa: entonces el descanso espera.
-            services.GetRequiredService<BreakService>().Start(() => notch.IsVisible);
+            // Con una app en pantalla completa el descanso espera. Si el notch se ocultó con ×, no:
+            // el aviso sale igual.
+            services.GetRequiredService<BreakService>().Start(() => !notch.IsFullscreenAppActive);
             // Los atajos necesitan la ventana del notch ya creada (Windows le avisa a ella).
             services.GetRequiredService<HotkeyService>().Start();
-            services.GetRequiredService<NotchViewModel>().HotkeysWindowRequested += () => OpenHotkeysWindow(services);            await services.GetRequiredService<NotchContentViewModel>().StartAsync();
+            var options = services.GetRequiredService<NotchViewModel>();
+            options.HotkeysWindowRequested += () => OpenHotkeysWindow(services);
+            options.CustomBreakRequested += () => OpenCustomBreakWindow(services);
+            options.CleanupWindowRequested += () => OpenCleanupWindow(services);
+            // Hambre y popós de la mascota (con --fake las horas son segundos).
+            services.GetRequiredService<PetViewModel>().StartCare(fast: _fake);
+            await services.GetRequiredService<NotchContentViewModel>().StartAsync();
         }
         catch (Exception error)
         {
@@ -174,6 +184,7 @@ public partial class App : Application
         services.AddSingleton(_ => new FocusViewModel(includeTestPreset: useFakeMedia));
         services.AddSingleton<PetViewModel>();
         services.AddSingleton<IAudioMixer, NAudioMixer>();
+        services.AddSingleton<ISystemMemory, SystemMemory>();
         services.AddSingleton<MixerViewModel>();
         services.AddSingleton(s => new BreakService(s.GetRequiredService<NotchViewModel>(), fast: useFakeMedia));
         services.AddSingleton<NotchContentViewModel>();
@@ -197,6 +208,41 @@ public partial class App : Application
         _hotkeysWindow.Closed += (_, _) => _hotkeysWindow = null;
         _hotkeysWindow.Show();
         _hotkeysWindow.Activate();
+    }
+
+    private CustomBreakWindow? _customBreakWindow;
+
+    // «Otro…» del menú de descansos: escribir los minutos.
+    private void OpenCustomBreakWindow(IServiceProvider services)
+    {
+        if (_customBreakWindow is not null)
+        {
+            _customBreakWindow.Activate();
+            return;
+        }
+        _customBreakWindow = new CustomBreakWindow(new CustomBreakViewModel(services.GetRequiredService<NotchViewModel>()),
+            services.GetRequiredService<ThemeService>());
+        _customBreakWindow.Closed += (_, _) => _customBreakWindow = null;
+        _customBreakWindow.Show();
+        _customBreakWindow.Activate();
+    }
+
+    private CleanupWindow? _cleanupWindow;
+
+    // «Limpiar caché y RAM…»: una sola ventana a la vez.
+    private void OpenCleanupWindow(IServiceProvider services)
+    {
+        if (_cleanupWindow is not null)
+        {
+            _cleanupWindow.Activate();
+            return;
+        }
+        var viewModel = new CleanupViewModel(services.GetRequiredService<ISystemMemory>(),
+            (TimeSpan)FindResource("Cleanup.RamSettleDelay"));
+        _cleanupWindow = new CleanupWindow(viewModel, services.GetRequiredService<ThemeService>());
+        _cleanupWindow.Closed += (_, _) => _cleanupWindow = null;
+        _cleanupWindow.Show();
+        _cleanupWindow.Activate();
     }
 
     private void OnExitClick(object sender, RoutedEventArgs e) => Shutdown();

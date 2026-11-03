@@ -20,6 +20,14 @@ public static class PetBitmaps
         return frame;
     }
 
+    private static readonly BitmapSource FullBowl = ToBitmap(PetSprites.Bowl(full: true), PetSprites.BowlPalette);
+    private static readonly BitmapSource EmptyBowl = ToBitmap(PetSprites.Bowl(full: false), PetSprites.BowlPalette);
+    private static readonly BitmapSource PoopImage = ToBitmap(PetSprites.Poop(), PetSprites.PoopPalette);
+
+    public static BitmapSource Bowl(bool full) => full ? FullBowl : EmptyBowl;
+
+    public static BitmapSource Poop() => PoopImage;
+
     public static BitmapSource Toy(PetToy toy, int index)
     {
         index %= PetSprites.ToyFrameCount(toy);

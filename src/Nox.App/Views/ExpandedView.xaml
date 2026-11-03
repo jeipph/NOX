@@ -35,6 +35,39 @@
         <views:PetView DataContext="{Binding Pet}"
                        Visibility="{Binding DataContext.IsPetActive, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibleIfTrue}}" />
 
+        <!-- Asa para mover el notch (la ventana lo arrastra en vivo) y × para ocultarlo. -->
+        <Border x:Name="DragHandleElement"
+                Grid.Row="1"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Margin="{DynamicResource Space.TabBarEdge}"
+                Width="{DynamicResource Size.NotchEdgeButton}"
+                Height="{DynamicResource Size.NotchEdgeButton}"
+                CornerRadius="{DynamicResource Radius.Control}"
+                Background="{DynamicResource Brush.HitArea}"
+                Cursor="SizeAll"
+                ToolTip="Arrastra para mover el notch"
+                AutomationProperties.Name="Mover el notch">
+            <TextBlock Text="&#xE7C2;"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontFamily="{DynamicResource Font.Icons}"
+                       FontSize="{DynamicResource FontSize.IconSmall}"
+                       Foreground="{DynamicResource Brush.TextMuted}" />
+        </Border>
+        <Button Grid.Row="1"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="{DynamicResource Space.TabBarEdge}"
+                Style="{StaticResource SmallIconButton}"
+                Width="{DynamicResource Size.NotchEdgeButton}"
+                Height="{DynamicResource Size.NotchEdgeButton}"
+                Foreground="{DynamicResource Brush.TextMuted}"
+                Content="&#xE711;"
+                Click="OnCloseClick"
+                ToolTip="Ocultar el notch (vuelve con el atajo o desde la bandeja)"
+                AutomationProperties.Name="Ocultar el notch" />
+
         <!-- Pestañas -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="{DynamicResource Space.TabBar}">
             <Button Content="Ahora suena"

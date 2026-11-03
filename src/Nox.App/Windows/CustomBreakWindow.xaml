@@ -1,0 +1,54 @@
+<Window x:Class="Nox.App.Windows.CustomBreakWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="NOX · Recordar descansar"
+        Icon="/Assets/nox.ico"
+        Width="{DynamicResource Size.MinutesWindow.Width}"
+        SizeToContent="Height"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource Brush.Background}"
+        Foreground="{DynamicResource Brush.Text}"
+        FontFamily="{DynamicResource Font.Main}"
+        FontSize="{DynamicResource FontSize.Small}">
+    <!-- DataContext: CustomBreakViewModel -->
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="VisibleIfTrue" />
+    </Window.Resources>
+
+    <StackPanel Margin="{DynamicResource Padding.Window}">
+        <TextBlock Text="¿Cada cuántos minutos te recuerdo descansar?"
+                   TextWrapping="Wrap"
+                   Margin="{DynamicResource Space.Row}" />
+
+        <StackPanel Orientation="Horizontal" Margin="{DynamicResource Space.Row}">
+            <TextBox x:Name="MinutesBox"
+                     Style="{StaticResource NoteTextBox}"
+                     Width="{DynamicResource Size.MinutesBox.Width}"
+                     AcceptsReturn="False"
+                     TextAlignment="Center"
+                     Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"
+                     AutomationProperties.Name="Minutos entre avisos" />
+            <TextBlock Text="minutos"
+                       VerticalAlignment="Center"
+                       Margin="{DynamicResource Space.Inline}" />
+        </StackPanel>
+
+        <TextBlock Text="{Binding Hint}"
+                   Foreground="{DynamicResource Brush.TextMuted}"
+                   FontSize="{DynamicResource FontSize.Micro}" />
+        <TextBlock Text="{Binding Error}"
+                   Foreground="{DynamicResource Brush.Danger}"
+                   FontSize="{DynamicResource FontSize.Micro}"
+                   TextWrapping="Wrap"
+                   Margin="{DynamicResource Space.Above}"
+                   Visibility="{Binding HasError, Converter={StaticResource VisibleIfTrue}}" />
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="{DynamicResource Space.Above}">
+            <Button Style="{StaticResource ChipButton}" Margin="{DynamicResource Space.Chip}"
+                    Content="Cancelar" Click="OnCancelClick" AutomationProperties.Name="Cancelar" />
+            <Button Style="{StaticResource ChipButton}" Margin="{DynamicResource Space.Chip}"
+                    Content="Aceptar" Command="{Binding AcceptCommand}" AutomationProperties.Name="Aceptar" />
+        </StackPanel>
+    </StackPanel>
+</Window>

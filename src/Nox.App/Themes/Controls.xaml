@@ -127,7 +127,7 @@
     <!-- Pestaña del notch abierto: como la etiqueta, pero sin fondo si no está activa. -->
     <Style x:Key="TabButton" TargetType="Button" BasedOn="{StaticResource ChipButton}">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Margin" Value="{DynamicResource Space.Inline}" />
+        <Setter Property="Margin" Value="{DynamicResource Space.Tab}" />
     </Style>
 
     <!-- Líneas de letra apagadas (la anterior y la siguiente). -->

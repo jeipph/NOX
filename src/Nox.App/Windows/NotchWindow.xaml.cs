@@ -38,6 +38,20 @@ public partial class NotchWindow : Window, IDisposable
     private readonly GlobalHotkeys _hotkeys;
     private readonly HotkeyService _hotkeyService;
 
+    // --- Posición (todo en píxeles físicos) ---
+    // Desplazamiento visual de la pastilla: cuando la ventana se recoloca (para que el notch abierto
+    // no se salga de la pantalla), empieza en lo que se movió y se anima a 0, así no se ve un salto.
+    private readonly TranslateTransform _pillShift = new();
+    private PixelRect _workArea;
+    private (int X, int Y) _home;   // dónde va la ventana con el notch cerrado
+    private bool _placed;
+    private bool _growsUp;          // en la mitad de abajo: la pastilla cuelga del borde de abajo
+
+    // Arrastre con el asa: dónde estaban el ratón y la ventana al empezar.
+    private bool _isDragging;
+    private (int X, int Y) _dragCursorStart;
+    private (int X, int Y) _dragWindowStart;
+
     public NotchWindow(NotchViewModel viewModel, NotchContentViewModel content, ClipboardMonitor clipboard,
         GlobalHotkeys hotkeys, HotkeyService hotkeyService)
     {
@@ -51,6 +65,15 @@ public partial class NotchWindow : Window, IDisposable
         _hotkeyService = hotkeyService;
         _hotkeyService.ToggleNotchRequested += OnToggleRequested;
         Pill.DataContext = content;
+        Pill.RenderTransform = _pillShift;
+        _content.Pet.PropertyChanged += OnPetChanged;
+
+        UIElement handle = ExpandedContent.DragHandle;
+        handle.MouseLeftButtonDown += OnDragHandleDown;
+        handle.MouseMove += OnDragHandleMove;
+        handle.MouseLeftButtonUp += (_, _) => handle.ReleaseMouseCapture();
+        handle.LostMouseCapture += (_, _) => EndDrag();
+        ExpandedContent.CloseClicked += () => _viewModel.HideNotchCommand.Execute(null);
 
         _collapseTimer = new DispatcherTimer { Interval = (TimeSpan)FindResource("Hover.CollapseDelay") };
         _collapseTimer.Tick += (_, _) =>
@@ -89,7 +112,7 @@ public partial class NotchWindow : Window, IDisposable
 
         _appBar = new AppBar(_hwnd);
         _appBar.FullscreenChanged += OnFullscreenChanged;
-        _appBar.PositionChanged += PlaceWindow;
+        _appBar.PositionChanged += () => PlaceWindow();
         _clipboard.Attach(_hwnd);
         _hotkeys.Attach(_hwnd);
         SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
@@ -121,12 +144,15 @@ public partial class NotchWindow : Window, IDisposable
         // Windows actualiza el área de trabajo un poco después de reservar o liberar la franja;
         // al llegar este aviso se recoloca con los valores ya actualizados.
         if (WindowHelper.IsWorkAreaChanged(msg, wParam))
-            Dispatcher.BeginInvoke(PlaceWindow);
+            Dispatcher.BeginInvoke(() => PlaceWindow());
 
         return 0;
     }
 
     // --- Avisos ---
+
+    /// <summary>Hay una app en pantalla completa (el notch está escondido): el aviso de descanso espera.</summary>
+    public bool IsFullscreenAppActive => _appBar?.IsFullscreen == true;
 
     private void OnAttentionRequested()
     {
@@ -216,9 +242,43 @@ public partial class NotchWindow : Window, IDisposable
             case nameof(NotchViewModel.ReserveTopStrip):
                 PlaceWindow();
                 break;
+            case nameof(NotchViewModel.Position):
+                // Al soltarlo tras arrastrar, o «Volver arriba al centro»: se desliza hasta su sitio.
+                PlaceWindow(animate: true);
+                break;
+            case nameof(NotchViewModel.IsNotchHidden):
+                UpdateShown();
+                break;
             case nameof(NotchViewModel.Pet) or nameof(NotchViewModel.PetInCollapsed):
                 UpdateCollapsedPet();
                 break;
+        }
+    }
+
+    // Con hambre, la mascota del notch cerrado abre la boca.
+    private void OnPetChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(PetViewModel.IsHungry))
+            UpdateCollapsedPet();
+    }
+
+    // Se ve salvo que se haya ocultado con × o haya una app en pantalla completa.
+    private void UpdateShown()
+    {
+        bool show = !_viewModel.IsNotchHidden && !IsFullscreenAppActive;
+        if (show == IsVisible)
+            return;
+        if (show)
+        {
+            Show();
+            PlaceWindow();
+        }
+        else
+        {
+            _collapseTimer.Stop();
+            _attentionTimer.Stop();
+            ApplyCollapsedLook();
+            Hide();
         }
     }
 
@@ -230,71 +290,219 @@ public partial class NotchWindow : Window, IDisposable
         PlaceWindow();
     }
 
-    private void OnDisplaySettingsChanged(object? sender, EventArgs e) => Dispatcher.BeginInvoke(PlaceWindow);
+    private void OnDisplaySettingsChanged(object? sender, EventArgs e) => Dispatcher.BeginInvoke(() => PlaceWindow());
 
     // WPF mide en unidades independientes del escalado; Windows coloca en píxeles reales.
-    private void PlaceWindow()
+    // El escalado es el del monitor principal (donde vive el notch), no el de donde esté la ventana
+    // ahora: con monitores de distinto escalado, la primera vez la ventana puede nacer en el otro.
+    private static double Scale => WindowHelper.GetPrimaryMonitorScale();
+
+    private static int Px(double units, double scale) => (int)Math.Round(units * scale);
+
+    /// <param name="animate">True: la pastilla se desliza desde donde estaba en vez de saltar.</param>
+    private void PlaceWindow(bool animate = false)
     {
-        if (_hwnd == 0 || _appBar is null)
+        if (_hwnd == 0 || _appBar is null || _isDragging)
             return;
 
-        // El escalado del monitor principal (donde vive el notch), no el de donde esté la ventana ahora:
-        // con monitores de distinto escalado, la primera vez la ventana puede nacer en el otro.
-        double scale = WindowHelper.GetPrimaryMonitorScale();
+        double scale = Scale;
         var (bounds, workArea) = WindowHelper.GetPrimaryMonitor();
-        PixelRect area = workArea;
+        _workArea = workArea;
+        int windowWidth = Px(Width, scale), windowHeight = Px(Height, scale);
+        bool growsUp = false;
 
-        if (_viewModel.ReserveTopStrip)
+        if (_viewModel.Position is (double fractionX, double fractionY))
         {
-            int stripHeight = (int)Math.Round(CollapsedStripHeight() * scale);
-            area = _appBar.ReserveTop(bounds, stripHeight);
+            // En otro sitio la franja reservada no tiene sentido (no está arriba).
+            _appBar.ReleaseReservation();
+            growsUp = NotchLayout.GrowsUp(fractionY);
+            var (pillWidth, pillHeight) = PillSizePx(expanded: false, scale);
+            var (centerX, centerY) = NotchLayout.PillCenter(workArea, fractionX, fractionY, pillWidth, pillHeight);
+            _home = NotchLayout.WindowForPill(centerX, centerY, windowWidth, windowHeight, pillHeight,
+                EdgeGapPx(growsUp, scale), growsUp);
         }
         else
         {
-            _appBar.ReleaseReservation();
+            PixelRect area = workArea;
+            if (_viewModel.ReserveTopStrip)
+                area = _appBar.ReserveTop(bounds, Px(CollapsedStripHeight(), scale));
+            else
+                _appBar.ReleaseReservation();
+            _home = (area.Left + (area.Width - windowWidth) / 2, area.Top);
         }
 
-        WindowHelper.PlaceTopCenter(_hwnd, area, (int)Math.Round(Width * scale));
+        PixelRect before = WindowHelper.GetWindowBounds(_hwnd);
+        bool grewUp = _growsUp;
+        SetGrowsUp(growsUp);
+        _placed = true;
+        MoveWindow(before, grewUp, _isExpanded ? FitExpanded(_home, scale) : _home, animate);
     }
 
-    // Alto que ocupa la pastilla contraída, contando su separación del borde.
+    // Alto que ocupa la pastilla contraída arriba del todo, contando su separación del borde.
     private double CollapsedStripHeight() =>
-        (double)FindResource(CollapsedSizeKey + ".Height") + ((Thickness)FindResource(MarginKey)).Top;
+        (double)FindResource(CollapsedSizeKey + ".Height") + ((Thickness)FindResource(MarginKeyFor(growsUp: false))).Top;
+
+    private (int Width, int Height) PillSizePx(bool expanded, double scale)
+    {
+        string key = expanded ? "Size.Expanded" : CollapsedSizeKey;
+        return (Px((double)FindResource(key + ".Width"), scale), Px((double)FindResource(key + ".Height"), scale));
+    }
+
+    // Separación entre la pastilla y el borde de la ventana del que cuelga (solo la Cápsula tiene).
+    private int EdgeGapPx(bool growsUp, double scale)
+    {
+        var margin = (Thickness)FindResource(MarginKeyFor(growsUp));
+        return Px(growsUp ? margin.Bottom : margin.Top, scale);
+    }
+
+    // Dónde poner la ventana para que el notch abierto quepa entero en la pantalla.
+    private (int X, int Y) FitExpanded((int X, int Y) window, double scale)
+    {
+        var (width, height) = PillSizePx(expanded: true, scale);
+        PixelRect pill = NotchLayout.PillRect(window.X, window.Y, Px(Width, scale), Px(Height, scale),
+            width, height, EdgeGapPx(_growsUp, scale), _growsUp);
+        var (dx, dy) = NotchLayout.ShiftToFit(_workArea, pill);
+        return (window.X + dx, window.Y + dy);
+    }
+
+    // En la mitad de abajo la pastilla cuelga del borde de abajo de la ventana y crece hacia arriba.
+    private void SetGrowsUp(bool growsUp)
+    {
+        _growsUp = growsUp;
+        var alignment = growsUp ? VerticalAlignment.Bottom : VerticalAlignment.Top;
+        Pill.VerticalAlignment = alignment;
+        ExpandedContent.VerticalAlignment = alignment;
+        Pill.SetResourceReference(MarginProperty, MarginKey);
+        Pill.SetResourceReference(Border.CornerRadiusProperty, _isExpanded ? ExpandedRadiusKey : CollapsedRadiusKey);
+    }
+
+    /// <summary>
+    /// Mueve la ventana. Con <paramref name="animate"/>, la pastilla empieza dibujada donde se veía
+    /// antes (de la ventana vieja con su alineación vieja) y se desliza hasta su sitio nuevo.
+    /// </summary>
+    private void MoveWindow(PixelRect before, bool grewUp, (int X, int Y) target, bool animate)
+    {
+        double scale = Scale;
+        bool moved = before.Left != target.X || before.Top != target.Y;
+        WindowHelper.MoveTo(_hwnd, target.X, target.Y);
+
+        if (!animate || !IsVisible || before.Width == 0)
+        {
+            // Sin animación, la pastilla se dibuja ya en su sitio (si quedaba un deslizamiento, se corta).
+            if (moved)
+            {
+                _pillShift.BeginAnimation(TranslateTransform.XProperty, null);
+                _pillShift.BeginAnimation(TranslateTransform.YProperty, null);
+            }
+            return;
+        }
+
+        var (width, height) = PillSizePx(_isExpanded, scale);
+        int windowWidth = Px(Width, scale), windowHeight = Px(Height, scale);
+        PixelRect from = NotchLayout.PillRect(before.Left, before.Top, windowWidth, windowHeight, width, height,
+            EdgeGapPx(grewUp, scale), grewUp);
+        PixelRect to = NotchLayout.PillRect(target.X, target.Y, windowWidth, windowHeight, width, height,
+            EdgeGapPx(_growsUp, scale), _growsUp);
+        if (from == to)
+            return;
+
+        // Se suma a lo que quede de un deslizamiento anterior (abrir y cerrar muy rápido).
+        var duration = new Duration((TimeSpan)FindResource("Duration.Expand"));
+        var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
+        _pillShift.BeginAnimation(TranslateTransform.XProperty,
+            new DoubleAnimation(_pillShift.X + (from.Left - to.Left) / scale, 0, duration) { EasingFunction = ease });
+        _pillShift.BeginAnimation(TranslateTransform.YProperty,
+            new DoubleAnimation(_pillShift.Y + (from.Top - to.Top) / scale, 0, duration) { EasingFunction = ease });
+    }
+
+    private void MoveWindowTo((int X, int Y) target, bool animate)
+    {
+        if (_hwnd == 0 || !_placed)
+            return;
+        MoveWindow(WindowHelper.GetWindowBounds(_hwnd), _growsUp, target, animate);
+    }
+
+    // --- Arrastrar con el asa ---
+    // La ventana sigue al ratón en vivo (en píxeles físicos, para que no se desfase con el escalado).
+    // Mientras se arrastra no se cierra. Al soltar se guarda dónde quedó.
+
+    private void OnDragHandleDown(object sender, MouseButtonEventArgs e)
+    {
+        if (_hwnd == 0 || sender is not UIElement handle)
+            return;
+        e.Handled = true;
+        _isDragging = true;
+        _collapseTimer.Stop();
+        _attentionTimer.Stop();
+        _pillShift.BeginAnimation(TranslateTransform.XProperty, null);
+        _pillShift.BeginAnimation(TranslateTransform.YProperty, null);
+        _dragCursorStart = WindowHelper.GetCursorPosition();
+        PixelRect bounds = WindowHelper.GetWindowBounds(_hwnd);
+        _dragWindowStart = (bounds.Left, bounds.Top);
+        handle.CaptureMouse();
+    }
+
+    private void OnDragHandleMove(object sender, MouseEventArgs e)
+    {
+        if (!_isDragging)
+            return;
+        var (x, y) = WindowHelper.GetCursorPosition();
+        WindowHelper.MoveTo(_hwnd, _dragWindowStart.X + x - _dragCursorStart.X, _dragWindowStart.Y + y - _dragCursorStart.Y);
+    }
+
+    private void EndDrag()
+    {
+        if (!_isDragging)
+            return;
+        _isDragging = false;
+
+        double scale = Scale;
+        var (_, workArea) = WindowHelper.GetPrimaryMonitor();
+        PixelRect window = WindowHelper.GetWindowBounds(_hwnd);
+        var (width, height) = PillSizePx(expanded: true, scale);
+        PixelRect expanded = NotchLayout.PillRect(window.Left, window.Top, window.Width, window.Height,
+            width, height, EdgeGapPx(_growsUp, scale), _growsUp);
+        var (_, collapsedHeight) = PillSizePx(expanded: false, scale);
+        var (centerX, centerY, _) = NotchLayout.PillCenterAfterDrag(workArea, expanded, collapsedHeight);
+
+        // Guardar la posición recoloca la ventana (OnViewModelChanged → PlaceWindow).
+        var position = NotchLayout.ToFraction(workArea, centerX, centerY);
+        if (_viewModel.Position == position)
+            PlaceWindow(animate: true);
+        else
+            _viewModel.Position = position;
+
+        if (!Pill.IsMouseOver)
+            _collapseTimer.Start();
+    }
 
     // --- Pantalla completa ---
 
-    private void OnFullscreenChanged(bool isFullscreen)
-    {
-        if (isFullscreen)
-        {
-            _collapseTimer.Stop();
-            ApplyCollapsedLook();
-            Hide();
-        }
-        else
-        {
-            Show();
-            PlaceWindow();
-        }
-    }
+    // Al salir de la pantalla completa vuelve a verse, salvo que se hubiera ocultado con ×.
+    private void OnFullscreenChanged(bool isFullscreen) => UpdateShown();
 
     // --- Estilo (claves de los tokens según el estilo elegido) ---
 
     private string CollapsedSizeKey =>
         _viewModel.Style == NotchStyle.Indicator ? "Size.Indicator" : "Size.Collapsed";
 
+    // Creciendo hacia arriba se usan las versiones ".Up" (esquinas y separación al revés).
+    private string Up => _growsUp ? ".Up" : "";
+
     private string CollapsedRadiusKey => _viewModel.Style switch
     {
         NotchStyle.Capsule => "Radius.Capsule.Collapsed",
         NotchStyle.Indicator => "Radius.Indicator",
         _ => "Radius.Notch.Collapsed",
-    };
+    } + Up;
 
     private string ExpandedRadiusKey =>
-        _viewModel.Style == NotchStyle.Capsule ? "Radius.Capsule.Expanded" : "Radius.Notch.Expanded";
+        (_viewModel.Style == NotchStyle.Capsule ? "Radius.Capsule.Expanded" : "Radius.Notch.Expanded") + Up;
 
-    private string MarginKey =>
-        _viewModel.Style == NotchStyle.Capsule ? "Margin.Capsule" : "Margin.Notch";
+    private string MarginKey => MarginKeyFor(_growsUp);
+
+    private string MarginKeyFor(bool growsUp) =>
+        (_viewModel.Style == NotchStyle.Capsule ? "Margin.Capsule" : "Margin.Notch") + (growsUp ? ".Up" : "");
 
     // Con "solo al pasar el ratón", la pastilla contraída es invisible pero sigue detectando el ratón.
     private string CollapsedBackgroundKey =>
@@ -312,11 +520,26 @@ public partial class NotchWindow : Window, IDisposable
         SetExpanded(true);
     }
 
-    private void OnPillMouseLeave(object sender, MouseEventArgs e) => _collapseTimer.Start();
+    private void OnPillMouseLeave(object sender, MouseEventArgs e)
+    {
+        if (!_isDragging)
+            _collapseTimer.Start();
+    }
 
     // Atajo "abrir o cerrar": se queda abierto hasta pulsarlo otra vez, Esc o pasar el ratón y salir.
+    // Si se había ocultado con ×, lo vuelve a mostrar (abierto).
     private void OnToggleRequested()
     {
+        if (_viewModel.IsNotchHidden)
+        {
+            _viewModel.IsNotchHidden = false;
+            if (IsVisible)
+            {
+                _collapseTimer.Stop();
+                SetExpanded(true);
+            }
+            return;
+        }
         if (!IsVisible) // oculto por una app en pantalla completa
             return;
         _collapseTimer.Stop();
@@ -326,6 +549,8 @@ public partial class NotchWindow : Window, IDisposable
     private void SetExpanded(bool expanded)
     {
         // Cerrar (Esc, o el temporizador) termina el modo escritura y devuelve el teclado a donde estaba.
+        if (!expanded && _isDragging)
+            return; // mientras se arrastra no se cierra
         if (!expanded)
             ExitTyping(returnFocus: true);
 
@@ -364,6 +589,10 @@ public partial class NotchWindow : Window, IDisposable
         CollapsedContent.Visibility = !expanded && ShowsCollapsedText ? Visibility.Visible : Visibility.Collapsed;
         UpdateCollapsedPet();
         _content.SetExpanded(expanded);
+
+        // Abierto no debe salirse de la pantalla: la ventana se corre lo necesario y la pastilla se
+        // desliza (sin salto); al cerrar vuelve a su sitio.
+        MoveWindowTo(expanded ? FitExpanded(_home, Scale) : _home, animate: true);
     }
 
     // La mascota sentada a la izquierda del notch cerrado (solo donde también se ve el texto).
@@ -375,7 +604,8 @@ public partial class NotchWindow : Window, IDisposable
         if (!show)
             return;
         double scale = (double)FindResource("Pet.CollapsedScale");
-        CollapsedPet.Source = PetBitmaps.Pet(_viewModel.Pet, Nox.Core.Pets.PetPose.Sit);
+        var pose = _content.Pet.IsHungry ? Nox.Core.Pets.PetPose.Talk : Nox.Core.Pets.PetPose.Sit;
+        CollapsedPet.Source = PetBitmaps.Pet(_viewModel.Pet, pose);
         CollapsedPet.Width = Nox.Core.Pets.PetSprites.Width * scale;
         CollapsedPet.Height = Nox.Core.Pets.PetSprites.Height * scale;
     }
@@ -398,6 +628,8 @@ public partial class NotchWindow : Window, IDisposable
         CollapsedContent.Visibility = ShowsCollapsedText ? Visibility.Visible : Visibility.Collapsed;
         UpdateCollapsedPet();
         _content.SetExpanded(false);
+        if (!_isDragging)
+            MoveWindowTo(_home, animate: false);
     }
 
     public void Dispose()
@@ -406,6 +638,7 @@ public partial class NotchWindow : Window, IDisposable
         _escapeKey.Dispose();
         _hotkeyService.ToggleNotchRequested -= OnToggleRequested;
         _viewModel.PropertyChanged -= OnViewModelChanged;
+        _content.Pet.PropertyChanged -= OnPetChanged;
         SystemEvents.DisplaySettingsChanged -= OnDisplaySettingsChanged;
         _appBar?.Dispose();
         _appBar = null;

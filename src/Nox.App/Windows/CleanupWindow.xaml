@@ -1,0 +1,71 @@
+<Window x:Class="Nox.App.Windows.CleanupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="NOX · Limpiar caché y RAM"
+        Icon="/Assets/nox.ico"
+        Width="{DynamicResource Size.CleanupWindow.Width}"
+        SizeToContent="Height"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource Brush.Background}"
+        Foreground="{DynamicResource Brush.Text}"
+        FontFamily="{DynamicResource Font.Main}"
+        FontSize="{DynamicResource FontSize.Small}">
+    <!-- DataContext: CleanupViewModel -->
+    <StackPanel Margin="{DynamicResource Padding.Window}">
+
+        <!-- Archivos temporales -->
+        <StackPanel Margin="{DynamicResource Space.Section}">
+            <TextBlock Text="Archivos temporales"
+                       FontSize="{DynamicResource FontSize.Title}"
+                       FontWeight="{DynamicResource FontWeight.Title}"
+                       Margin="{DynamicResource Space.Below}" />
+            <Grid Margin="{DynamicResource Space.Below}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Text="Temporales de Windows (%TEMP%):" Foreground="{DynamicResource Brush.TextMuted}" />
+                <TextBlock Grid.Column="1" Text="{Binding TempText}" TextWrapping="Wrap" Margin="{DynamicResource Space.Inline}" />
+                <TextBlock Grid.Row="1" Text="Caché de letras de NOX:" Foreground="{DynamicResource Brush.TextMuted}" Margin="{DynamicResource Space.Above}" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CacheText}" TextWrapping="Wrap" Margin="{DynamicResource Space.Inline}" VerticalAlignment="Bottom" />
+            </Grid>
+            <TextBlock TextWrapping="Wrap"
+                       Foreground="{DynamicResource Brush.TextMuted}"
+                       FontSize="{DynamicResource FontSize.Micro}"
+                       Margin="{DynamicResource Space.Below}"
+                       Text="Solo se borran archivos con más de 24 h de esas dos carpetas. Los que estén en uso se saltan. La Papelera no se toca." />
+            <DockPanel LastChildFill="True">
+                <Button DockPanel.Dock="Left" Style="{StaticResource ChipButton}" Content="Limpiar"
+                        Command="{Binding CleanFilesCommand}" AutomationProperties.Name="Limpiar archivos temporales" />
+                <TextBlock Text="{Binding FilesResult}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="{DynamicResource Space.Inline}" />
+            </DockPanel>
+        </StackPanel>
+
+        <!-- RAM -->
+        <StackPanel Margin="{DynamicResource Space.Section}">
+            <TextBlock Text="Memoria RAM"
+                       FontSize="{DynamicResource FontSize.Title}"
+                       FontWeight="{DynamicResource FontWeight.Title}"
+                       Margin="{DynamicResource Space.Below}" />
+            <TextBlock Text="{Binding RamText}" Margin="{DynamicResource Space.Below}" />
+            <TextBlock TextWrapping="Wrap"
+                       Foreground="{DynamicResource Brush.TextMuted}"
+                       FontSize="{DynamicResource FontSize.Micro}"
+                       Margin="{DynamicResource Space.Below}"
+                       Text="Pide a las apps que devuelvan la memoria que no usan; Windows vuelve a cargar lo que se use, así que es normal que la cifra suba otra vez poco a poco." />
+            <DockPanel LastChildFill="True">
+                <Button DockPanel.Dock="Left" Style="{StaticResource ChipButton}" Content="Liberar RAM"
+                        Command="{Binding FreeRamCommand}" AutomationProperties.Name="Liberar RAM" />
+                <TextBlock Text="{Binding RamResult}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="{DynamicResource Space.Inline}" />
+            </DockPanel>
+        </StackPanel>
+
+        <Button HorizontalAlignment="Right" Style="{StaticResource ChipButton}" Content="Cerrar"
+                Click="OnCloseClick" AutomationProperties.Name="Cerrar" />
+    </StackPanel>
+</Window>

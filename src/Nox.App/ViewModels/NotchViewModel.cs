@@ -39,9 +39,38 @@ public partial class NotchViewModel : ObservableObject
     [ObservableProperty]
     private bool _onlyOnHover;
 
-    /// <summary>Si es true, las ventanas maximizadas empiezan debajo del notch.</summary>
+    /// <summary>Si es true, las ventanas maximizadas empiezan debajo del notch (solo arriba al centro).</summary>
     [ObservableProperty]
     private bool _reserveTopStrip;
+
+    /// <summary>
+    /// Dónde se dejó el notch al arrastrarlo: centro de la pastilla cerrada como fracción del área
+    /// de trabajo. Null = arriba al centro.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasCustomPosition))]
+    [NotifyCanExecuteChangedFor(nameof(ResetPositionCommand))]
+    private (double X, double Y)? _position;
+
+    public bool HasCustomPosition => Position is not null;
+
+    /// <summary>«Volver arriba al centro»: olvida la posición elegida.</summary>
+    [RelayCommand(CanExecute = nameof(HasCustomPosition))]
+    private void ResetPosition() => Position = null;
+
+    /// <summary>
+    /// El notch se ocultó con su botón ×. NOX sigue en la bandeja; vuelve con el atajo de abrir/cerrar
+    /// o con «Mostrar el notch». No se guarda: al abrir NOX se ve otra vez.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ShowNotchCommand))]
+    private bool _isNotchHidden;
+
+    [RelayCommand]
+    private void HideNotch() => IsNotchHidden = true;
+
+    [RelayCommand(CanExecute = nameof(IsNotchHidden))]
+    private void ShowNotch() => IsNotchHidden = false;
 
     /// <summary>Permite buscar letras en lrclib.net (envía título, artista y duración).</summary>
     [ObservableProperty]
@@ -70,18 +99,34 @@ public partial class NotchViewModel : ObservableObject
     [ObservableProperty]
     private bool _petInCollapsed = true;
 
-    /// <summary>Minutos entre avisos de descanso; 0 = nunca.</summary>
+    /// <summary>Minutos entre avisos de descanso; 0 = nunca. El menú marca la opción con EqualsConverter.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsBreak20), nameof(IsBreak40), nameof(IsBreak60), nameof(IsBreakOff))]
+    [NotifyPropertyChangedFor(nameof(IsBreakCustom), nameof(CustomBreakHeader))]
     private int _breakMinutes = 40;
 
-    public bool IsBreak20 => BreakMinutes == 20;
-    public bool IsBreak40 => BreakMinutes == 40;
-    public bool IsBreak60 => BreakMinutes == 60;
-    public bool IsBreakOff => BreakMinutes <= 0;
+    /// <summary>Un intervalo escrito en «Otro…» (no es ninguna opción fija del menú).</summary>
+    public bool IsBreakCustom => BreakIntervals.IsCustom(BreakMinutes);
+
+    public string CustomBreakHeader => IsBreakCustom ? $"Otro… ({BreakMinutes} min)" : "Otro…";
 
     [RelayCommand]
     private void SetBreakMinutes(string minutes) => BreakMinutes = int.Parse(minutes);
+
+    /// <summary>«Otro…»: la ventanita para escribir los minutos la abre App.</summary>
+    public event Action? CustomBreakRequested;
+
+    [RelayCommand]
+    private void ChooseCustomBreak() => CustomBreakRequested?.Invoke();
+
+    /// <summary>Hambre y popós de la mascota (lo lleva PetViewModel; aquí solo para guardarlo).</summary>
+    [ObservableProperty]
+    private PetCareState? _petCare;
+
+    /// <summary>«Limpiar caché y RAM…»: la ventana la abre App.</summary>
+    public event Action? CleanupWindowRequested;
+
+    [RelayCommand]
+    private void OpenCleanup() => CleanupWindowRequested?.Invoke();
 
     /// <summary>"Descansar ahora": la mascota aparece ya (también sirve para verla sin esperar).</summary>
     public event Action? BreakNowRequested;
@@ -135,6 +180,9 @@ public partial class NotchViewModel : ObservableObject
         Style = settings.Style;
         OnlyOnHover = settings.OnlyOnHover;
         ReserveTopStrip = settings.ReserveTopStrip;
+        Position = settings.PositionX is double x && settings.PositionY is double y
+            ? (Math.Clamp(x, 0, 1), Math.Clamp(y, 0, 1))
+            : null;
         LyricsEnabled = settings.LyricsEnabled;
         Theme = settings.Theme;
         NotesFolder = settings.NotesFolder;
@@ -142,7 +190,8 @@ public partial class NotchViewModel : ObservableObject
         Pet = settings.Pet;
         PetToy = settings.PetToy;
         PetInCollapsed = settings.PetInCollapsed;
-        BreakMinutes = settings.BreakMinutes;
+        BreakMinutes = Math.Clamp(settings.BreakMinutes, 0, BreakIntervals.MaxMinutes);
+        PetCare = settings.PetCare;
     }
 
     public AppSettings ToSettings(string? preferredSourceId) => new()
@@ -150,6 +199,8 @@ public partial class NotchViewModel : ObservableObject
         Style = Style,
         OnlyOnHover = OnlyOnHover,
         ReserveTopStrip = ReserveTopStrip,
+        PositionX = Position?.X,
+        PositionY = Position?.Y,
         LyricsEnabled = LyricsEnabled,
         Theme = Theme,
         PreferredSourceId = preferredSourceId,
@@ -159,5 +210,6 @@ public partial class NotchViewModel : ObservableObject
         PetToy = PetToy,
         PetInCollapsed = PetInCollapsed,
         BreakMinutes = BreakMinutes,
+        PetCare = PetCare,
     };
 }

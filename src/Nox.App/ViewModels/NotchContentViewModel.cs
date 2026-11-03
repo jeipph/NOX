@@ -60,10 +60,11 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
         NowPlaying.PropertyChanged += OnPartChanged;
         Focus.PropertyChanged += OnPartChanged;
         Focus.Finished += OnFocusFinished;
+        Pet.HungerStarted += OnPetHungry;
         UpdateCollapsedText();
     }
 
-    /// <summary>Algo importante (fin de la concentración): la ventana abre el notch un momento.</summary>
+    /// <summary>Algo importante (fin de la concentración, la mascota tiene hambre): la ventana abre el notch un momento.</summary>
     public event Action? AttentionRequested;
 
     public NowPlayingViewModel NowPlaying { get; }
@@ -127,6 +128,13 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
         AttentionRequested?.Invoke();
     }
 
+    // La mascota pide comida: se abre el notch en su pestaña.
+    private void OnPetHungry()
+    {
+        ActivePanel = NotchPanel.Pet;
+        AttentionRequested?.Invoke();
+    }
+
     private void OnPartChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(NowPlayingViewModel.ShortTitle) or nameof(NowPlayingViewModel.HasMedia)
@@ -166,5 +174,6 @@ public partial class NotchContentViewModel : ObservableObject, IDisposable
         NowPlaying.PropertyChanged -= OnPartChanged;
         Focus.PropertyChanged -= OnPartChanged;
         Focus.Finished -= OnFocusFinished;
+        Pet.HungerStarted -= OnPetHungry;
     }
 }
