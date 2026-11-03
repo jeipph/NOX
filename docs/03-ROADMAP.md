@@ -144,6 +144,23 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [x] **Aviso de descanso** (`BreakReminder` en Core con 8 pruebas, `BreakService`, `BreakWindow`): cada **40 min** de uso la mascota cruza la parte de abajo de la pantalla, por encima de todo y sin robar el teclado, con «¡Hora de descansar!», **Ya descansé**, **5 min más** o Esc. Si dejas el PC 5 min cuenta como descanso (y cierra el aviso). Con una app en pantalla completa espera. Bandeja → «Recordar descansar»: cada 20/40/60 min, Nunca, o «Descansar ahora».
 - *Verificado por Claude (2026-10-29, `--fake`, donde los minutos son segundos): el aviso aparece a los 40 s, la mascota cruza la pantalla, «5 min más» lo vuelve a mostrar, el notch cerrado muestra al gato. CPU: 1,6 % con el aviso abierto. **La persona lo vio y quedó conforme.** 229 pruebas.*
 
+## M13 — Notch movible, descansos a medida, limpieza y cuidados de la mascota (0.3.0) *(pedido 2026-11-03)*
+*Hecho en una sesión en la nube (Linux): Core, pruebas y la app compilan (`-p:EnableWindowsTargeting=true`), pero **nada de la interfaz se pudo ver ni probar**. Las casillas se marcan cuando la persona lo pruebe en Windows.*
+- [ ] **Notch en cualquier parte:** asa (✥) a la izquierda y × a la derecha de las pestañas. Arrastrar mueve la ventana en vivo y no se cierra mientras tanto; al soltar se guarda `PositionX/PositionY` (fracción del área de trabajo; las cuentas en `NotchLayout`, Core, 19 pruebas).
+- [ ] Con posición propia no se reserva la franja; en la mitad de abajo crece hacia arriba; al abrirse cerca de un borde se corre para no salirse y se desliza sin saltar.
+- [ ] **×** oculta el notch (NOX sigue en la bandeja). Vuelve con Ctrl+Alt+N o bandeja → «Mostrar el notch». Salir de pantalla completa no lo vuelve a mostrar. Bandeja → «Volver arriba al centro».
+- [ ] El aviso de descanso ya no depende de que el notch se vea, solo de la pantalla completa.
+- [ ] **Aviso de descanso:** × en la tarjeta (= «Ya descansé») y se mueve arrastrando la tarjeta (sin salirse de la pantalla).
+- [ ] Intervalo: 15, 20, 30, 40, 45, 60, 90, 120 min, «Otro…» (ventanita, de 5 a 480 min; `BreakIntervals`, 15 pruebas) o «Nunca». El menú marca la opción con `EqualsConverter`.
+- [ ] **Limpiar caché y RAM…** (bandeja): tamaño de `%TEMP%` y de la caché de letras; «Limpiar» borra solo archivos con más de 24 h, salta los que están en uso y dice cuánto liberó (`FolderCleaner`, Core, 19 pruebas; nunca toca la raíz de un disco ni sigue enlaces). RAM en uso de la total y «Liberar RAM» (`EmptyWorkingSet`) con antes y después.
+- [ ] **Mascota que habla:** pose de boca abierta y bocadillo «¡Miau!» / «¡Guau!»; sale a veces sola, al pasar el ratón y al hacer clic. También en el aviso de descanso. Sin sonido (era opcional).
+- [ ] **Pedir comida:** cada 4 h sin comer, «¡Tengo hambre!», boca abierta en el notch cerrado y el notch se abre en la pestaña Mascota. «Dar comida»: aparece un cuenco, va hasta él y come con la cabeza baja (`PetCare`, Core, 12 pruebas; hablar y comer, 19 pruebas).
+- [ ] **Popó cada 5 h** (máximo 3, también si el PC estuvo apagado) hasta pulsar «Limpiar». Con `--fake` las horas son segundos.
+- [x] Pixel art propio nuevo: boca abierta y comiendo (gatos y beagle), cuenco lleno/vacío y popó. Revisado ampliado en PNG en la nube.
+- [x] Versión 0.3.0 (`Nox.App.csproj`, `installer/nox.iss`). 341 pruebas (antes 242).
+
+**Qué probar en Windows** (primero con `dotnet run --project src/Nox.App -- --fake`): arrastrar el notch a las cuatro esquinas y a la mitad de abajo, abrirlo pegado a un borde, soltarlo medio fuera de la pantalla, ×, Ctrl+Alt+N, «Mostrar el notch», «Volver arriba al centro» con la franja reservada marcada, los tres estilos (sobre todo Cápsula e Indicador abajo), escalado 125 %, el aviso de descanso (× y arrastrar), «Otro…», limpiar (con un archivo abierto en `%TEMP%`), liberar RAM, y la mascota: bocadillos, clic, hambre (4 s en `--fake`), «Dar comida», popós y «Limpiar».
+
 ---
 
 ## Decisiones pendientes (la persona usuaria debe elegir)
@@ -153,6 +170,7 @@ Objetivo: poder compilar y ejecutar un programa C# en este PC.
 - [ ] ¿Repositorio privado en GitHub? **Sí** (2026-10-27); falta instalar `gh` y `gh auth login` (pasos de la persona usuaria).
 
 ## Registro de sesiones
+- **2026-11-03 — M13 en la nube (0.3.0).** Notch movible y ocultable con ×, aviso de descanso con × y movible, intervalos 15–120 min y «Otro…», ventana «Limpiar caché y RAM», mascota que maúlla o ladra, pide comida y hace popós. 341 pruebas en Linux; la app WPF compila, pero la interfaz no se pudo ver. Siguiente: probarlo todo en Windows (lista en M13), corregir lo que salga, marcar las casillas y hacer el instalador 0.3.0.
 - **2026-10-29 — NOX 0.2.0.** Instalador `dist/NOX-0.2.0-instalador.exe` (47,5 MB, .NET incluido) e instalado en el PC de la persona (`%LOCALAPPDATA%\Programs\NOX`). La persona decidió no probar el escalado 125/150 %. Incluye todo lo de hoy: keep-awake, atajos, mascota y descansos, mezclador y las correcciones de M11.
 - **2026-10-29 — M11.** Dos monitores probados (100 %); escalado tomado del monitor principal; registro de errores que no cierra NOX; corregido el notch que se escondía con capas transparentes; barra de título oscura. 242 pruebas. Falta: escalado 125/150 % (lo cambia la persona) y el instalador 0.2.0.
 - **2026-10-29 — M6d mezclador.** Volumen y silencio por app y cambio de salida de audio, desde «Ahora suena» → «Mezclador». 235 pruebas. Queda: M11 (monitores/escalados, logs, barra de título oscura en la ventana de atajos) e instalador 0.2.0.

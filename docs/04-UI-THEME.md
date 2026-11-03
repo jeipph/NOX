@@ -44,6 +44,8 @@ Regla: el acento es el mismo blanco/negro del texto (monocromo). Si más adelant
 ## Cómo se cambia el tema (técnica)
 - `Themes/Tokens.Dark.xaml` y `Tokens.Light.xaml` definen **solo colores**, con los mismos nombres de recurso (ej. `Brush.Background`). Medidas, tiempos y tipografía están en `Tokens.Layout.xaml`, que es común a todos los temas.
 - Estilos de la pastilla (M2b): **Notch** (`Size.Collapsed`, `Radius.Notch.*`), **Cápsula** (`Radius.Capsule.*`, `Margin.Capsule` = 8 px desde arriba) e **Indicador** (`Size.Indicator` = 60 × 6 px). En modo "solo al pasar el ratón" el fondo contraído es `Brush.HitArea` (alfa 1/255: invisible pero detecta el ratón).
+- Notch arrastrado a la mitad de abajo (0.3.0): crece hacia arriba y usa las variantes `.Up` (`Radius.Notch.Collapsed.Up` = esquinas redondas arriba, `Margin.Capsule.Up` = 8 px desde abajo…). El asa y el × de la fila de pestañas miden `Size.NotchEdgeButton` (26 px) y van con `Space.TabBarEdge`; las pestañas se separan con `Space.Tab` (3 px) para dejarles sitio.
+- Bocadillo de la mascota: fondo `Brush.Surface`, borde `Brush.Border`, texto `Brush.Text` (`Padding.PetBubble`, `Radius.PetBubble`). El cuenco y los popós son pixel art con su paleta en Core, como las mascotas.
 - Las vistas usan **siempre** `{DynamicResource Brush.Background}` (DynamicResource, no StaticResource, para que cambie en vivo).
 - `ThemeService` reemplaza el diccionario activo en `Application.Current.Resources.MergedDictionaries`.
 - Tema "Sistema": leer `AppsUseLightTheme` del registro y escuchar `SystemEvents.UserPreferenceChanged`.

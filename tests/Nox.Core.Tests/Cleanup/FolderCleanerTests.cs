@@ -150,6 +150,23 @@ public sealed class FolderCleanerTests : IDisposable
         Assert.False(FolderCleaner.IsInside(_root, _root + "-copia" + Path.DirectorySeparatorChar + "a.txt"));
 
     [Fact]
+    public void IsSafeTempFolder_OnlyRealTempFolders()
+    {
+        Assert.True(FolderCleaner.IsSafeTempFolder(Path.GetTempPath())); // la de verdad (Temp en Windows, tmp en Linux)
+        Assert.True(FolderCleaner.IsSafeTempFolder(Path.Combine(_root, "Temp")));
+        Assert.True(FolderCleaner.IsSafeTempFolder(Path.Combine(_root, "tmp") + Path.DirectorySeparatorChar));
+        Assert.False(FolderCleaner.IsSafeTempFolder(Path.GetPathRoot(_root)));
+        Assert.False(FolderCleaner.IsSafeTempFolder(Path.Combine(_root, "Documentos")));
+        Assert.False(FolderCleaner.IsSafeTempFolder(""));
+        Assert.False(FolderCleaner.IsSafeTempFolder(null));
+    }
+
+    [Fact]
+    public void Clean_NeverTouchesADriveRoot() =>
+        Assert.Equal(default, new FolderCleaner(deleteFile: _ => throw new InvalidOperationException("no debía borrar"))
+            .Clean(Path.GetPathRoot(_root)!, Now));
+
+    [Fact]
     public void CleanResults_AddUp() =>
         Assert.Equal(new CleanResult(30, 3, 1), new CleanResult(10, 1, 0) + new CleanResult(20, 2, 1));
 
