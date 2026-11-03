@@ -65,16 +65,38 @@ public static class WindowHelper
         return GetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, out uint dpi, out _) == 0 && dpi > 0 ? dpi / 96.0 : 1.0;
     }
 
-    /// <summary>Coloca la ventana arriba al centro de <paramref name="area"/> y la mantiene encima de todo.</summary>
-    public static void PlaceTopCenter(nint hwnd, PixelRect area, int pixelWidth)
-    {
-        int x = area.Left + (area.Width - pixelWidth) / 2;
-        SetWindowPos(hwnd, HWND_TOPMOST, x, area.Top, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE);
-    }
-
     /// <summary>Coloca y dimensiona la ventana (en píxeles reales) encima de todo, sin activarla.</summary>
     public static void PlaceTopmost(nint hwnd, PixelRect bounds) =>
         SetWindowPos(hwnd, HWND_TOPMOST, bounds.Left, bounds.Top, bounds.Width, bounds.Height, SWP_NOACTIVATE);
+
+    /// <summary>Dónde está el ratón, en píxeles físicos de pantalla.</summary>
+    public static (int X, int Y) GetCursorPosition() =>
+        GetCursorPos(out POINT point) ? (point.X, point.Y) : (0, 0);
+
+    /// <summary>Rectángulo de la ventana en píxeles físicos.</summary>
+    public static PixelRect GetWindowBounds(nint hwnd) =>
+        GetWindowRect(hwnd, out RECT rect) ? ToPixelRect(rect) : default;
+
+    /// <summary>Mueve la ventana (en píxeles físicos) sin cambiar su tamaño, encima de todo y sin activarla.</summary>
+    public static void MoveTo(nint hwnd, int x, int y) =>
+        SetWindowPos(hwnd, HWND_TOPMOST, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE);
+
+    /// <summary>
+    /// Para el WndProc: si la ventana se está arrastrando (<c>WM_MOVING</c>), corrige el destino para
+    /// que no salga de <paramref name="area"/>. Devuelve true si el mensaje era ese.
+    /// </summary>
+    public static unsafe bool KeepMovingInside(int msg, nint lParam, PixelRect area)
+    {
+        if (msg != WM_MOVING || lParam == 0)
+            return false;
+        RECT* rect = (RECT*)lParam;
+        var (dx, dy) = NotchLayout.ShiftToFit(area, ToPixelRect(*rect));
+        rect->Left += dx;
+        rect->Right += dx;
+        rect->Top += dy;
+        rect->Bottom += dy;
+        return true;
+    }
 
     internal static PixelRect ToPixelRect(RECT r) => new(r.Left, r.Top, r.Right, r.Bottom);
 }

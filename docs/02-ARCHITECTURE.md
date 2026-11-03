@@ -55,7 +55,7 @@ Regla de dependencias: `App → Windows → Core` y `App → Core`. **Core nunca
 
 | Qué | Dónde |
 |---|---|
-| Ajustes | `%APPDATA%\NOX\settings.json` |
+| Ajustes (también la posición del notch y el hambre y popós de la mascota) | `%APPDATA%\NOX\settings.json` |
 | Letras en caché | `%LOCALAPPDATA%\NOX\lyrics\<hash>.json` |
 | Portapapeles fijado | `%APPDATA%\NOX\pinned-clips.json` |
 | Notas rápidas | `%USERPROFILE%\Documents\NOX\notes\*.md` |
@@ -67,7 +67,7 @@ Regla de dependencias: `App → Windows → Core` y `App → Core`. **Core nunca
 Se construye como una ventana WPF "flotante":
 - `WindowStyle="None"`, `AllowsTransparency="True"`, `Background="Transparent"`, `ShowInTaskbar="False"`, `Topmost="True"`, `ResizeMode="NoResize"`.
 - Al cargarse, por **P/Invoke** se le añaden los estilos extendidos `WS_EX_TOOLWINDOW` (no aparece en Alt+Tab) y `WS_EX_NOACTIVATE` (no roba el foco al hacer clic). Funciones: `GetWindowLong` / `SetWindowLong` sobre el `HWND` obtenido con `WindowInteropHelper`.
-- **Posición:** centrada horizontalmente en el monitor principal, `Top = 0`. Usar `SystemParameters.PrimaryScreenWidth` (ya en unidades independientes de DPI).
+- **Posición:** por defecto, centrada horizontalmente en el monitor principal, `Top = 0`. Desde 0.3.0 se puede arrastrar a cualquier parte del monitor principal (ver §10).
 - **Expandir/contraer:** `MouseEnter` → anima `Width` y `Height` con `DoubleAnimation` (~220 ms, `CubicEase EaseOut`). `MouseLeave` → espera ~400 ms (para no parpadear) y contrae. Estado en `NotchViewModel.IsExpanded`.
 - **Tamaños:** contraído ~ 220×34 px; expandido ~ 560×200 px (valores en `Tokens.*.xaml`).
 - **Pantalla completa:** la ventana se registra como *AppBar* (`SHAppBarMessage(ABM_NEW)`) **sin reservar espacio**; Windows envía entonces el aviso `ABN_FULLSCREENAPP` al entrar y salir de pantalla completa. Al recibirlo se comprueba que la ventana activa tape nuestro monitor y no sea el escritorio (`FullscreenRules` en Core, con pruebas). Sin temporizadores. (Cambio 2026-10-27: sustituye a `SHQueryUserNotificationState` + `SetWinEventHook`, que obligaba a consultar en cada cambio de ventana.)
@@ -129,6 +129,14 @@ Implementado en `VinylView`: la animación se quita (y el disco queda en su áng
 
 ### 9. Arranque de la app y DI
 `App.xaml.cs`: construir el contenedor de servicios → crear la bandeja → mostrar `NotchWindow`. Un solo proceso: usar un `Mutex` con nombre para evitar abrir dos copias.
+
+### 10. Notch movible, descansos, limpieza y cuidados de la mascota (0.3.0)
+- **Mover el notch:** asa y × en la fila de pestañas (`ExpandedView`). `NotchWindow` captura el ratón y mueve la ventana en vivo con `GetCursorPos` + `SetWindowPos`, en píxeles físicos (`WindowHelper.GetPrimaryMonitorScale`). Mientras se arrastra no se cierra. Al soltar se guarda en `AppSettings.PositionX/PositionY` el **centro de la pastilla cerrada** como fracción del área de trabajo. Las cuentas están en `Nox.Core/Shell/NotchLayout` (con pruebas).
+- **Con posición propia:** no se reserva la franja de arriba; en la mitad de abajo la pastilla cuelga del borde de abajo de la ventana y crece hacia arriba (tokens `.Up`). Al abrirse, si el notch abierto se saldría de la pantalla, la ventana se corre (`NotchLayout.ShiftToFit`) y la pastilla se desliza con un `TranslateTransform` animado para que no salte; al cerrar vuelve a su sitio. Bandeja → «Volver arriba al centro» borra la posición.
+- **Ocultar con ×:** `NotchViewModel.IsNotchHidden` (no se guarda). Vuelve con el atajo de abrir/cerrar o «Mostrar el notch». Salir de pantalla completa no lo vuelve a mostrar. El aviso de descanso depende solo de la pantalla completa (`NotchWindow.IsFullscreenAppActive`), no del ×.
+- **Descansos:** intervalos fijos `BreakIntervals.Presets` (15–120 min) marcados en el menú con `EqualsConverter`; «Otro…» abre `CustomBreakWindow` (5–480 min, validado en Core). El aviso tiene × (= «Ya descansé») y se arrastra por la tarjeta (`DragMove`, sin salirse de la pantalla con `WM_MOVING`).
+- **Limpiar caché y RAM:** `CleanupWindow` + `CleanupViewModel`, todo en segundo plano (`Task.Run`). La lógica de qué borrar es `Nox.Core/Cleanup/FolderCleaner` (con pruebas): solo `%TEMP%` y `%LOCALAPPDATA%\NOX\lyrics`, solo archivos con más de 24 h, sin entrar en enlaces, saltando los que estén en uso o sean de solo lectura y nunca en la raíz de un disco. La RAM es `Nox.Windows/Memory/SystemMemory` (`GlobalMemoryStatusEx`, `OpenProcess` + `K32EmptyWorkingSet`) detrás de `ISystemMemory`.
+- **Mascota:** actividad «hablar» (pose `Talk`, bocadillo «¡Miau!»/«¡Guau!» con `PetSpeech`), al azar en `ChooseNext`, al pasar el ratón y al hacer clic. `PetCare` (Core, pura) lleva hambre (cada 4 h) y popós (cada 5 h, máx. 3), guardados en `AppSettings.PetCare`; `PetViewModel` programa un único `DispatcherTimer` hasta `NextChange` y lo recalcula al volver de la suspensión. Al entrarle hambre, `NotchContentViewModel` abre la pestaña Mascota con `AttentionRequested`. «Dar comida» pone el cuenco (`PetPlayground.PlaceFood`): la mascota va y come con las poses `EatA/EatB`. Con `--fake` las horas son segundos.
 
 ## Flujo de datos (resumen)
 ```

@@ -31,6 +31,10 @@ public sealed class JsonSettingsStoreTests : IDisposable
             ReserveTopStrip = true,
             LyricsEnabled = false,
             PreferredSourceId = "Chrome",
+            PositionX = 0.25,
+            PositionY = 0.8,
+            PetCare = new Nox.Core.Pets.PetCareState(new DateTime(2026, 11, 3, 8, 0, 0, DateTimeKind.Utc),
+                new DateTime(2026, 11, 3, 9, 30, 0, DateTimeKind.Utc), 2),
             Hotkeys = new Nox.Core.Hotkeys.HotkeySettings { Enabled = false, PlayPause = "Ctrl+Alt+P" },
         };
 

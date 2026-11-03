@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using Nox.Core.Pets;
@@ -9,7 +10,8 @@ namespace Nox.App.Windows;
 
 /// <summary>
 /// Aviso de descanso: la mascota corre y juega por la parte de abajo de la pantalla, encima de todo,
-/// con un mensaje. No roba el teclado; se cierra con «Ya descansé», «5 min más» o Esc.
+/// con un mensaje. No roba el teclado; se cierra con «Ya descansé», ×, «5 min más» o Esc.
+/// Se puede mover arrastrando la tarjeta.
 /// </summary>
 public partial class BreakWindow : Window
 {
@@ -17,6 +19,7 @@ public partial class BreakWindow : Window
     private readonly PetToy _toy;
     private readonly EscapeKeyHook _escapeKey = new();
     private nint _hwnd;
+    private PixelRect _workArea;
 
     public BreakWindow(PetKind kind, PetToy toy, string workedFor)
     {
@@ -43,6 +46,8 @@ public partial class BreakWindow : Window
         // Escalado del monitor principal: la ventana puede nacer en el otro monitor y luego pasar a este.
         double screenScale = WindowHelper.GetPrimaryMonitorScale();
         var (_, work) = WindowHelper.GetPrimaryMonitor();
+        _workArea = work;
+        HwndSource.FromHwnd(_hwnd).AddHook(WndProc);
         double scale = (double)FindResource("Pet.BreakScale");
         Width = work.Width / screenScale;
         double stageHeight = PetPlayground.StageHeight * scale;
@@ -56,6 +61,24 @@ public partial class BreakWindow : Window
         Stage.Kind = _kind;
         Stage.Playground = new PetPlayground(stageWidth: Width / scale) { Toy = _toy };
         _escapeKey.Start();
+    }
+
+    // Mientras se arrastra, Windows pregunta adónde va: se corrige para que no se salga de la pantalla.
+    private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
+    {
+        if (WindowHelper.KeepMovingInside(msg, lParam, _workArea))
+        {
+            handled = true;
+            return 1;
+        }
+        return 0;
+    }
+
+    // Arrastrar la tarjeta mueve el aviso (los botones no: ellos se quedan el clic).
+    private void OnCardMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ButtonState == MouseButtonState.Pressed)
+            DragMove();
     }
 
     private void OnDoneClick(object sender, RoutedEventArgs e) => Finish(BreakChoice.Done);

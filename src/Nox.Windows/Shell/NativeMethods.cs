@@ -81,6 +81,15 @@ internal static partial class NativeMethods
     [LibraryImport("user32.dll")]
     public static partial nint MonitorFromPoint(POINT pt, uint dwFlags);
 
+    // --- Arrastrar ventanas ---
+
+    /// <summary>Windows avisa mientras se arrastra una ventana; lParam apunta al RECT de destino (se puede corregir).</summary>
+    public const int WM_MOVING = 0x0216;
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool GetCursorPos(out POINT lpPoint);
+
     [LibraryImport("user32.dll")]
     public static partial nint MonitorFromWindow(nint hwnd, uint dwFlags);
 
@@ -233,4 +242,39 @@ internal static partial class NativeMethods
 
     [LibraryImport("kernel32.dll")]
     public static partial uint SetThreadExecutionState(uint esFlags);
+
+    // --- Memoria RAM (ventana «Limpiar caché y RAM») ---
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MEMORYSTATUSEX
+    {
+        public uint dwLength;
+        public uint dwMemoryLoad;
+        public ulong ullTotalPhys;
+        public ulong ullAvailPhys;
+        public ulong ullTotalPageFile;
+        public ulong ullAvailPageFile;
+        public ulong ullTotalVirtual;
+        public ulong ullAvailVirtual;
+        public ulong ullAvailExtendedVirtual;
+    }
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool GlobalMemoryStatusEx(ref MEMORYSTATUSEX lpBuffer);
+
+    public const uint PROCESS_SET_QUOTA = 0x0100;
+    public const uint PROCESS_QUERY_LIMITED_INFORMATION = 0x1000;
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    public static partial nint OpenProcess(uint dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, uint dwProcessId);
+
+    [LibraryImport("kernel32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool CloseHandle(nint hObject);
+
+    // EmptyWorkingSet de psapi.dll; desde Windows 7 vive en kernel32 con el prefijo K32.
+    [LibraryImport("kernel32.dll", EntryPoint = "K32EmptyWorkingSet")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool EmptyWorkingSet(nint hProcess);
 }

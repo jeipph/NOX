@@ -11,7 +11,8 @@
         ShowInTaskbar="False"
         ShowActivated="False"
         WindowStartupLocation="Manual">
-    <!-- Franja transparente abajo de la pantalla: el ratón la atraviesa salvo en el mensaje y la mascota. -->
+    <!-- Franja transparente abajo de la pantalla: el ratón la atraviesa salvo en el mensaje y la mascota.
+         Arrastrando la tarjeta se mueve la franja entera (arriba o abajo, sin salirse de la pantalla). -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -24,7 +25,11 @@
                 Background="{DynamicResource Brush.Background}"
                 BorderBrush="{DynamicResource Brush.Border}"
                 BorderThickness="1"
-                CornerRadius="{DynamicResource Radius.Capsule.Expanded}">
+                CornerRadius="{DynamicResource Radius.Capsule.Expanded}"
+                Cursor="SizeAll"
+                ToolTip="Arrastra para mover el aviso"
+                MouseLeftButtonDown="OnCardMouseDown">
+            <Grid>
             <StackPanel>
                 <TextBlock Text="¡Hora de descansar!"
                            HorizontalAlignment="Center"
@@ -47,6 +52,17 @@
                             Content="5 min más" Click="OnSnoozeClick" AutomationProperties.Name="Recordar en 5 minutos" />
                 </StackPanel>
             </StackPanel>
+            <!-- × cuenta como «Ya descansé». -->
+            <Button HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Margin="{DynamicResource Margin.BreakCardClose}"
+                    Style="{StaticResource SmallIconButton}"
+                    Foreground="{DynamicResource Brush.TextMuted}"
+                    Content="&#xE711;"
+                    Click="OnDoneClick"
+                    ToolTip="Cerrar (cuenta como «Ya descansé»)"
+                    AutomationProperties.Name="Cerrar el aviso" />
+            </Grid>
         </Border>
 
         <views:PetStage x:Name="Stage" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" ShowGround="False" ReactsToMouse="False" />

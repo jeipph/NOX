@@ -4,6 +4,9 @@
              xmlns:views="clr-namespace:Nox.App.Views"
              xmlns:pets="clr-namespace:Nox.Core.Pets;assembly=Nox.Core">
     <!-- DataContext: PetViewModel. La animación solo corre mientras se ve (PetStage). -->
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="VisibleIfTrue" />
+    </UserControl.Resources>
     <Grid Margin="{DynamicResource Padding.Expanded}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -95,7 +98,24 @@
             </Button>
         </StackPanel>
 
-        <!-- Escenario: pasa el ratón cerca de la mascota y se gira (o se despierta). -->
+        <!-- Escenario: pasa el ratón cerca de la mascota y se gira (o se despierta); clic y maúlla. -->
         <views:PetStage x:Name="Stage" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+
+        <!-- Cuidados, en las esquinas de arriba del escenario (la mascota anda por el suelo, abajo). -->
+        <Grid Grid.Row="1" VerticalAlignment="Top" Margin="{DynamicResource Space.PetActions}">
+            <Button HorizontalAlignment="Left"
+                    Style="{StaticResource ChipButton}"
+                    Content="Dar comida"
+                    Command="{Binding FeedCommand}"
+                    ToolTip="Pon comida en su cuenco"
+                    AutomationProperties.Name="Dar comida a la mascota" />
+            <Button HorizontalAlignment="Right"
+                    Style="{StaticResource ChipButton}"
+                    Content="Limpiar"
+                    Command="{Binding CleanCommand}"
+                    Visibility="{Binding HasPoops, Converter={StaticResource VisibleIfTrue}}"
+                    ToolTip="Recoge los popós del suelo"
+                    AutomationProperties.Name="Limpiar los popós" />
+        </Grid>
     </Grid>
 </UserControl>

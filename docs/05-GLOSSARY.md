@@ -61,4 +61,14 @@ Añade aquí cada término nuevo que aparezca. Explicaciones cortas y sin jerga.
 - **Atajo global (`RegisterHotKey`):** combinación de teclas que Windows reserva para una app y le avisa al pulsarla, aunque estés en otra ventana. Si otra app ya la tiene, Windows la rechaza.
 - **Sprite / pixel art:** dibujo pequeño hecho píxel a píxel (aquí 20×14). Para verlo grande sin que se emborrone se amplía con `NearestNeighbor` (cada píxel se vuelve un cuadrado).
 - **AltGr:** en teclados español y latino equivale a Ctrl+Alt; por eso un atajo Ctrl+Alt+Q taparía la @.
+- **Capturar el ratón (`CaptureMouse`):** pedir que todos los movimientos del ratón lleguen a un elemento aunque el puntero salga de él. Se usa al arrastrar el notch por el asa.
+- **`GetCursorPos` / `SetWindowPos`:** funciones de Windows para leer dónde está el ratón y mover una ventana, las dos en píxeles físicos.
+- **Área de trabajo:** la parte de la pantalla sin la barra de tareas. La posición del notch se guarda como fracción de ella (0 = izquierda/arriba, 1 = derecha/abajo), para que siga en su sitio si cambia la resolución.
+- **`DragMove`:** método de WPF que deja arrastrar una ventana sin barra de título; mientras tanto Windows manda `WM_MOVING`, donde se puede corregir el destino (así el aviso de descanso no se sale de la pantalla).
+- **Convertidor (`IValueConverter`):** pieza de WPF que transforma un valor al enlazarlo. `EqualsConverter` dice si los minutos elegidos son iguales a los de una opción del menú, para marcarla.
+- **Archivos temporales (`%TEMP%`):** carpeta donde las apps dejan archivos de usar y tirar. NOX solo borra los que tienen más de 24 h y salta los que estén en uso.
+- **Enlace o «junction»:** carpeta que en realidad apunta a otra. Al limpiar no se entra en ellas, para no borrar nada fuera de la carpeta elegida.
+- **Memoria de trabajo (working set) y `EmptyWorkingSet`:** la RAM que una app tiene cargada ahora. `EmptyWorkingSet` le pide que la devuelva a Windows; si la vuelve a necesitar, Windows se la carga otra vez (por eso la cifra sube de nuevo poco a poco).
+- **`GlobalMemoryStatusEx`:** función de Windows que dice cuánta RAM hay en total y cuánta está libre.
+- **Temporizador hasta el próximo evento:** en vez de mirar cada poco si la mascota tiene hambre, se calcula cuándo le tocará y se programa un solo temporizador para esa hora (`PetCare.NextChange`).
 - **Keep-awake (`SetThreadExecutionState`):** aviso a Windows de "estoy trabajando, no te suspendas ni apagues la pantalla". No toca las opciones de energía; Windows lo olvida en cuanto el programa se cierra.

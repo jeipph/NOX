@@ -2,7 +2,7 @@
 
 Utilidad de escritorio para **Windows 10 (2004 o posterior) y Windows 11, de 64 bits**: una pastilla ("notch") minimalista en el borde superior de la pantalla que se abre al pasar el ratón. Hecha en **C# / .NET 10 / WPF**. Estilo minimalista en blanco o negro, con tema claro, oscuro o el de Windows.
 
-Versión **0.2.0**.
+Versión **0.3.0**.
 
 ## Qué hace
 
@@ -14,26 +14,30 @@ Versión **0.2.0**.
 | **Portapapeles** | Tus últimas 50 copias de texto; clic para volver a copiar, chinche para fijar. Ignora lo que copian los gestores de contraseñas. |
 | **Notas** | Notas rápidas: Ctrl+Enter guarda un `.md` en `Documentos\NOX\notes`. |
 | **Enfoque** | Temporizador de concentración (15 min – 1 h 30); avisa al terminar. |
-| **Mascota** | Un gato gris de ojos amarillos en pixel art que juega, salta, se lame, se estira y duerme. Arriba eliges la mascota (gato gris, atigrado o beagle) y el juguete (ovillo, pelota o ratón). Pasa el ratón cerca y se gira hacia ti. |
+| **Mascota** | Un gato gris de ojos amarillos en pixel art que juega, salta, se lame, se estira, duerme y a veces maúlla («¡Miau!»; el beagle ladra «¡Guau!»). Arriba eliges la mascota (gato gris, atigrado o beagle) y el juguete (ovillo, pelota o ratón). Pasa el ratón cerca y se gira hacia ti; haz clic encima y te maúlla. **Cuidados:** cada 4 h sin comer pide comida («¡Tengo hambre!» y el notch se abre en su pestaña): pulsa **Dar comida** y va a su cuenco. Cada 5 h hace un popó (como mucho 3) hasta que pulses **Limpiar**. |
 
-**Descansos:** cada 40 minutos de uso, tu mascota cruza la parte de abajo de la pantalla para recordarte descansar («Ya descansé», «5 min más» o Esc). Se cambia en la bandeja → «Recordar descansar» (20, 40, 60 min o nunca). Si dejas el PC 5 minutos, cuenta como descanso.
+**Descansos:** cada 40 minutos de uso, tu mascota cruza la parte de abajo de la pantalla para recordarte descansar («Ya descansé», ×, «5 min más» o Esc). Arrastrando la tarjeta del aviso lo mueves. Se cambia en la bandeja → «Recordar descansar» (15, 20, 30, 40, 45, 60, 90 o 120 min, «Otro…» para escribir de 5 a 480 min, o nunca). Si dejas el PC 5 minutos, cuenta como descanso.
 
 Con el notch cerrado se ve el título de la canción, la cuenta atrás de la concentración o la hora. Se oculta solo cuando una app está en pantalla completa.
 
-**Opciones** (clic derecho en el icono **N** de la bandeja): estilo (Notch, Cápsula, Indicador), visible solo al pasar el ratón, reservar la franja superior, buscar letras en internet, atajos de teclado, mantener el PC despierto, tema, carpeta de notas, iniciar con Windows.
+**Moverlo u ocultarlo:** con el notch abierto, arrastra el asa (✥, a la izquierda de las pestañas) para llevarlo a cualquier parte de la pantalla; se queda donde lo sueltes. En la mitad de abajo crece hacia arriba. El **×** de la derecha lo oculta (NOX sigue en la bandeja): vuelve con Ctrl+Alt+N o con «Mostrar el notch» en la bandeja. «Volver arriba al centro» lo devuelve a su sitio de siempre.
+
+**Opciones** (clic derecho en el icono **N** de la bandeja): mostrar el notch, volver arriba al centro, estilo (Notch, Cápsula, Indicador), visible solo al pasar el ratón, reservar la franja superior (solo arriba al centro), buscar letras en internet, recordar descansar, atajos de teclado, limpiar caché y RAM, mantener el PC despierto, tema, carpeta de notas, iniciar con Windows.
+
+**Limpiar caché y RAM…** abre una ventana que mide los archivos temporales de Windows (`%TEMP%`) y la caché de letras de NOX; **Limpiar** borra solo los que tienen más de 24 h (salta los que estén en uso; no toca la Papelera ni nada más). **Liberar RAM** pide a las apps que devuelvan la memoria que no usan y muestra cuánta había en uso antes y después.
 
 **Atajos de teclado** (funcionan desde cualquier app; se cambian en «Atajos de teclado…»):
 
 | Atajo | Hace |
 |---|---|
-| Ctrl+Alt+N | Abrir o cerrar el notch |
+| Ctrl+Alt+N | Abrir o cerrar el notch (y mostrarlo si lo ocultaste con ×) |
 | Ctrl+Alt+P | Reproducir / pausar |
 | Ctrl+Alt+, / Ctrl+Alt+. | Letra 0,5 s antes / después |
 | Ctrl+Alt+0 | Letra sin desfase |
 
 ## Instalar
 
-1. Ejecuta `NOX-0.2.0-instalador.exe`. No pide permisos de administrador: se instala solo para tu usuario.
+1. Ejecuta `NOX-0.3.0-instalador.exe`. No pide permisos de administrador: se instala solo para tu usuario.
 2. Windows puede avisar "Windows protegió tu PC" porque el instalador no tiene firma digital (es normal en programas personales): pulsa **Más información → Ejecutar de todas formas**.
 3. NOX aparece arriba al centro de la pantalla y en el menú Inicio. Para quitarlo: **Configuración → Aplicaciones → NOX → Desinstalar**.
 

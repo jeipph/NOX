@@ -40,6 +40,25 @@ public enum PetPose
     Stretch,
     LickA,
     LickB,
+
+    /// <summary>Maullando o ladrando: sentada con la boca abierta.</summary>
+    Talk,
+
+    /// <summary>Comiendo con la cabeza baja (dos imágenes que se alternan al masticar).</summary>
+    EatA,
+    EatB,
+}
+
+/// <summary>Bocadillo de texto sobre la cabeza de la mascota.</summary>
+public enum PetBubble
+{
+    None,
+
+    /// <summary>«¡Miau!» o «¡Guau!».</summary>
+    Talk,
+
+    /// <summary>«¡Tengo hambre!».</summary>
+    Hungry,
 }
 
 /// <summary>
@@ -52,6 +71,23 @@ public static class PetSprites
     public const int Width = 20;
     public const int Height = 14;
     public const int ToySize = 5;
+
+    /// <summary>Cuenco de comida: 9 × 4 píxeles.</summary>
+    public const int BowlWidth = 9;
+    public const int BowlHeight = 4;
+
+    /// <summary>Popó: 5 × 4 píxeles.</summary>
+    public const int PoopWidth = 5;
+    public const int PoopHeight = 4;
+
+    /// <summary>
+    /// Centro de la cabeza (en píxeles desde el borde izquierdo del dibujo, mirando a la derecha)
+    /// en las posturas de comer: ahí tiene que quedar el cuenco.
+    /// </summary>
+    public const double EatingHeadCenter = 17;
+
+    // Fila vacía. Va antes que los dibujos que la usan: los campos se crean en el orden en que se escriben.
+    private static readonly string Empty = new('.', Width);
 
     // Gato: o contorno, b pelo, s rayas, l claro (hocico, panza), e ojo, p pupila, n nariz y lengua, z "zzz".
     private static readonly string[] CatHead =
@@ -205,6 +241,39 @@ public static class PetSprites
         "...owo.owo..........",
     ];
 
+    // Para comer: el cuerpo de pie sin la cabeza (se pone abajo, delante) y con la cola arriba.
+    private static readonly string[] CatEatBody =
+    [
+        Empty, Empty, Empty, Empty,
+        ".o..................",
+        "obo.................",
+        ".obooooooooooooooo..",
+        .. CatBody[1..],
+        .. Legs('b', 'l', apart: true),
+    ];
+
+    // La cabeza del gato sola (columnas 12 a 18 del dibujo de pie).
+    private static readonly string[] CatHeadBlock = [.. CatHead.Select(row => row[12..19])];
+
+    // Beagle comiendo: el cuello baja y el hocico llega al suelo (en B mastica y asoma la lengua).
+    private static readonly string[] DogEat =
+    [
+        "..o.................",
+        ".owo................",
+        ".oto................",
+        "..oto...............",
+        "...ot...............",
+        "....oooooooooooo....",
+        "...otkkkkkkkkkkko...",
+        "...ottkkkkkkkkkttoo.",
+        "...otttkkkkkktttrrto",
+        "...ottttttttttttrrto",
+        "...owwwwwwwwwwwrrteo",
+        "...owo.owo...oworwwo",
+        "...owo.owo...owowwwo",
+        "...owo.owo...owoowno",
+    ];
+
     // Una "Z" pequeña y otra grande, para el ir y venir del ronquido.
     private static readonly (int Row, string Text)[] SmallZ =
         [(4, "..................zz"), (5, "...................z"), (6, "..................zz")];
@@ -231,6 +300,28 @@ public static class PetSprites
             [".....", "...o.", ".oggk", "tgggo", ".o.o."],
             [".....", "...o.", ".oggk", "tgggo", "o.o.."],
         ],
+    };
+
+    // Cuenco de 9×4: o contorno, b cuenco, w brillo, f y k croquetas (lleno) o vacío.
+    private static readonly string[] BowlFull = ["..fkfkf..", ".okfkfko.", "obwbbbbbo", ".ooooooo."];
+    private static readonly string[] BowlEmpty = [".........", ".o.....o.", "obwbbbbbo", ".ooooooo."];
+
+    // Popó de 5×4: o contorno, p marrón, h brillo.
+    private static readonly string[] PoopRows = ["..o..", ".oho.", "oppho", "ooooo"];
+
+    /// <summary>El cuenco con comida o ya vacío.</summary>
+    public static IReadOnlyList<string> Bowl(bool full) => full ? BowlFull : BowlEmpty;
+
+    public static IReadOnlyList<string> Poop() => PoopRows;
+
+    public static IReadOnlyDictionary<char, uint> BowlPalette { get; } = new Dictionary<char, uint>
+    {
+        ['o'] = 0xFF1E2F4D, ['b'] = 0xFF4F7FD0, ['w'] = 0xFFB9D2F5, ['f'] = 0xFFB0712E, ['k'] = 0xFF7A4518,
+    };
+
+    public static IReadOnlyDictionary<char, uint> PoopPalette { get; } = new Dictionary<char, uint>
+    {
+        ['o'] = 0xFF3A2410, ['p'] = 0xFF7B4A22, ['h'] = 0xFFA8733F,
     };
 
     public static int ToyFrameCount(PetToy toy) => ToyFrames[toy].Length;
@@ -262,6 +353,11 @@ public static class PetSprites
         // Lamiéndose la pata: ojos cerrados, la pata junto a la boca y la lengua fuera (o dentro).
         PetPose.LickA => Replace(CatSit, (3, "............ooobooo."), (4, "............obbnbbol"),
             (5, "............oblnlbol"), (6, "...........obbbbbbol")),
+        // Maullando: la boca abierta (oscura, con la lengua) bajo la nariz.
+        PetPose.Talk => Replace(CatSit, (4, "............obbnbbo."), (5, "............olpnplo."), (6, "...........obbppbbo.")),
+        // Comiendo: la cabeza baja hasta el cuenco (ojos cerrados) y sube un poco al masticar.
+        PetPose.EatA => Overlay(CatEatBody, 9, 13, CatHeadBlock[0], CatHeadBlock[1], CatHeadBlock[2], "ooobooo", CatHeadBlock[4]),
+        PetPose.EatB => Overlay(CatEatBody, 8, 13, CatHeadBlock),
         _ => Replace(CatSit, (3, "............ooobooo."), (4, "............obbnbbol"),
             (5, "............oblllbol"), (6, "...........obbbbbbol")),
     };
@@ -280,10 +376,13 @@ public static class PetSprites
         PetPose.Stretch => DogStretch,
         // Jadeando contento: ojo cerrado y la lengua fuera (o dentro).
         PetPose.LickA => Replace(DogSit, (2, "...........ottotoo.."), (5, "...........orrwwwwoq")),
+        // Ladrando: la mandíbula de abajo baja y se ve la boca.
+        PetPose.Talk => Replace(DogSit, (4, "...........orrtwwwwo"), (5, "...........orrwwokqo"), (6, "..........okrrwwwoo.")),
+        PetPose.EatA => DogEat,
+        PetPose.EatB => Replace(DogEat, (8, "...otttkkkkkktttrro."), (10, "...owwwwwwwwwwwrrtto"),
+            (11, "...owo.owo...owrrteo"), (13, "...owo.owo...owoqwno")),
         _ => Replace(DogSit, (2, "...........ottotoo..")),
     };
-
-    private static readonly string Empty = new('.', Width);
 
     // Tres filas de patas: separadas (paso) o juntas (el otro paso). "paw" es el color de la punta.
     private static string[] Legs(char fur, char paw, bool apart) => apart
@@ -297,6 +396,21 @@ public static class PetSprites
     // Dando un zarpazo: la pata de delante está levantada (dibujada en el cuerpo).
     private static string[] SwipeLegs(char fur, char paw) =>
         [$"...o{fur}o.o{fur}o...o{fur}o....", $"...o{fur}o.o{fur}o...o{fur}o....", $"...o{paw}o.o{paw}o...o{paw}o...."];
+
+    // Pone el dibujo <layer> encima de <rows> desde la fila <top> y la columna <left> ('.' deja ver lo de abajo).
+    private static string[] Overlay(string[] rows, int top, int left, params string[] layer)
+    {
+        string[] copy = [.. rows];
+        for (int y = 0; y < layer.Length && top + y < copy.Length; y++)
+        {
+            char[] row = copy[top + y].ToCharArray();
+            for (int x = 0; x < layer[y].Length && left + x < row.Length; x++)
+                if (layer[y][x] != '.')
+                    row[left + x] = layer[y][x];
+            copy[top + y] = new string(row);
+        }
+        return copy;
+    }
 
     private static string[] Replace(string[] rows, params (int Row, string Text)[] changes)
     {

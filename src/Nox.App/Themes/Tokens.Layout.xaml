@@ -22,10 +22,25 @@
     <CornerRadius x:Key="Radius.Capsule.Expanded">26</CornerRadius>
     <CornerRadius x:Key="Radius.Indicator">0,0,3,3</CornerRadius>
     <CornerRadius x:Key="Radius.Control">10</CornerRadius>
+    <!-- Notch arrastrado a la mitad de abajo: crece hacia arriba y las esquinas redondas pasan arriba. -->
+    <CornerRadius x:Key="Radius.Notch.Collapsed.Up">18,18,0,0</CornerRadius>
+    <CornerRadius x:Key="Radius.Notch.Expanded.Up">26,26,0,0</CornerRadius>
+    <CornerRadius x:Key="Radius.Capsule.Collapsed.Up">17</CornerRadius>
+    <CornerRadius x:Key="Radius.Capsule.Expanded.Up">26</CornerRadius>
+    <CornerRadius x:Key="Radius.Indicator.Up">3,3,0,0</CornerRadius>
 
     <!-- Separación del borde superior según el estilo. -->
     <Thickness x:Key="Margin.Notch">0</Thickness>
     <Thickness x:Key="Margin.Capsule">0,8,0,0</Thickness>
+    <!-- Lo mismo con el notch en la mitad de abajo (crece hacia arriba): la separación va abajo. -->
+    <Thickness x:Key="Margin.Notch.Up">0</Thickness>
+    <Thickness x:Key="Margin.Capsule.Up">0,0,0,8</Thickness>
+
+    <!-- Fila de pestañas: asa para mover (izquierda) y × para ocultar (derecha), a los lados de las pestañas. -->
+    <sys:Double x:Key="Size.NotchEdgeButton">26</sys:Double>
+    <Thickness x:Key="Space.TabBarEdge">12,0,12,10</Thickness>
+    <!-- Separación entre pestañas (menos que Space.Inline para que quepan el asa y el ×). -->
+    <Thickness x:Key="Space.Tab">3,0,3,0</Thickness>
 
     <!-- Panel "Ahora suena" -->
     <Thickness x:Key="Padding.Expanded">20,16,20,8</Thickness>
@@ -93,11 +108,19 @@
     <Thickness x:Key="Margin.CollapsedPet">10,0,0,0</Thickness>
     <!-- Con la mascota a la izquierda, el texto deja sitio -->
     <Thickness x:Key="Padding.CollapsedWithPet">52,0,16,0</Thickness>
+    <!-- Bocadillo «¡Miau!» sobre la cabeza: relleno, esquinas y hueco hasta la cabeza -->
+    <Thickness x:Key="Padding.PetBubble">7,2,7,3</Thickness>
+    <CornerRadius x:Key="Radius.PetBubble">9</CornerRadius>
+    <sys:Double x:Key="Space.PetBubble">4</sys:Double>
+    <!-- Botones «Dar comida» y «Limpiar» en las esquinas de arriba del escenario -->
+    <Thickness x:Key="Space.PetActions">0,2,0,0</Thickness>
 
     <!-- Aviso de descanso: franja abajo de la pantalla con la mascota (×5) y un mensaje -->
     <sys:Double x:Key="Pet.BreakScale">5</sys:Double>
     <sys:Double x:Key="Size.BreakCard.Width">420</sys:Double>
     <Thickness x:Key="Padding.BreakCard">18,14,18,14</Thickness>
+    <!-- El × de la tarjeta, en su esquina de arriba a la derecha -->
+    <Thickness x:Key="Margin.BreakCardClose">0,-8,-10,0</Thickness>
     <!-- Cada cuánto se mira si toca descansar (no hace falta más precisión) -->
     <sys:TimeSpan x:Key="Break.CheckInterval">00:00:30</sys:TimeSpan>
 
@@ -106,6 +129,16 @@
     <Thickness x:Key="Padding.Window">20</Thickness>
     <GridLength x:Key="Size.HotkeyBox">170</GridLength>
     <Thickness x:Key="Space.Row">0,0,0,10</Thickness>
+
+    <!-- Ventanita «Otro…» (minutos del descanso) -->
+    <sys:Double x:Key="Size.MinutesWindow.Width">320</sys:Double>
+    <sys:Double x:Key="Size.MinutesBox.Width">80</sys:Double>
+
+    <!-- Ventana «Limpiar caché y RAM» -->
+    <sys:Double x:Key="Size.CleanupWindow.Width">460</sys:Double>
+    <Thickness x:Key="Space.Section">0,0,0,18</Thickness>
+    <!-- Tras liberar la RAM se espera un momento antes de medir «después» (Windows tarda en contarlo) -->
+    <sys:TimeSpan x:Key="Cleanup.RamSettleDelay">00:00:01.5</sys:TimeSpan>
 
     <!-- Tiempos -->
     <sys:TimeSpan x:Key="Duration.Expand">00:00:00.22</sys:TimeSpan>

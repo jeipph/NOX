@@ -36,7 +36,10 @@ public sealed class BreakService : IDisposable
 
     private TimeSpan Interval => _fast ? TimeSpan.FromSeconds(_options.BreakMinutes) : TimeSpan.FromMinutes(_options.BreakMinutes);
 
-    /// <param name="canShow">False mientras hay una app en pantalla completa.</param>
+    /// <param name="canShow">
+    /// False mientras hay una app en pantalla completa. No depende de si el notch se ocultó con ×:
+    /// el aviso de descanso sale igual.
+    /// </param>
     public void Start(Func<bool> canShow)
     {
         _canShow = canShow;
