@@ -22,6 +22,14 @@ public sealed record AppSettings
 
     public bool ReserveTopStrip { get; init; }
 
+    /// <summary>
+    /// Dónde se dejó el notch al arrastrarlo: centro de la pastilla cerrada como fracción del área
+    /// de trabajo (0 a 1). Null = arriba al centro, como siempre.
+    /// </summary>
+    public double? PositionX { get; init; }
+
+    public double? PositionY { get; init; }
+
     public bool LyricsEnabled { get; init; } = true;
 
     /// <summary>Reproductor fijado con la etiqueta del notch; null = automático.</summary>
@@ -40,6 +48,9 @@ public sealed record AppSettings
 
     /// <summary>Cada cuántos minutos aparece la mascota para recordar descansar; 0 = nunca.</summary>
     public int BreakMinutes { get; init; } = 40;
+
+    /// <summary>Hambre y popós de la mascota; null = aún no se guardó nada (recién comida y limpia).</summary>
+    public Pets.PetCareState? PetCare { get; init; }
 
     /// <summary>Atajos de teclado globales.</summary>
     public Hotkeys.HotkeySettings Hotkeys { get; init; } = new();
